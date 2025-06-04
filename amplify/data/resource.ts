@@ -1,6 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { testTickle } from '../functions/test/resource';
-
+import { promptGpt } from '../functions/q-openai/resource';
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
 adding a new "isDone" field as a boolean. The authorization rule below
@@ -12,6 +12,14 @@ const schema = a.schema({
     .model({
       content: a.string(),
     }).authorization(allow => [allow.owner()]),
+  promptGpt: a 
+    .query()
+    .arguments({
+      prompt: a.string(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.authenticated()])
+    .handler(a.handler.function(promptGpt)),
   testMonkey: a
     .query()
     .arguments({  name: a.string()  })

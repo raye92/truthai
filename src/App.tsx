@@ -8,26 +8,26 @@ const client = generateClient<Schema>();
 function App() {
   const { user, signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-  // ⬅ NEW: state to hold the testMonkey response
-  const [testMonkeyResult, setTestMonkeyResult] = useState<string>("");
 
+  // State to hold the GPT response
+  const [gptResponse, setGptResponse] = useState<string>("");
   useEffect(() => {
     client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
 
-    client.queries.testMonkey({ name: "testMONKEY" })
+    client.queries.promptGpt({ prompt: "Hello, how are you?" })
       .then((results) => {
-        console.log("Full testMonkey response:", results);
-        console.log("testMonkey data:", results.data);
-        setTestMonkeyResult(results.data ?? "");
+        console.log("Fullzzzz promptGpt response:", results);
+        console.log("promptGpt data:", results.data);
+        setGptResponse(results.data ?? "");
       })
       .catch((err) => {
-        console.error("testMonkey error:", err);
+        console.error("promptGpt error:", err);
         console.error("Error details:", JSON.stringify(err, null, 2));
-        setTestMonkeyResult("Error fetching testMonkey");
+        setGptResponse("Error fetching GPT response");
     });
-    console.log("DONZE")
+    console.log("DONE")
   }, []);
 
   function createTodo() {
@@ -52,15 +52,12 @@ function App() {
       </ul>
 
       <div style={{ marginTop: 24 }}>
-        <strong>testMonkey says:</strong> {testMonkeyResult}
+        <strong>GPT says:</strong> {gptResponse}
       </div>
 
       <div>
         🥳 App successfully hosted. Try creating a new todo.
         <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
       </div>
       <button onClick={signOut}>Sign out</button>
     </main>
