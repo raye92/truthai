@@ -8,11 +8,26 @@ const client = generateClient<Schema>();
 function App() {
   const { user, signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  // ⬅ NEW: state to hold the testMonkey response
+  const [testMonkeyResult, setTestMonkeyResult] = useState<string>("");
 
   useEffect(() => {
     client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
+
+    client.queries.testMonkey({ name: "testMONKEY" })
+      .then((results) => {
+        console.log("Full testMonkey response:", results);
+        console.log("testMonkey data:", results.data);
+        setTestMonkeyResult(results.data ?? "");
+      })
+      .catch((err) => {
+        console.error("testMonkey error:", err);
+        console.error("Error details:", JSON.stringify(err, null, 2));
+        setTestMonkeyResult("Error fetching testMonkey");
+    });
+    console.log("DONZE")
   }, []);
 
   function createTodo() {
@@ -35,6 +50,11 @@ function App() {
           {todo.content}</li>
         ))}
       </ul>
+
+      <div style={{ marginTop: 24 }}>
+        <strong>testMonkey says:</strong> {testMonkeyResult}
+      </div>
+
       <div>
         🥳 App successfully hosted. Try creating a new todo.
         <br />
