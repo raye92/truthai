@@ -7,16 +7,11 @@ const client = generateClient<Schema>();
 
 function App() {
   const { user, signOut } = useAuthenticator();
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
   // State to hold the GPT response
   const [gptResponse, setGptResponse] = useState<string>("");
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-
-    client.queries.promptGpt({ prompt: "Hello, how are you?" })
+    client.queries.promptGpt({ prompt: "Explain a gay person" })
       .then((results) => {
         console.log("Fullzzzz promptGpt response:", results);
         console.log("promptGpt data:", results.data);
@@ -30,33 +25,15 @@ function App() {
     console.log("DONE")
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
-  
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
-  }
-
   return (
     <main>
-      <h1>{user?.signInDetails?.loginId}'s todo</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li 
-          onClick={() => deleteTodo(todo.id)}
-          key={todo.id}>
-          {todo.content}</li>
-        ))}
-      </ul>
+      <h1>{user?.signInDetails?.loginId}'s TruthAI</h1>
 
       <div style={{ marginTop: 24 }}>
         <strong>GPT says:</strong> {gptResponse}
       </div>
 
       <div>
-        🥳 App successfully hosted. Try creating a new todo.
         <br />
       </div>
       <button onClick={signOut}>Sign out</button>
