@@ -16,5 +16,5 @@ export const handler: Schema['promptGpt']['functionHandler'] = async (event, con
         input: prompt
     });
 
-    return "Prompt: " + prompt + " Response: " + response.output_text;
+    return response.output_text;
 };

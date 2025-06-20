@@ -1,44 +1,25 @@
-import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { ChatWindow } from './components/ChatWindow';
+import { ChatInput } from './components/ChatInput';
+import { useChat } from './hooks/useChat';
 
-const client = generateClient<Schema>();
-
-function App() {
+export default function App() {
   const { user, signOut } = useAuthenticator();
-
-  // State to hold the GPT response
-  const [gptResponse, setGptResponse] = useState<string>("");
-  useEffect(() => {
-    client.queries.promptGpt({ prompt: "Explain a gay person" })
-      .then((results) => {
-        console.log("Fullzzzz promptGpt response:", results);
-        console.log("promptGpt data:", results.data);
-        setGptResponse(results.data ?? "");
-      })
-      .catch((err) => {
-        console.error("promptGpt error:", err);
-        console.error("Error details:", JSON.stringify(err, null, 2));
-        setGptResponse("Error fetching GPT response");
-    });
-    console.log("DONE")
-  }, []);
+  const { messages, isLoading, sendMessage } = useChat();
 
   return (
-    <main>
-      <h1>{user?.signInDetails?.loginId}'s TruthAI</h1>
+    <main style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
+      <h1>{user?.signInDetails?.loginId}'s TruthAI Chat</h1>
 
-      <div style={{ marginTop: 24 }}>
-        <strong>GPT says:</strong> {gptResponse}
-      </div>
+      <ChatWindow messages={messages} isLoading={isLoading} />
+      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
 
-      <div>
-        <br />
-      </div>
-      <button onClick={signOut}>Sign out</button>
+      <button 
+        onClick={signOut} 
+        style={{ marginTop: 24 }}
+      >
+        Sign out
+      </button>
     </main>
   );
 }
-
-export default App;
