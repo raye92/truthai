@@ -5,14 +5,17 @@ body {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   height: 100vh;
   width: 100vw;
-  justify-content: center;
-  align-items: center;
 }
 
 main {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  width: 220%;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 10;
+  align-items: center;
 }
 
 button {

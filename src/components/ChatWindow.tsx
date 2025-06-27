@@ -10,7 +10,8 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
   return (
     <section style={{ 
       marginBottom: 16, 
-      minHeight: 300, 
+      minHeight: 400, 
+      width: '100%',
       border: '1px solid #ccc', 
       borderRadius: 8, 
       padding: 12, 
