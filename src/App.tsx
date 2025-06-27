@@ -2,6 +2,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { ChatWindow } from './components/ChatWindow';
 import { ChatInput } from './components/ChatInput';
 import { useChat } from './hooks/useChat';
+import { Ticker } from './components/Ticker';
 
 export default function App() {
   const { user, signOut } = useAuthenticator();
@@ -13,6 +14,8 @@ export default function App() {
 
       <ChatWindow messages={messages} isLoading={isLoading} />
       <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
+
+      <Ticker text="Welcome to TruthAI! This is a ticker example using framer-motion." />
 
       <button 
         onClick={signOut} 
