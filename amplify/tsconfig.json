@@ -12,6 +12,8 @@
       "$amplify/*": [
         "../.amplify/generated/*"
       ]
-    }
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   }
 }
