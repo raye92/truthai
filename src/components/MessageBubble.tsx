@@ -1,4 +1,5 @@
-import { Message } from '../hooks/useChat';
+import { Message } from "../hooks/useChat";
+import "./MessageBubble.css";
 
 interface MessageBubbleProps {
   message: Message;
@@ -6,17 +7,8 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   return (
-    <div style={{ marginBottom: 12, textAlign: message.role === 'user' ? 'right' : 'left' }}>
-      <span
-        style={{
-          display: 'inline-block',
-          padding: '8px 12px',
-          borderRadius: 16,
-          background: message.role === 'user' ? '#DCF8C6' : '#F1F0F0',
-        }}
-      >
-        {message.content}
-      </span>
+    <div className={`message-container ${message.role}`}>
+      <div className="message-bubble">{message.content}</div>
     </div>
   );
-} 
+}
