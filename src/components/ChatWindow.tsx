@@ -1,5 +1,6 @@
-import { Message } from '../hooks/useChat';
-import { MessageBubble } from './MessageBubble';
+import { Message } from "../hooks/useChat";
+import { MessageBubble } from "./MessageBubble";
+import "./ChatWindow.css";
 
 interface ChatWindowProps {
   messages: Message[];
@@ -8,19 +9,20 @@ interface ChatWindowProps {
 
 export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
   return (
-    <section style={{ 
-      marginBottom: 16, 
-      minHeight: 400, 
-      width: '100%',
-      border: '1px solid #ccc', 
-      borderRadius: 8, 
-      padding: 12, 
-      overflowY: 'auto' 
-    }}>
+    <div className="chat-window">
+      {messages.length === 0 && (
+        <div className="empty-state">
+          <p>Start a conversation...</p>
+        </div>
+      )}
       {messages.map((message, idx) => (
         <MessageBubble key={idx} message={message} />
       ))}
-      {isLoading && <div>Loading...</div>}
-    </section>
+      {isLoading && (
+        <div className="loading-indicator">
+          <span>Thinking...</span>
+        </div>
+      )}
+    </div>
   );
-} 
+}
