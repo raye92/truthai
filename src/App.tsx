@@ -22,9 +22,6 @@ export default function App() {
 
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
-          <div className="logo-container">
-            
-          </div>
           <div className="app-title">
             <h1>CurateAI</h1>
             <p>Multi-LLM Aggregator</p>
