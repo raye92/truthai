@@ -37,14 +37,14 @@ export default function App() {
         <div className="sidebar-header">
           <div className="logo-container">
             <svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 1024 1024"
-  width="24"
-  height="24"
-  preserveAspectRatio="xMidYMid meet"
->
-  <path d="M451 163.1c-28.4 3.6-59.1 16-82.2 33.1-45.2 33.5-69.4 90.3..." />
-</svg>
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1024 1024"
+              width="24"
+              height="24"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path d="M451 163.1c-28.4 3.6-59.1 16-82.2 33.1-45.2 33.5-69.4 90.3..." />
+            </svg>
 
           </div>
           <div className="app-title">
