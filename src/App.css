@@ -128,16 +128,27 @@
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  width: 48px;
+  height: 48px;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.app-title {
+  text-align: center;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.app-title h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.025em;
+}
+
+.app-title p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-weight: 400;
 }
 
 .chat-input-container {

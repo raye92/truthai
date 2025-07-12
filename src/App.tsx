@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { ChatInput } from "./components/ChatInput";
@@ -58,6 +59,6 @@ export default function App() {
           <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
         </div>
       </main>
-    </>
+    </div>
   );
 }
