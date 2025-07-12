@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { ChatInput } from "./components/ChatInput";

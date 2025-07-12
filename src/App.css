@@ -124,31 +124,35 @@
   flex: 1;
   overflow-y: auto;
   padding: 2rem;
+  background: white;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  font-style: italic;
   text-align: center;
 }
 
-.logo {
-  width: 48px;
-  height: 48px;
-}
-
-.app-title {
-  text-align: center;
-}
-
-.app-title h1 {
+.empty-state p {
   margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: white;
-  letter-spacing: -0.025em;
+  font-size: 1.125rem;
+  max-width: 400px;
 }
 
-.app-title p {
-  margin: 0.25rem 0 0 0;
-  font-size: 0.875rem;
-  color: #9ca3af;
-  font-weight: 400;
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 1rem 0;
+}
+
+.loading-indicator span {
+  color: #6b7280;
+  font-style: italic;
 }
 
 .chat-input-container {
@@ -162,6 +166,10 @@
   .sidebar {
     width: 240px;
     padding: 1.5rem 1rem;
+  }
+
+  .sidebar-header {
+    margin-top: 3rem;
   }
 
   .app-title h1 {
