@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import { SignOutButton } from "./auth";
 import { ChatInput } from "./components/ChatInput";
 import { MessageBubble } from "./components/MessageBubble";
 import { useChat } from "./hooks/useChat";
 import "./App.css";
 
 export default function App() {
-  const { user, signOut } = useAuthenticator();
+  const { user } = useAuthenticator();
   const { messages, isLoading, sendMessage } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -29,9 +30,7 @@ export default function App() {
         </div>
 
         <div className="sidebar-footer">
-          <button onClick={signOut} className="sign-out-btn">
-            Sign out
-          </button>
+          <SignOutButton className="sign-out-btn" />
         </div>
       </aside>
 

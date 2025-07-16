@@ -15,7 +15,8 @@
     "motion": "^12.19.1",
     "openai": "^5.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.60.0"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.5.0",
