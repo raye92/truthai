@@ -1,7 +1,7 @@
 /* Auth Components Styles */
 
 .auth-container {
-  min-height: 100vh;
+  min-height: 656px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +34,7 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin: -200px auto 0;
 }
 
 .view-header {
