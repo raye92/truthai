@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Controller, ControllerProps, FieldValues, Control } from 'react-hook-form';
+import { Logo } from '../assets/Logo';
 
 const styles = {
   viewHeader: { marginBottom: 16 },
@@ -189,6 +190,19 @@ export function Container({ children, className, ...props }: ContainerProps) {
   return (
     <div {...props} className={`auth-container ${className || ''}`}>
       {children}
+    </div>
+  );
+}
+
+export interface LogoHeaderProps {
+  title?: string;
+}
+
+export function LogoHeader({ title = 'CurateAI' }: LogoHeaderProps) {
+  return (
+    <div className="auth-logo-header">
+      <Logo width={40} height={40} fill="white" />
+      <h2 className="auth-logo-title">{title}</h2>
     </div>
   );
 }

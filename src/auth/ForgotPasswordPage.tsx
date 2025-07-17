@@ -10,7 +10,8 @@ import {
   SubmitButton,
   LinksContainer,
   LinkButton,
-  ErrorMessage
+  ErrorMessage,
+  LogoHeader
 } from './components';
 import './auth.css';
 
@@ -56,6 +57,7 @@ export function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps) {
 
   return (
     <Container>
+      <LogoHeader />
       <ViewContainer>
         <ViewHeader>Reset Password</ViewHeader>
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '24px' }}>

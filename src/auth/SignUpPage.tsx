@@ -10,7 +10,8 @@ import {
   SubmitButton,
   LinksContainer,
   LinkButton,
-  ErrorMessage
+  ErrorMessage,
+  LogoHeader
 } from './components';
 import './auth.css';
 
@@ -61,6 +62,7 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
 
   return (
     <Container>
+      <LogoHeader />
       <ViewContainer>
         <ViewHeader>Create Account</ViewHeader>
         

@@ -10,7 +10,8 @@ import {
   SubmitButton,
   LinksContainer,
   LinkButton,
-  ErrorMessage
+  ErrorMessage,
+  LogoHeader
 } from './components';
 import './auth.css';
 
@@ -85,6 +86,7 @@ export function ConfirmEmailPage({ onNavigate, email: initialEmail }: ConfirmEma
 
   return (
     <Container>
+      <LogoHeader />
       <ViewContainer>
         <ViewHeader>Confirm Your Email</ViewHeader>
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '24px' }}>

@@ -10,7 +10,8 @@ import {
   SubmitButton,
   LinksContainer,
   LinkButton,
-  ErrorMessage
+  ErrorMessage,
+  LogoHeader
 } from './components';
 import './auth.css';
 
@@ -51,6 +52,7 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
 
   return (
     <Container>
+      <LogoHeader />
       <ViewContainer>
         <ViewHeader>Sign In</ViewHeader>
         

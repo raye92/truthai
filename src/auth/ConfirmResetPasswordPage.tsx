@@ -10,7 +10,8 @@ import {
   SubmitButton,
   LinksContainer,
   LinkButton,
-  ErrorMessage
+  ErrorMessage,
+  LogoHeader
 } from './components';
 import './auth.css';
 
@@ -68,6 +69,7 @@ export function ConfirmResetPasswordPage({ onNavigate, email: initialEmail }: Co
 
   return (
     <Container>
+      <LogoHeader />
       <ViewContainer>
         <ViewHeader>Set New Password</ViewHeader>
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '24px' }}>
