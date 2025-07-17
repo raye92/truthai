@@ -1,15 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { ChatInput } from "./components/ChatInput";
 import { MessageBubble } from "./components/MessageBubble";
+import { SignInModal } from "./components/SignInModal";
 import { useChat } from "./hooks/useChat";
 import { Logo } from "./assets/Logo";
 import "./App.css";
 
 export default function App() {
-  const { user, signOut } = useAuthenticator();
+  const { user, signOut, authStatus } = useAuthenticator();
   const { messages, isLoading, sendMessage } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const isAuthenticated = authStatus === 'authenticated';
 
   return (
     <div className="app-container">
@@ -21,6 +33,16 @@ export default function App() {
         <Logo width={80} height={80} fill="white" />
       </button>
 
+      {/* Sign In Button for unauthenticated users */}
+      {!isAuthenticated && (
+        <button
+          className="sign-in-button"
+          onClick={() => setSignInModalOpen(true)}
+        >
+          Sign In
+        </button>
+      )}
+
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <div className="app-title">
@@ -30,9 +52,21 @@ export default function App() {
         </div>
 
         <div className="sidebar-footer">
-          <button onClick={signOut} className="sign-out-btn">
-            Sign out
-          </button>
+          {isAuthenticated ? (
+            <div className="user-info">
+              <p className="welcome-text">Welcome, {user?.signInDetails?.loginId || 'User'}!</p>
+              <button onClick={handleSignOut} className="sign-out-btn">
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setSignInModalOpen(true)} 
+              className="sign-in-btn"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </aside>
 
@@ -60,6 +94,12 @@ export default function App() {
           <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
         </div>
       </main>
+
+      {/* Sign In Modal */}
+      <SignInModal 
+        isOpen={signInModalOpen} 
+        onClose={() => setSignInModalOpen(false)} 
+      />
     </div>
   );
 }

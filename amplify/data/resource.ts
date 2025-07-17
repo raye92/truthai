@@ -14,13 +14,13 @@ const schema = a.schema({
       prompt: a.string(),
     })
     .returns(a.string())
-    .authorization(allow => [allow.authenticated()])
+    .authorization(allow => [allow.publicApiKey()])
     .handler(a.handler.function(promptGpt)),
   testMonkey: a
     .query()
     .arguments({  name: a.string()  })
     .returns(a.string())
-    .authorization(allow => [allow.authenticated()])
+    .authorization(allow => [allow.publicApiKey()])
     .handler(a.handler.function(testTickle))
 });
 
@@ -29,12 +29,11 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'userPool',
-    // defaultAuthorizationMode: "apiKey",
-    // API Key is used for a.allow.public() rules
-    // apiKeyAuthorizationMode: {
-    //   expiresInDays: 30,
-    // },
+    defaultAuthorizationMode: 'apiKey',
+    apiKeyAuthorizationMode: {
+      expiresInDays: 30,
+    },
+    
   },
 });
 
