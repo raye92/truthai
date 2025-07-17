@@ -7,7 +7,6 @@ import React from 'react';
 import { Controller, ControllerProps, FieldValues, Control } from 'react-hook-form';
 
 const styles = {
-  signOutButton: { marginVertical: 32, marginHorizontal: 16 },
   viewHeader: { marginBottom: 16 },
   viewDivider: { marginVertical: 16 },
   linksContainer: {

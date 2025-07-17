@@ -52,7 +52,7 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
   return (
     <Container>
       <ViewContainer>
-        <ViewHeader>Welcome Back</ViewHeader>
+        <ViewHeader>Sign In</ViewHeader>
         
         <form onSubmit={handleSubmit(onSubmit)}>
           <ViewSection>

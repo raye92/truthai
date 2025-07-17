@@ -9,7 +9,7 @@ This directory contains a modular custom authentication system built with AWS Am
 - **Email Confirmation**: Verify email address with confirmation code
 - **Forgot Password**: Request password reset via email
 - **Confirm Reset Password**: Set new password with reset code
-- **Sign Out**: Secure sign out functionality
+- **Sign Out**: Secure sign out functionality (handled by the main app)
 
 ## Components
 
@@ -32,7 +32,6 @@ This directory contains a modular custom authentication system built with AWS Am
 - `ConfirmEmailPage`: Email verification
 - `ForgotPasswordPage`: Password reset request
 - `ConfirmResetPasswordPage`: Password reset confirmation
-- `SignOutButton`: Reusable sign out component
 
 ### Router
 - `CustomAuthenticator`: Main router that manages navigation between auth pages
@@ -42,18 +41,8 @@ This directory contains a modular custom authentication system built with AWS Am
 ### Basic Setup
 The authentication system is already integrated into `main.tsx`. The `CustomAuthenticator` component automatically handles routing between different auth states.
 
-### Using the SignOut Button
-```tsx
-import { SignOutButton } from './auth';
-
-// Basic usage
-<SignOutButton />
-
-// With custom styling
-<SignOutButton className="my-custom-class" style={{ margin: '10px' }}>
-  Log Out
-</SignOutButton>
-```
+### Sign Out Functionality
+Sign out is handled by the main application using the `useAuthenticator` hook from AWS Amplify UI React. The sign out button in the main app uses the `signOut` function directly.
 
 ### Navigation Flow
 1. User starts at Sign In page

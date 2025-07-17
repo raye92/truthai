@@ -124,11 +124,14 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
         <ErrorMessage>{error}</ErrorMessage>
 
         <LinksContainer>
+          <span style={{ color: '#4a5568', fontSize: '14px' }}>
+            Already have an account?{' '}
+          </span>
           <LinkButton
             type="button"
             onClick={() => onNavigate('signIn')}
           >
-            Already have an account? Sign In
+            Sign In
           </LinkButton>
         </LinksContainer>
       </ViewContainer>
