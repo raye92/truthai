@@ -153,6 +153,26 @@
 .loading-indicator span {
   color: #6b7280;
   font-style: italic;
+  margin-left: 10px;
+}
+
+.loading-logo {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
 }
 
 .chat-input-container {
