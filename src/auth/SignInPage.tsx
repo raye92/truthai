@@ -1,6 +1,6 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { signIn } from 'aws-amplify/auth';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { signIn } from "aws-amplify/auth";
 import {
   Container,
   ViewContainer,
@@ -11,9 +11,11 @@ import {
   LinksContainer,
   LinkButton,
   ErrorMessage,
-  LogoHeader
-} from './components';
-import './auth.css';
+  LogoHeader,
+  OAuthSection,
+  ViewDivider,
+} from "./components";
+import "./auth.css";
 
 interface SignInFormData {
   email: string;
@@ -26,25 +28,25 @@ interface SignInPageProps {
 
 export function SignInPage({ onNavigate }: SignInPageProps) {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string>('');
+  const [error, setError] = React.useState<string>("");
 
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<SignInFormData>();
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       await signIn({
         username: data.email,
-        password: data.password
+        password: data.password,
       });
     } catch (err: any) {
-      setError(err.message || 'An error occurred during sign in');
+      setError(err.message || "An error occurred during sign in");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +57,7 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Sign In</ViewHeader>
-        
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <ViewSection>
             <TextField
@@ -65,11 +67,11 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
               label="Email"
               placeholder="Enter your email"
               rules={{
-                required: 'Email is required',
+                required: "Email is required",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
-                }
+                  message: "Invalid email address",
+                },
               }}
               error={errors.email?.message}
             />
@@ -81,11 +83,11 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
               label="Password"
               placeholder="Enter your password"
               rules={{
-                required: 'Password is required',
+                required: "Password is required",
                 minLength: {
                   value: 8,
-                  message: 'Password must be at least 8 characters'
-                }
+                  message: "Password must be at least 8 characters",
+                },
               }}
               error={errors.password?.message}
             />
@@ -101,14 +103,11 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
         <LinksContainer>
           <LinkButton
             type="button"
-            onClick={() => onNavigate('forgotPassword')}
+            onClick={() => onNavigate("forgotPassword")}
           >
             Forgot Password?
           </LinkButton>
-          <LinkButton
-            type="button"
-            onClick={() => onNavigate('signUp')}
-          >
+          <LinkButton type="button" onClick={() => onNavigate("signUp")}>
             Create Account
           </LinkButton>
         </LinksContainer>
