@@ -76,7 +76,7 @@ export function ConfirmResetPasswordPage({
   };
 
   return (
-    <Container>
+    <Container className="confirm-reset-password-page">
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Set New Password</ViewHeader>

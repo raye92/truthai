@@ -79,7 +79,7 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
   };
 
   return (
-    <Container>
+    <Container className="signin-page">
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Sign In</ViewHeader>

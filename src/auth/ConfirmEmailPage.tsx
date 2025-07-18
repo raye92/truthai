@@ -89,7 +89,7 @@ export function ConfirmEmailPage({
   };
 
   return (
-    <Container>
+    <Container className="confirm-email-page">
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Confirm Your Email</ViewHeader>
