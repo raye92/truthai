@@ -29,6 +29,7 @@ interface SignUpPageProps {
 
 export function SignUpPage({ onNavigate }: SignUpPageProps) {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [oauthLoading, setOauthLoading] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string>("");
 
   const {
