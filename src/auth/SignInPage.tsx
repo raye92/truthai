@@ -79,6 +79,13 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
       <ViewContainer>
         <ViewHeader>Sign In</ViewHeader>
 
+        <OAuthSection
+          onOAuthSignIn={handleOAuthSignIn}
+          loading={oauthLoading}
+        />
+
+        <ViewDivider />
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <ViewSection>
             <TextField
