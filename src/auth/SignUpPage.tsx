@@ -90,7 +90,7 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
   };
 
   return (
-    <Container className="signup-page">
+    <Container>
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Create Account</ViewHeader>

@@ -1,7 +1,6 @@
 /* Auth Components Styles */
 
 .auth-container {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,27 +33,8 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
-}
-
-/* Specific margins for different auth pages */
-.signin-page .view-container {
-  margin-top: 0;
-}
-
-.signup-page .view-container {
   margin-top: 50px;
-}
-
-.forgot-password-page .view-container {
-  margin-top: -250px;
-}
-
-.confirm-reset-password-page .view-container {
-  margin-top: 50px;
-}
-
-.confirm-email-page .view-container {
-  margin-top: -150px;
+  margin-bottom: 25px;
 }
 
 .view-header {
