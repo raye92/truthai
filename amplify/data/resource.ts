@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { testTickle } from '../functions/test/resource';
 import { promptGpt } from '../functions/q-openai/resource';
+import { postConfirmation } from "../auth/post-confirmation/resource";
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
 adding a new "isDone" field as a boolean. The authorization rule below
@@ -8,6 +9,58 @@ specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
+  User: a.model({
+    id: a.id().required(),
+    username: a.string().required().default("User"),
+    email: a.string().required(),
+    profilePicture: a.string(),
+    preferences: a.json(),
+    apiUsage: a.integer().default(0),
+    lastActive: a.datetime(),
+    role: a.string().required().default('USER'),
+    isNewUser: a.boolean().default(false),
+    conversations: a.hasMany('Conversation', 'userId')
+  }).authorization(
+    allow => [
+      allow.owner(),
+      allow.authenticated().to(['read']),
+      allow.authenticated().to(['create'])
+    ]
+  ),
+  
+  Conversation: a.model({
+    id: a.id().required(),
+    title: a.string().required(),
+    userId: a.string().required(),
+    user: a.belongsTo('User', 'userId'),
+    messages: a.hasMany('Message', 'conversationId'),
+    createdAt: a.datetime().required(),
+    updatedAt: a.datetime(),
+    isArchived: a.boolean().default(false),
+    metadata: a.json()
+  }).authorization(
+    allow => [
+      allow.owner(),
+      allow.authenticated().to(['read'])
+    ]
+  ),
+  
+  Message: a.model({
+    id: a.id().required(),
+    content: a.string().required(),
+    conversationId: a.string().required(),
+    conversation: a.belongsTo('Conversation', 'conversationId'),
+    role: a.string().required(),
+    createdAt: a.datetime().required(),
+    tokens: a.integer(),
+    metadata: a.json()
+  }).authorization(
+    allow => [
+      allow.owner(),
+      allow.authenticated().to(['read'])
+    ]
+  ),
+  
   promptGpt: a 
     .query()
     .arguments({
