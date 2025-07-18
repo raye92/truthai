@@ -35,7 +35,12 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignInFormData>();
+  } = useForm<SignInFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
