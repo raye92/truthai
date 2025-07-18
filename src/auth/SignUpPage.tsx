@@ -89,6 +89,13 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
       <ViewContainer>
         <ViewHeader>Create Account</ViewHeader>
 
+        <OAuthSection
+          onOAuthSignIn={handleOAuthSignIn}
+          loading={oauthLoading}
+        />
+
+        <ViewDivider />
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <ViewSection>
             <TextField<SignUpFormData>
