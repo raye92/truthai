@@ -37,7 +37,13 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<SignUpFormData>();
+  } = useForm<SignUpFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
   const password = watch("password");
 
