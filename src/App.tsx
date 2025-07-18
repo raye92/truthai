@@ -17,11 +17,11 @@ export default function App() {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
-  const isAuthenticated = authStatus === 'authenticated';
+  const isAuthenticated = authStatus === "authenticated";
 
   return (
     <div className="app-container">
@@ -54,14 +54,16 @@ export default function App() {
         <div className="sidebar-footer">
           {isAuthenticated ? (
             <div className="user-info">
-              <p className="welcome-text">Welcome, {user?.signInDetails?.loginId || 'User'}!</p>
+              <p className="welcome-text">
+                Welcome, {user?.signInDetails?.loginId || "User"}!
+              </p>
               <button onClick={handleSignOut} className="sign-out-btn">
                 Sign out
               </button>
             </div>
           ) : (
-            <button 
-              onClick={() => setSignInModalOpen(true)} 
+            <button
+              onClick={() => setSignInModalOpen(true)}
               className="sign-in-btn"
             >
               Sign In
@@ -74,6 +76,7 @@ export default function App() {
         <div className="messages-container">
           {messages.length === 0 && (
             <div className="empty-state">
+              <h1 className="auth-logo-title">CurateAI</h1>
               <p>
                 Ask a question and get curated answers from multiple AI models
               </p>
@@ -84,7 +87,12 @@ export default function App() {
           ))}
           {isLoading && (
             <div className="loading-indicator">
-              <Logo width={24} height={24} fill="#000000ff" className="loading-logo" />
+              <Logo
+                width={24}
+                height={24}
+                fill="#000000ff"
+                className="loading-logo"
+              />
               <span>Aggregating responses from multiple LLMs...</span>
             </div>
           )}
@@ -96,9 +104,9 @@ export default function App() {
       </main>
 
       {/* Sign In Modal */}
-      <SignInModal 
-        isOpen={signInModalOpen} 
-        onClose={() => setSignInModalOpen(false)} 
+      <SignInModal
+        isOpen={signInModalOpen}
+        onClose={() => setSignInModalOpen(false)}
       />
     </div>
   );
