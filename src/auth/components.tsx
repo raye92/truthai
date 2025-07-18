@@ -58,6 +58,7 @@ export function TextField<T extends FieldValues = FieldValues>({
           <input
             {...props}
             {...field}
+            value={field.value || ""}
             id={name as string}
             type={type}
             className={`text-field-input ${error ? "error" : ""} ${
