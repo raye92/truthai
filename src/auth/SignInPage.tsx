@@ -28,6 +28,7 @@ interface SignInPageProps {
 
 export function SignInPage({ onNavigate }: SignInPageProps) {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [oauthLoading, setOauthLoading] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string>("");
 
   const {
