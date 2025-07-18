@@ -53,6 +53,26 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
     }
   };
 
+  const handleOAuthSignIn = async (
+    provider: "google" | "apple" | "facebook"
+  ) => {
+    setOauthLoading(provider);
+    setError("");
+
+    try {
+      // TODO: Implement OAuth sign-in with AWS Amplify
+      console.log(`OAuth sign-in with ${provider}`);
+      // Example: await signInWithRedirect({ provider: provider as any });
+
+      // For now, just simulate the OAuth flow
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (err: any) {
+      setError(err.message || `An error occurred signing in with ${provider}`);
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
   return (
     <Container>
       <LogoHeader />
