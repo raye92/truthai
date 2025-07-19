@@ -69,35 +69,16 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
     }
   };
 
-  const handleOAuthSignIn = async (
-    provider: "google" | "apple" | "facebook"
-  ) => {
-    setOauthLoading(provider);
-    setError("");
-
-    try {
-      // TODO: Implement OAuth sign-in with AWS Amplify
-      console.log(`OAuth sign-up with ${provider}`);
-      // Example: await signInWithRedirect({ provider: provider as any });
-
-      // For now, just simulate the OAuth flow
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } catch (err: any) {
-      setError(err.message || `An error occurred signing up with ${provider}`);
-    } finally {
-      setOauthLoading(null);
-    }
-  };
-
   return (
-    <Container className="signup-page">
+    <Container>
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Create Account</ViewHeader>
 
         <OAuthSection
-          onOAuthSignIn={handleOAuthSignIn}
           loading={oauthLoading}
+          setLoading={setOauthLoading}
+          setError={setError}
         />
 
         <ViewDivider />

@@ -60,7 +60,7 @@ export function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps) {
   };
 
   return (
-    <Container className="forgot-password-page">
+    <Container>
       <LogoHeader />
       <ViewContainer>
         <ViewHeader>Reset Password</ViewHeader>
