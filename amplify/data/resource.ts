@@ -2,43 +2,38 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { testTickle } from '../functions/test/resource';
 import { promptGpt } from '../functions/q-openai/resource';
 import { postConfirmation } from "../auth/post-confirmation/resource";
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any user authenticated via an API key can "create", "read",
-"update", and "delete" any "Todo" records.
-=========================================================================*/
+
 const schema = a.schema({
-  User: a.model({
-    id: a.id().required(),
-    username: a.string().required().default("User"),
-    email: a.string().required(),
-    profilePicture: a.string(),
-    preferences: a.json(),
-    apiUsage: a.integer().default(0),
-    lastActive: a.datetime(),
-    role: a.string().required().default('USER'),
-    isNewUser: a.boolean().default(false),
-    conversations: a.hasMany('Conversation', 'userId')
-  }).authorization(
-    allow => [
-      allow.owner(),
-    ]
-  ),
+  UserProfile: a
+    .model({
+      email: a.string().required(),
+      profileOwner: a.string().required(),
+      username: a.string().required().default("User"),
+      profilePicture: a.string(),
+      preferences: a.json(),
+      apiUsage: a.integer().default(0),
+      lastActive: a.datetime(),
+      role: a.string().required().default('USER'),
+      isNewUser: a.boolean().default(true),
+      conversations: a.hasMany('Conversation', 'userId')
+    })
+    .authorization((allow: any) => [
+      allow.ownerDefinedIn("profileOwner"),
+    ]),
   
   Conversation: a.model({
     id: a.id().required(),
     title: a.string().required(),
     userId: a.string().required(),
-    user: a.belongsTo('User', 'userId'),
+    user: a.belongsTo('UserProfile', 'userId'),
     messages: a.hasMany('Message', 'conversationId'),
     createdAt: a.datetime().required(),
     updatedAt: a.datetime(),
     isArchived: a.boolean().default(false),
     metadata: a.json()
   }).authorization(
-    allow => [
-      allow.owner(),
+    (allow: any) => [
+      allow.ownerDefinedIn("userId"),
     ]
   ),
   
@@ -52,8 +47,8 @@ const schema = a.schema({
     tokens: a.integer(),
     metadata: a.json()
   }).authorization(
-    allow => [
-      allow.owner(),
+    (allow: any) => [
+      allow.publicApiKey(),
     ]
   ),
   
@@ -63,15 +58,16 @@ const schema = a.schema({
       prompt: a.string(),
     })
     .returns(a.string())
-    .authorization(allow => [allow.publicApiKey()])
+    .authorization((allow: any) => [allow.publicApiKey()])
     .handler(a.handler.function(promptGpt)),
   testMonkey: a
     .query()
     .arguments({  name: a.string()  })
     .returns(a.string())
-    .authorization(allow => [allow.publicApiKey()])
+    .authorization((allow: any) => [allow.publicApiKey()])
     .handler(a.handler.function(testTickle))
-});
+})
+.authorization((allow: any) => [allow.resource(postConfirmation)]);
 
 export type Schema = ClientSchema<typeof schema>;
 
@@ -82,7 +78,6 @@ export const data = defineData({
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
-    
   },
 });
 

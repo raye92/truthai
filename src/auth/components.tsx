@@ -10,6 +10,7 @@ import {
   FieldValues,
   Control,
 } from "react-hook-form";
+import { signInWithRedirect } from 'aws-amplify/auth';
 import { Logo } from "../assets/Logo";
 
 const styles = {
@@ -22,6 +23,28 @@ const styles = {
     marginTop: 16,
   },
   errorMessage: { marginTop: 16, padding: 16 },
+};
+
+/**
+ * OAuth sign-in handler
+ */
+export const handleOAuthSignIn = async (
+  provider: "google",
+  setLoading: (loading: string | null) => void,
+  setError: (error: string) => void
+): Promise<void> => {
+  setLoading(provider);
+  setError("");
+
+  try {
+    await signInWithRedirect({
+      provider: "Google"
+    });
+  } catch (err: any) {
+    setError(err.message || `An error occurred signing in with ${provider}`);
+  } finally {
+    setLoading(null);
+  }
 };
 
 export interface TextFieldProps<T extends FieldValues = FieldValues>
@@ -332,30 +355,30 @@ export function OAuthButton({
 }
 
 export interface OAuthSectionProps {
-  // onOAuthSignIn: (provider: "google" | "apple" | "facebook") => void;
-  onOAuthSignIn: (provider: "google") => void;
   loading?: string | null; // which provider is currently loading
+  setLoading: (loading: string | null) => void;
+  setError: (error: string) => void;
 }
 
-export function OAuthSection({ onOAuthSignIn, loading }: OAuthSectionProps) {
+export function OAuthSection({ loading, setLoading, setError }: OAuthSectionProps) {
   return (
     <div className="oauth-section">
       <OAuthButton
         provider="google"
-        onClick={() => onOAuthSignIn("google")}
+        onClick={() => handleOAuthSignIn("google", setLoading, setError)}
         loading={loading === "google"}
         disabled={!!loading}
       />
       {/*
       <OAuthButton
         provider="apple"
-        onClick={() => onOAuthSignIn("apple")}
+        onClick={() => handleOAuthSignIn("apple", setLoading, setError)}
         loading={loading === "apple"}
         disabled={!!loading}
       />
       <OAuthButton
         provider="facebook"
-        onClick={() => onOAuthSignIn("facebook")}
+        onClick={() => handleOAuthSignIn("facebook", setLoading, setError)}
         loading={loading === "facebook"}
         disabled={!!loading}
       />

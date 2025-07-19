@@ -14,6 +14,7 @@
     "user_verification_types": [
       "email"
     ],
+    "groups": [],
     "mfa_configuration": "NONE",
     "password_policy": {
       "min_length": 8,
@@ -58,8 +59,8 @@
     "model_introspection": {
       "version": 1,
       "models": {
-        "User": {
-          "name": "User",
+        "UserProfile": {
+          "name": "UserProfile",
           "fields": {
             "id": {
               "name": "id",
@@ -68,15 +69,22 @@
               "isRequired": true,
               "attributes": []
             },
-            "username": {
-              "name": "username",
+            "email": {
+              "name": "email",
               "isArray": false,
               "type": "String",
               "isRequired": true,
               "attributes": []
             },
-            "email": {
-              "name": "email",
+            "profileOwner": {
+              "name": "profileOwner",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "username": {
+              "name": "username",
               "isArray": false,
               "type": "String",
               "isRequired": true,
@@ -158,19 +166,11 @@
             }
           },
           "syncable": true,
-          "pluralName": "Users",
+          "pluralName": "UserProfiles",
           "attributes": [
             {
               "type": "model",
               "properties": {}
-            },
-            {
-              "type": "key",
-              "properties": {
-                "fields": [
-                  "id"
-                ]
-              }
             },
             {
               "type": "auth",
@@ -178,7 +178,7 @@
                 "rules": [
                   {
                     "provider": "userPools",
-                    "ownerField": "owner",
+                    "ownerField": "profileOwner",
                     "allow": "owner",
                     "identityClaim": "cognito:username",
                     "operations": [
@@ -226,7 +226,7 @@
               "name": "user",
               "isArray": false,
               "type": {
-                "model": "User"
+                "model": "UserProfile"
               },
               "isRequired": false,
               "attributes": [],
@@ -303,7 +303,7 @@
                 "rules": [
                   {
                     "provider": "userPools",
-                    "ownerField": "owner",
+                    "ownerField": "userId",
                     "allow": "owner",
                     "identityClaim": "cognito:username",
                     "operations": [
@@ -419,10 +419,8 @@
               "properties": {
                 "rules": [
                   {
-                    "provider": "userPools",
-                    "ownerField": "owner",
-                    "allow": "owner",
-                    "identityClaim": "cognito:username",
+                    "allow": "public",
+                    "provider": "apiKey",
                     "operations": [
                       "create",
                       "update",
@@ -475,5 +473,5 @@
       }
     }
   },
-  "version": "1.2"
+  "version": "1.4"
 }
