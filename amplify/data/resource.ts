@@ -23,8 +23,6 @@ const schema = a.schema({
   }).authorization(
     allow => [
       allow.owner(),
-      allow.authenticated().to(['read']),
-      allow.authenticated().to(['create'])
     ]
   ),
   
@@ -41,7 +39,6 @@ const schema = a.schema({
   }).authorization(
     allow => [
       allow.owner(),
-      allow.authenticated().to(['read'])
     ]
   ),
   
@@ -57,7 +54,6 @@ const schema = a.schema({
   }).authorization(
     allow => [
       allow.owner(),
-      allow.authenticated().to(['read'])
     ]
   ),
   

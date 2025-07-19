@@ -69,9 +69,8 @@ export function SignUpPage({ onNavigate }: SignUpPageProps) {
     }
   };
 
-  const handleOAuthSignIn = async (
-    provider: "google" | "apple" | "facebook"
-  ) => {
+  const handleOAuthSignIn = async (provider: "google") => {
+    //provider: "google" | "apple" | "facebook"
     setOauthLoading(provider);
     setError("");
 
