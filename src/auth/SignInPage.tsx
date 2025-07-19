@@ -47,10 +47,15 @@ export function SignInPage({ onNavigate }: SignInPageProps) {
     setError("");
 
     try {
-      await signIn({
+      const result = await signIn({
         username: data.email,
         password: data.password,
       });
+      // Check if user forgot to confirm their email
+      if (result?.nextStep?.signInStep === "CONFIRM_SIGN_UP") {
+        onNavigate("confirmEmail");
+        return;
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred during sign in");
     } finally {
