@@ -5,5 +5,6 @@ export const promptGpt = defineFunction({
   environment: {
     OPENAI_API_KEY: secret('OPENAI_API_KEY')
   },
-  entry: './handler.ts'
+  entry: './handler.ts',
+  timeoutSeconds: 30,
 });
