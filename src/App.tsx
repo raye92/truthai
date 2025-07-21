@@ -5,13 +5,17 @@ import { MessageBubble } from "./components/MessageBubble";
 import { SignInModal } from "./components/SignInModal";
 import { useChat } from "./hooks/useChat";
 import { Logo } from "./assets/Logo";
+import { ComponentDemo } from "./pages/ComponentDemo"; // ======== TESTING =========
 import "./App.css";
+type AppPage = 'chat' | 'demo';// ======== TESTING =========
+
 
 export default function App() {
   const { user, signOut, authStatus } = useAuthenticator();
   const { messages, isLoading, sendMessage } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<AppPage>('chat');// ======== TESTING =========
 
   const handleSignOut = async () => {
     try {
@@ -49,6 +53,20 @@ export default function App() {
             <h1>CurateAI</h1>
             <p>Multi-LLM Aggregator</p>
           </div>
+          <div className="navigation-menu">
+            <button 
+              className={`nav-button ${currentPage === 'chat' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('chat')}
+            >
+              💬 Chat
+            </button>
+            <button 
+              className={`nav-button ${currentPage === 'demo' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('demo')}
+            >
+              🎯 Quiz Demo
+            </button>
+          </div>
         </div>
 
         <div className="sidebar-footer">
@@ -73,34 +91,40 @@ export default function App() {
       </aside>
 
       <main className="chat-main">
-        <div className="messages-container">
-          {messages.length === 0 && (
-            <div className="empty-state">
-              <h1 className="auth-logo-title">CurateAI</h1>
-              <p>
-                Ask a question and get curated answers from multiple AI models
-              </p>
+        {currentPage === 'chat' ? (
+          <>
+            <div className="messages-container">
+              {messages.length === 0 && (
+                <div className="empty-state">
+                  <h1 className="auth-logo-title">CurateAI</h1>
+                  <p>
+                    Ask a question and get curated answers from multiple AI models
+                  </p>
+                </div>
+              )}
+              {messages.map((message, idx) => (
+                <MessageBubble key={idx} message={message} />
+              ))}
+              {isLoading && (
+                <div className="loading-indicator">
+                  <Logo
+                    width={24}
+                    height={24}
+                    fill="#000000ff"
+                    className="loading-logo"
+                  />
+                  <span>Aggregating responses from multiple LLMs...</span>
+                </div>
+              )}
             </div>
-          )}
-          {messages.map((message, idx) => (
-            <MessageBubble key={idx} message={message} />
-          ))}
-          {isLoading && (
-            <div className="loading-indicator">
-              <Logo
-                width={24}
-                height={24}
-                fill="#000000ff"
-                className="loading-logo"
-              />
-              <span>Aggregating responses from multiple LLMs...</span>
-            </div>
-          )}
-        </div>
 
-        <div className="chat-input-container">
-          <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
-        </div>
+            <div className="chat-input-container">
+              <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
+            </div>
+          </>
+        ) : (
+          <ComponentDemo />
+        )}
       </main>
 
       {/* Sign In Modal */}
