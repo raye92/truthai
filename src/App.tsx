@@ -12,14 +12,14 @@ import { generateSampleProviders } from "./components/Quiz/ProviderCard";
 export default function App() {
   const { user, signOut, authStatus } = useAuthenticator();
   const { messages, isLoading, sendMessage } = useChat();
-  // Quiz state
+  // Quiz state ======== ISS 6 Cursor ========
   const [quiz, setQuiz] = useState<QuizType>({ questions: [] });
   // Track the last user prompt to pair with the next assistant answer
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
   // Local chat messages with quiz message injection
   const [chatMessages, setChatMessages] = useState<any[]>([]);
 
-  // Helper to add or update a question/answer in the quiz
+  // Helper to add or update a question/answer in the quiz ======== ISS 6 Cursor ========
   function handleQuizUpdate(role: 'user' | 'assistant', content: string) {
     if (role === 'user') {
       setLastPrompt(content);
@@ -69,7 +69,7 @@ export default function App() {
     }
   }
 
-  // Listen for new messages and update quiz state and chatMessages
+  // Listen for new messages and update quiz state and chatMessages ======== ISS 6 Cursor ========
   useEffect(() => {
     if (messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
@@ -85,7 +85,7 @@ export default function App() {
     });
     // If no assistant yet, no quiz message
     setChatMessages(newChatMessages);
-    // eslint-disable-next-line
+    // eslint-disable-next-line ======== ISS 6 Cursor END ========
   }, [messages, quiz]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
