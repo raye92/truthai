@@ -12,7 +12,8 @@ interface AnswerProps {
 
 export function Answer({ answer, isWinning, percentage, maxProviders, answerKey }: AnswerProps) {
   const providerCount = answer.providers.length;
-  const height = maxProviders > 0 ? (providerCount / maxProviders) * 100 : 0;
+  const leading = (providerCount / maxProviders) == 1 ? 1 : 0;
+  const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
   return (
     <div className={`quiz-answer${isWinning ? ' quiz-answer-winning' : ''}`}> 
       <div className="quiz-answer-header">
