@@ -11,7 +11,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   if (message.type === 'quiz' && message.quizData) {
     return (
       <div className={`message-container ${message.role}`}>
-        <div className="message-bubble">
+        <div className="message-bubble quiz-message">
           <Quiz quiz={message.quizData} />
         </div>
       </div>

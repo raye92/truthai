@@ -23,6 +23,23 @@ export function Question({ question, questionNumber }: QuestionProps) {
     return totalProviders > 0 ? Math.round((providerCount / totalProviders) * 100) : 0;
   };
 
+  // Calculate optimal grid layout to avoid uneven distribution
+  const getBalancedGridClass = (answerCount: number) => {
+    if (answerCount === 4) {
+      return 'balanced-4'; // 2x2 instead of 3+1
+    }
+    if (answerCount === 6) {
+      return 'balanced-6'; // 3x2 instead of 4+2
+    }
+    if (answerCount === 5 || answerCount === 7) {
+      return 'force-balanced'; // Use smaller minmax to distribute more evenly
+    }
+    return '';
+  };
+
+  const gridClass = getBalancedGridClass(question.answers.length);
+  const answersClassName = `quiz-answers${gridClass ? ` ${gridClass}` : ''}`;
+
   return (
     <div className="quiz-question">
       <div className="quiz-question-header">
@@ -31,7 +48,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
         <p className="quiz-question-total">Total providers participating: <span className="quiz-question-total-number">{totalProviders}</span></p>
       </div>
 
-      <div className="quiz-answers">
+      <div className={answersClassName}>
         {question.answers.map((answer, index) => {
           const providerCount = answer.providers.length;
           const percentage = getPercentage(providerCount);
@@ -52,34 +69,6 @@ export function Question({ question, questionNumber }: QuestionProps) {
             />
           );
         })}
-      </div>
-
-      {/* Question Summary */}
-      <div className="quiz-question-summary">
-        <div className="quiz-question-summary-grid">
-          <div className="quiz-question-summary-item">
-            <div className="quiz-question-summary-value">{totalProviders}</div>
-            <div className="quiz-question-summary-label">Total Providers</div>
-          </div>
-          <div className="quiz-question-summary-item">
-            <div className="quiz-question-summary-value">{maxProviders}</div>
-            <div className="quiz-question-summary-label">Highest Count</div>
-          </div>
-          <div className="quiz-question-summary-item">
-            <div className="quiz-question-summary-value">
-              {winningAnswers.length > 1 ? "TIE" : winningAnswers[0]?.answer.split(' ').slice(-1)[0] || "-"}
-            </div>
-            <div className="quiz-question-summary-label">
-              {winningAnswers.length > 1 ? "Multiple Winners" : "Current Leader"}
-            </div>
-          </div>
-          <div className="quiz-question-summary-item">
-            <div className="quiz-question-summary-value">
-              {totalProviders > 0 ? Math.round((maxProviders / totalProviders) * 100) : 0}%
-            </div>
-            <div className="quiz-question-summary-label">Lead Margin</div>
-          </div>
-        </div>
       </div>
     </div>
   );
