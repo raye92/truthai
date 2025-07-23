@@ -4,6 +4,7 @@ import './Quiz.css';
 interface ProviderCardProps {
   provider: Provider;
   index: number;
+  choiceClass?: string;
 }
 
 // Sample SVG logos for different providers
@@ -82,7 +83,7 @@ const ProviderLogos = {
 
 const providerNames = Object.keys(ProviderLogos);
 
-export function ProviderCard({ provider, index }: ProviderCardProps) {
+export function ProviderCard({ provider, index, choiceClass }: ProviderCardProps) {
   // Use provider name if it exists in our logos, otherwise use a random one based on index
   const logoKey = providerNames.includes(provider.name) 
     ? provider.name 
@@ -91,7 +92,7 @@ export function ProviderCard({ provider, index }: ProviderCardProps) {
   const logo = ProviderLogos[logoKey as keyof typeof ProviderLogos];
 
   return (
-    <div className="quiz-provider-card" title={`${provider.name} - Vote #${index + 1}`}>
+    <div className={`quiz-provider-card ${choiceClass || ''}`} title={`${provider.name} - Vote #${index + 1}`}>
       {logo}
       <span className="quiz-provider-name">{provider.name}</span>
     </div>
