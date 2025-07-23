@@ -38,7 +38,7 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
           <div className="quiz-answer-text">{answer.answer}</div>
           {isWinning && <div className="quiz-answer-crown">👑 BEST ANSWER</div>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto' }}>
           <span className="quiz-answer-subtext">Confidence score:</span>
           <span className="quiz-answer-percent">{percentage}%</span>
         </div>
