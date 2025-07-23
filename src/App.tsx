@@ -6,10 +6,88 @@ import { SignInModal } from "./components/SignInModal";
 import { useChat } from "./hooks/useChat";
 import { Logo } from "./assets/Logo";
 import "./App.css";
+import { Quiz as QuizType, Question as QuizQuestion, Answer as QuizAnswer } from "./components/Quiz/types";
+import { generateSampleProviders } from "./components/Quiz/ProviderCard";
 
 export default function App() {
   const { user, signOut, authStatus } = useAuthenticator();
   const { messages, isLoading, sendMessage } = useChat();
+  // Quiz state ======== ISS 6 Cursor ========
+  const [quiz, setQuiz] = useState<QuizType>({ questions: [] });
+  // Track the last user prompt to pair with the next assistant answer
+  const [lastPrompt, setLastPrompt] = useState<string | null>(null);
+  // Local chat messages with quiz message injection
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+
+  // Helper to add or update a question/answer in the quiz ======== ISS 6 Cursor ========
+  function handleQuizUpdate(role: 'user' | 'assistant', content: string) {
+    if (role === 'user') {
+      setLastPrompt(content);
+      setQuiz(prevQuiz => {
+        const existingQuestion = prevQuiz.questions.find(q => q.text === content);
+        if (existingQuestion) return prevQuiz;
+        return {
+          ...prevQuiz,
+          questions: [
+            ...prevQuiz.questions,
+            { text: content, answers: [], totalProviders: 0 }
+          ]
+        };
+      });
+    } else if (role === 'assistant' && lastPrompt) {
+      setQuiz(prevQuiz => {
+        const questionIdx = prevQuiz.questions.findIndex(q => q.text === lastPrompt);
+        if (questionIdx === -1) return prevQuiz;
+        const question = prevQuiz.questions[questionIdx];
+        const answerIdx = question.answers.findIndex(a => a.answer === content);
+        let newAnswers: QuizAnswer[];
+        let newTotalProviders = question.totalProviders;
+        let newAnswer: QuizAnswer;
+        const allProviders = generateSampleProviders(10);
+        const randomProvider = allProviders[Math.floor(Math.random() * allProviders.length)];
+        if (answerIdx !== -1) {
+          const answer = question.answers[answerIdx];
+          const alreadyHas = answer.providers.some(p => p.name === randomProvider.name);
+          const updatedProviders = alreadyHas ? [...answer.providers] : [...answer.providers, randomProvider];
+          newAnswer = { ...answer, providers: updatedProviders };
+          newAnswers = question.answers.map((a, i) => i === answerIdx ? newAnswer : a);
+          if (!alreadyHas) newTotalProviders += 1;
+        } else {
+          newAnswer = { answer: content, providers: [randomProvider] };
+          newAnswers = [...question.answers, newAnswer];
+          newTotalProviders += 1;
+        }
+        const newQuestion: QuizQuestion = {
+          ...question,
+          answers: newAnswers,
+          totalProviders: newTotalProviders
+        };
+        const newQuestions = prevQuiz.questions.map((q, i) => i === questionIdx ? newQuestion : q);
+        return { ...prevQuiz, questions: newQuestions };
+      });
+      setLastPrompt(null);
+    }
+  }
+
+  // Listen for new messages and update quiz state and chatMessages ======== ISS 6 Cursor ========
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    handleQuizUpdate(lastMsg.role, lastMsg.content);
+    // Build chatMessages: inject quiz after each assistant message
+    let quizMsgInjected = false;
+    const newChatMessages = messages.flatMap((msg, idx) => {
+      if (msg.role === 'assistant') {
+        quizMsgInjected = true;
+        return [msg, { role: 'assistant', type: 'quiz', quizData: quiz }];
+      }
+      return [msg];
+    });
+    // If no assistant yet, no quiz message
+    setChatMessages(newChatMessages);
+    // eslint-disable-next-line ======== ISS 6 Cursor END ========
+  }, [messages, quiz]);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
 
@@ -74,7 +152,7 @@ export default function App() {
 
       <main className="chat-main">
         <div className="messages-container">
-          {messages.length === 0 && (
+          {chatMessages.length === 0 && (
             <div className="empty-state">
               <h1 className="auth-logo-title">CurateAI</h1>
               <p>
@@ -82,7 +160,7 @@ export default function App() {
               </p>
             </div>
           )}
-          {messages.map((message, idx) => (
+          {chatMessages.map((message, idx) => (
             <MessageBubble key={idx} message={message} />
           ))}
           {isLoading && (
