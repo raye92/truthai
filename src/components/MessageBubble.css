@@ -19,6 +19,16 @@
   word-wrap: break-word;
 }
 
+/* Quiz messages should span full width */
+.message-bubble.quiz-message {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 .user .message-bubble {
   background: #3b82f6;
   color: white;
