@@ -21,7 +21,11 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
       'A': 'color-1',
       'B': 'color-2', 
       'C': 'color-3',
-      'D': 'color-4'
+      'D': 'color-4',
+      'E': 'color-5',
+      'F': 'color-6',
+      'G': 'color-7',
+      'H': 'color-8'
     };
     return keyMap[key] || 'color-1';
   };
