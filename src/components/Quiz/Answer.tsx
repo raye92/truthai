@@ -29,11 +29,15 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
   return (
     <div className={`quiz-answer${isWinning ? ' quiz-answer-winning' : ''}`}> 
       <div className="quiz-answer-header">
-        <div className="quiz-answer-key">{answerKey}</div>
-        <div className="quiz-answer-text">{answer.answer}</div>
-        {isWinning && <div className="quiz-answer-crown">👑 WINNING</div>}
-        <div className="quiz-answer-count">{providerCount} providers</div>
-        <div className="quiz-answer-percent">{percentage}%</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="quiz-answer-key">{answerKey}</div>
+          <div className="quiz-answer-text">{answer.answer}</div>
+          {isWinning && <div className="quiz-answer-crown">👑 BEST ANSWER</div>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+          <span className="quiz-answer-subtext">Confidence score:</span>
+          <span className="quiz-answer-percent">{percentage}%</span>
+        </div>
       </div>
       <div className="quiz-answer-bar-container">
         <div className="quiz-answer-bar-bg">
