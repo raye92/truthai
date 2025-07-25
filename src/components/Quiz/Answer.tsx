@@ -15,19 +15,9 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
   const leading = (providerCount / maxProviders) == 1 ? 1 : 0;
   const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
   
-  // Get color for label
-  const getChoiceClass = (key: string) => {
-    const keyMap: Record<string, string> = {
-      'A': 'color-1',
-      'B': 'color-2', 
-      'C': 'color-3',
-      'D': 'color-4',
-      'E': 'color-5',
-      'F': 'color-6',
-      'G': 'color-7',
-      'H': 'color-8'
-    };
-    return keyMap[key] || 'color-1';
+  // Get color class based on winning status
+  const getChoiceClass = () => {
+    return isWinning ? 'winning' : 'non-winning';
   };
 
   return (
@@ -45,9 +35,9 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
       </div>
       <div className="quiz-answer-bar-container">
         <div className="quiz-answer-bar-bg">
-          <div className={`quiz-answer-bar ${getChoiceClass(answerKey)}`} style={{ width: `${height}%` }}>
+          <div className={`quiz-answer-bar ${getChoiceClass()}`} style={{ width: `${height}%` }}>
             {answer.providers.map((provider, index) => (
-              <ProviderCard key={`${provider.name}-${index}`} provider={provider} index={index} choiceClass={getChoiceClass(answerKey)} />
+              <ProviderCard key={`${provider.name}-${index}`} provider={provider} index={index} choiceClass={getChoiceClass()} />
             ))}
             {providerCount === 0 && <div className="quiz-answer-no-providers">No providers yet</div>}
           </div>
@@ -56,4 +46,3 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
     </div>
   );
 }
-
