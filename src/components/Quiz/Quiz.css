@@ -205,36 +205,14 @@
   justify-content: center;
 }
 
-.quiz-provider-card.color-1 {
-  background: #60a5fa;
+.quiz-provider-card.winning {
+  background: #f59e0b;
+  border-color: #d97706;
 }
 
-.quiz-provider-card.color-2 {
-  background: #4ade80;
-}
-
-.quiz-provider-card.color-3 {
-  background: #a78bfa;
-}
-
-.quiz-provider-card.color-4 {
-  background: #f87171;
-}
-
-.quiz-provider-card.color-5 {
-  background: #fb923c;
-}
-
-.quiz-provider-card.color-6 {
-  background: #f472b6;
-}
-
-.quiz-provider-card.color-7 {
-  background: #818cf8;
-}
-
-.quiz-provider-card.color-8 {
-  background: #facc15;
+.quiz-provider-card.non-winning {
+  background: #6b7280;
+  border-color: #4b5563;
 }
 
 .quiz-provider-card:hover {
