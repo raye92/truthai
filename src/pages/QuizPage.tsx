@@ -157,6 +157,8 @@ export function QuizPage() {
             </div>
           )}
         </div>
+        <div>
+        </div>
       </div>
     </div>
   );
