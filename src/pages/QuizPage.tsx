@@ -157,9 +157,6 @@ export function QuizPage() {
             </div>
           )}
         </div>
-        <div>
-        <p> PENIS </p>
-        </div>
       </div>
     </div>
   );
