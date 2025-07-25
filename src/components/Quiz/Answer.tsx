@@ -35,9 +35,9 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey 
       </div>
       <div className="quiz-answer-bar-container">
         <div className="quiz-answer-bar-bg">
-          <div className={`quiz-answer-bar ${getChoiceClass(answerKey)}`} style={{ width: `${height}%` }}>
+          <div className={`quiz-answer-bar ${getChoiceClass()}`} style={{ width: `${height}%` }}>
             {answer.providers.map((provider, index) => (
-              <ProviderCard key={`${provider.name}-${index}`} provider={provider} index={index} choiceClass={getChoiceClass(answerKey)} />
+              <ProviderCard key={`${provider.name}-${index}`} provider={provider} index={index} choiceClass={getChoiceClass()} />
             ))}
             {providerCount === 0 && <div className="quiz-answer-no-providers">No providers yet</div>}
           </div>
