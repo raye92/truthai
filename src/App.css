@@ -63,6 +63,37 @@
   margin-top: 4rem;
 }
 
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: #d1d5db;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: #374151;
+  color: white;
+  border-color: #4b5563;
+}
+
+.nav-link.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+}
+
 .logo-container {
   display: flex;
   justify-content: center;
