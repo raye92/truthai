@@ -96,8 +96,8 @@
   margin-bottom: 0.5rem;
 }
 .quiz-answer-winning {
-  background: #fffbe6;
-  border: 2px solid #fde68a;
+  background: #fff6e6;
+  border: 2px solid #fdc58a;
   box-shadow: 0 2px 8px #fde68a33;
 }
 .quiz-answer-header {
