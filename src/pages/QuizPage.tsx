@@ -91,7 +91,7 @@ export function QuizPage() {
     <div className="quiz-page">
       <div className="quiz-page-header">
         <h1>Quiz Mode</h1>
-        <p>Add questions and answers to create an interactive quiz</p>
+        <p>Add questions to CurateAI answers</p>
       </div>
 
       <div className="quiz-page-content">

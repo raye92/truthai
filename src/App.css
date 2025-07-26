@@ -79,7 +79,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  border: 1px solid transparent;
+  border: 1px solid #4b5563;
 }
 
 .nav-link:hover {

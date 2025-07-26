@@ -53,17 +53,17 @@ export default function App() {
           <nav className="sidebar-nav">
             <Link
               to="/"
-              className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+              className={`nav-link ${location.pathname === '/' || location.pathname === '/quiz' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              💬 Chat
+              Quiz Mode
             </Link>
             <Link
-              to="/quiz"
-              className={`nav-link ${location.pathname === '/quiz' ? 'active' : ''}`}
+              to="/chat"
+              className={`nav-link ${location.pathname === '/chat' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              🧠 Quiz Mode
+              Chat
             </Link>
           </nav>
         </div>
@@ -91,7 +91,8 @@ export default function App() {
 
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<ChatPage />} />
+          <Route path="/" element={<QuizPage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/quiz" element={<QuizPage />} />
         </Routes>
       </main>

@@ -23,7 +23,7 @@
   text-align: center;
 }
 
-.auth-logo-title {
+.chat-logo-title {
   color: #1f2937;
   text-shadow: none;
   margin: 0 0 20px 0;
@@ -86,7 +86,7 @@
     padding: 1rem;
   }
 
-  .auth-logo-title {
+  .chat-logo-title {
     font-size: 2rem;
   }
 }

@@ -12,7 +12,7 @@ export function ChatPage() {
       <div className="messages-container">
         {messages.length === 0 && (
           <div className="empty-state">
-            <h1 className="auth-logo-title">CurateAI</h1>
+            <h1 className="chat-logo-title">CurateAI</h1>
             <p>
               Ask a question and get curated answers from multiple AI models
             </p>
