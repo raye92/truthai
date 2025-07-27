@@ -148,7 +148,8 @@
   background: #374151;
   color: white;
   border: 1px solid #4b5563;
-  padding: 12.5px 24px;
+  width: 96px;
+  height: 48px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -218,13 +219,6 @@
     font-size: 1.5rem;
   }
 
-  .sidebar-toggle {
-    width: 44px;
-    height: 44px;
-    left: 16px;
-    top: 16px;
-  }
-
   .toggle-icon {
     width: 20px;
     height: 20px;
@@ -239,5 +233,12 @@
   .sidebar-toggle {
     left: 12px;
     top: 12px;
+  }
+
+  .sign-in-button {
+    left: 68px;
+    top: 12px;
+    width: 80px;
+    font-size: 13px;
   }
 }

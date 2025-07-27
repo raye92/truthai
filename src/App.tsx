@@ -56,7 +56,7 @@ export default function App() {
               className={`nav-link ${location.pathname === '/' || location.pathname === '/quiz' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              Quiz Mode
+              Curate Mode
             </Link>
             <Link
               to="/chat"

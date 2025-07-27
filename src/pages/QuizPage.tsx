@@ -90,13 +90,12 @@ export function QuizPage() {
   return (
     <div className="quiz-page">
       <div className="quiz-page-header">
-        <h1>Quiz Mode</h1>
-        <p>Add questions to CurateAI answers</p>
+        <h1>Curate Mode</h1>
+        <p>Add questions to Curate AI answers</p>
       </div>
 
       <div className="quiz-page-content">
         <div className="add-question-section">
-          <h2>Add Questions</h2>
           <div className="question-input-group">
             <input
               type="text"
@@ -111,9 +110,12 @@ export function QuizPage() {
             </button>
           </div>
 
+          {/* ======== TESTING ======== */}
           {quiz.questions.length > 0 && (
             <div className="add-answer-section">
-              <h3>Add Answer</h3>
+              <div>
+                <h4> </h4>
+              </div>
               <div className="answer-input-group">
                 <select
                   value={selectedQuestionIndex ?? ''}

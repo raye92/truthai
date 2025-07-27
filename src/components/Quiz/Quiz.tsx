@@ -11,8 +11,8 @@ export function Quiz({ quiz }: QuizProps) {
   return (
     <div className="quiz-root">
       <div className="quiz-header">
-        <h1 className="quiz-title">Provider Quiz Results</h1>
-        <div className="quiz-total">Total providers participating: <span className="quiz-total-number">{totalVotes}</span></div>
+        <h1 className="quiz-title">Curated Answers</h1>
+        <div className="quiz-total">Total models participating: <span className="quiz-total-number">{totalVotes}</span></div>
       </div>
       <div className="quiz-questions">
         {quiz.questions.map((question, index) => (

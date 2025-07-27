@@ -14,7 +14,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0;
 }
 
 .quiz-page-header p {
@@ -34,28 +34,13 @@
 .add-question-section {
   background: #f9fafb;
   border-radius: 1rem;
-  padding: 1.5rem;
+  padding: 1rem;
   border: 1px solid #e5e7eb;
-}
-
-.add-question-section h2 {
-  margin: 0 0 1rem 0;
-  color: #1f2937;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.add-question-section h3 {
-  margin: 1.5rem 0 1rem 0;
-  color: #1f2937;
-  font-size: 1.25rem;
-  font-weight: 600;
 }
 
 .question-input-group {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1rem;
 }
 
 .answer-input-group {
@@ -150,6 +135,7 @@
 
   .quiz-page-header h1 {
     font-size: 2rem;
+    margin-top: 2rem;
   }
 
   .question-input-group,
