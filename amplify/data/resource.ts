@@ -65,7 +65,7 @@ const schema = a.schema({
     .query()
     .arguments({
       prompt: a.string(),
-      useGrounding: a.boolean().required().default(false),
+      useGrounding: a.boolean(),
     })
     .returns(a.string())
     .authorization((allow: any) => [allow.publicApiKey()])
