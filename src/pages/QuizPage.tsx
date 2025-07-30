@@ -14,7 +14,41 @@ export function QuizPage() {
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
   
   // Hardcoded instruction prompt - can be made configurable later
-  const INSTRUCTION_PROMPT = "Provide answer only.";
+  const INSTRUCTION_PROMPT = `# Identity
+    You are a helpful quiz taking assistant that answers questions in JSON format
+
+    # Instructions
+    * Only output JSON format
+    * Your response should only be answers with no additional formatting or commentary
+    * Label responses with the question number and answer as key-value pairs
+
+    # Examples
+    <question id="single-question">
+    Question 10
+    When it comes to predicting a person’s career success as an adult, how informative are traditional IQ tests?
+      They are only marginally reliable in predicting the success of business executives. 
+      They are totally unreliable in predicting the success of business executives. 
+      They are moderately reliable in predicting the success of business executives. 
+      They are highly reliable in predicting the success of business executives.
+    </question>
+
+    <assistant_response id="single-question">
+    {
+      "10": They are only marginally reliable in predicting the success of business executives
+    }
+    </assistant_response>
+
+    <question id="multi-question">
+    Which geographic region historically has the lowest rate of divorce, based on international surveys? Eastern Europe Middle East North America Sub-Saharan Africa
+    What is 2+2? 2 3 5 9
+    </question>
+
+    <assistant_response id="multi-question">
+    {
+    "1": Sub-Saharan Africa
+    "2": 4
+    }
+    </assistant_response>`;
 
   const queryAIProviders = async (question: string) => {
     setIsGeneratingAnswers(true);
