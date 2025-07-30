@@ -11,13 +11,21 @@ const client = generateClient<Schema>();
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
+  model?: string;
+}
+
+export type ModelType = 'chatgpt' | 'gemini';
+
+export interface ChatOptions {
+  model: ModelType;
+  useGrounding?: boolean;
 }
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, options: ChatOptions = { model: 'chatgpt' }) => {
     if (!content.trim()) return;
 
     const userMessage: Message = { role: 'user', content };
@@ -25,8 +33,18 @@ export function useChat() {
     setIsLoading(true);
 
     try {
-      console.log('Sending prompt to API:', content);
-      const result = await client.queries.promptGpt({ prompt: content });
+      console.log(`Sending prompt to ${options.model} API:`, content);
+      let result;
+      
+      if (options.model === 'gemini') {
+        result = await client.queries.promptGemini({ 
+          prompt: content, 
+          useGrounding: options.useGrounding || false 
+        });
+      } else {
+        result = await client.queries.promptGpt({ prompt: content });
+      }
+      
       console.log('API result:', result);
       
       if (result.errors && result.errors.length > 0) {
@@ -40,7 +58,11 @@ export function useChat() {
       }
 
       const assistantText = result.data ?? "";
-      const assistantMessage: Message = { role: 'assistant', content: assistantText };
+      const assistantMessage: Message = { 
+        role: 'assistant', 
+        content: assistantText,
+        model: options.model 
+      };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
       console.error("promptGpt error:", err);

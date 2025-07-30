@@ -456,6 +456,26 @@
             }
           }
         },
+        "promptGemini": {
+          "name": "promptGemini",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "prompt": {
+              "name": "prompt",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "useGrounding": {
+              "name": "useGrounding",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false
+            }
+          }
+        },
         "testMonkey": {
           "name": "testMonkey",
           "isArray": false,

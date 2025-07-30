@@ -70,19 +70,9 @@
   }
 }
 
-.chat-input-container {
-  padding: 1.5rem 2rem;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
   .messages-container {
-    padding: 1rem;
-  }
-
-  .chat-input-container {
     padding: 1rem;
   }
 

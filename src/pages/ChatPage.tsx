@@ -34,9 +34,7 @@ export function ChatPage() {
         )}
       </div>
 
-      <div className="chat-input-container">
-        <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
-      </div>
+      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
     </div>
   );
 }
