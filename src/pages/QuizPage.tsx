@@ -1,16 +1,102 @@
 import { useState } from 'react';
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../amplify/data/resource";
 import { Quiz } from '../components/Quiz/Quiz';
 import { Quiz as QuizType, Question as QuizQuestion, Answer as QuizAnswer } from '../components/Quiz/types';
-import { generateSampleProviders } from '../components/Quiz/ProviderCard';
+import { getAIProviders } from '../components/Quiz/ProviderCard';
 import './QuizPage.css';
+
+const client = generateClient<Schema>();
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>({ questions: [] });
   const [newQuestion, setNewQuestion] = useState('');
-  const [newAnswer, setNewAnswer] = useState('');
-  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number | null>(null);
+  const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
+  
+  // Hardcoded instruction prompt - can be made configurable later
+  const INSTRUCTION_PROMPT = "Provide answer only.";
 
-  const handleAddQuestion = () => {
+  const queryAIProviders = async (question: string) => {
+    setIsGeneratingAnswers(true);
+    
+    const fullPrompt = `${INSTRUCTION_PROMPT}\n\nQuestion: ${question}`;
+    
+    const providers = [
+      { name: "GPT", url: "https://openai.com" },
+      { name: "Gemini", url: "https://gemini.google.com" },
+      { name: "Gemini Google Grounded", url: "https://gemini.google.com" }
+    ];
+
+    // Query each provider separately so results show up individually
+    const queryProvider = async (provider: typeof providers[0], index: number) => {
+      try {
+        let result;
+        
+        if (provider.name === "GPT") {
+          result = await client.queries.promptGpt({ prompt: fullPrompt });
+        } else if (provider.name === "Gemini") {
+          result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: false });
+        } else if (provider.name === "Gemini Google Grounded") {
+          result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: true });
+        }
+
+        if (result && !result.errors && result.data && result.data.trim()) {
+          const response = result.data.trim();
+          
+          // Add answer as it arrives
+          setQuiz(prevQuiz => {
+            const questionIndex = prevQuiz.questions.length - 1; // Latest question
+            if (questionIndex < 0) return prevQuiz;
+            
+            const newQuestions = [...prevQuiz.questions];
+            const questionToUpdate = { ...newQuestions[questionIndex] };
+            
+            const existingAnswer = questionToUpdate.answers.find(a => a.answer === response);
+            
+            if (existingAnswer) {
+              // Add provider to existing answer
+              const providerExists = existingAnswer.providers.some(p => p.name === provider.name);
+              if (!providerExists) {
+                questionToUpdate.answers = questionToUpdate.answers.map(answer => 
+                  answer.answer === response
+                    ? { ...answer, providers: [...answer.providers, provider] }
+                    : answer
+                );
+                questionToUpdate.totalProviders += 1;
+              }
+            } else {
+              // Create new answer
+              questionToUpdate.answers = [
+                ...questionToUpdate.answers,
+                { answer: response, providers: [provider] }
+              ];
+              questionToUpdate.totalProviders += 1;
+            }
+            
+            newQuestions[questionIndex] = questionToUpdate;
+            return { ...prevQuiz, questions: newQuestions };
+          });
+        } else {
+          console.error(`Error from ${provider.name}:`, result?.errors);
+        }
+      } catch (error) {
+        console.error(`Error querying ${provider.name}:`, error);
+      }
+    };
+
+    // Start all queries simultaneously but process results as they arrive
+    const promises = providers.map((provider, index) => queryProvider(provider, index));
+    
+    try {
+      await Promise.allSettled(promises);
+    } catch (error) {
+      console.error('Error querying AI providers:', error);
+    } finally {
+      setIsGeneratingAnswers(false);
+    }
+  };
+
+  const handleAddQuestion = async () => {
     if (!newQuestion.trim()) return;
     
     const existingQuestion = quiz.questions.find(q => q.text === newQuestion.trim());
@@ -19,6 +105,7 @@ export function QuizPage() {
       return;
     }
 
+    // Add the question first
     setQuiz(prevQuiz => ({
       ...prevQuiz,
       questions: [
@@ -26,65 +113,12 @@ export function QuizPage() {
         { text: newQuestion.trim(), answers: [], totalProviders: 0 }
       ]
     }));
+    
+    const questionText = newQuestion.trim();
     setNewQuestion('');
-  };
-
-  const handleAddAnswer = () => {
-    if (!newAnswer.trim() || selectedQuestionIndex === null) return;
-
-    const question = quiz.questions[selectedQuestionIndex];
-    const existingAnswer = question.answers.find(a => a.answer === newAnswer.trim());
     
-    if (existingAnswer) {
-      // Add a provider to existing answer
-      const allProviders = generateSampleProviders(10);
-      const availableProviders = allProviders.filter(p => 
-        !existingAnswer.providers.some(ep => ep.name === p.name)
-      );
-      
-      if (availableProviders.length === 0) {
-        alert('All providers have already voted for this answer!');
-        return;
-      }
-
-      const randomProvider = availableProviders[Math.floor(Math.random() * availableProviders.length)];
-      
-      setQuiz(prevQuiz => {
-        const newQuestions = [...prevQuiz.questions];
-        const questionToUpdate = { ...newQuestions[selectedQuestionIndex] };
-        const answerIndex = questionToUpdate.answers.findIndex(a => a.answer === newAnswer.trim());
-        
-        questionToUpdate.answers = questionToUpdate.answers.map((answer, idx) => 
-          idx === answerIndex 
-            ? { ...answer, providers: [...answer.providers, randomProvider] }
-            : answer
-        );
-        questionToUpdate.totalProviders += 1;
-        newQuestions[selectedQuestionIndex] = questionToUpdate;
-        
-        return { ...prevQuiz, questions: newQuestions };
-      });
-    } else {
-      // Create new answer
-      const allProviders = generateSampleProviders(10);
-      const randomProvider = allProviders[Math.floor(Math.random() * allProviders.length)];
-      
-      setQuiz(prevQuiz => {
-        const newQuestions = [...prevQuiz.questions];
-        const questionToUpdate = { ...newQuestions[selectedQuestionIndex] };
-        
-        questionToUpdate.answers = [
-          ...questionToUpdate.answers,
-          { answer: newAnswer.trim(), providers: [randomProvider] }
-        ];
-        questionToUpdate.totalProviders += 1;
-        newQuestions[selectedQuestionIndex] = questionToUpdate;
-        
-        return { ...prevQuiz, questions: newQuestions };
-      });
-    }
-    
-    setNewAnswer('');
+    // Then query AI providers for answers
+    await queryAIProviders(questionText);
   };
 
   return (
@@ -104,48 +138,16 @@ export function QuizPage() {
               placeholder="Enter a new question..."
               className="question-input"
               onKeyPress={(e) => e.key === 'Enter' && handleAddQuestion()}
+              disabled={isGeneratingAnswers}
             />
-            <button onClick={handleAddQuestion} className="add-question-btn">
-              Add Question
+            <button onClick={handleAddQuestion} className="add-question-btn" disabled={isGeneratingAnswers}>
+              {isGeneratingAnswers ? 'Generating Answers...' : 'Add Question'}
             </button>
           </div>
 
-          {/* ======== TESTING ======== */}
-          {quiz.questions.length > 0 && (
-            <div className="add-answer-section">
-              <div>
-                <h4> </h4>
-              </div>
-              <div className="answer-input-group">
-                <select
-                  value={selectedQuestionIndex ?? ''}
-                  onChange={(e) => setSelectedQuestionIndex(e.target.value ? parseInt(e.target.value) : null)}
-                  className="question-select"
-                >
-                  <option value="">Select a question...</option>
-                  {quiz.questions.map((question, index) => (
-                    <option key={index} value={index}>
-                      Q{index + 1}: {question.text}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  value={newAnswer}
-                  onChange={(e) => setNewAnswer(e.target.value)}
-                  placeholder="Enter an answer..."
-                  className="answer-input"
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddAnswer()}
-                  disabled={selectedQuestionIndex === null}
-                />
-                <button 
-                  onClick={handleAddAnswer} 
-                  className="add-answer-btn"
-                  disabled={selectedQuestionIndex === null}
-                >
-                  Add Answer
-                </button>
-              </div>
+          {isGeneratingAnswers && (
+            <div className="loading-indicator">
+              <p>🤖 Querying AI providers for answers...</p>
             </div>
           )}
         </div>
