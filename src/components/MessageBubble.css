@@ -17,6 +17,24 @@
   border-radius: 1rem;
   line-height: 1.5;
   word-wrap: break-word;
+  position: relative;
+}
+
+.model-badge {
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.message-content {
+  line-height: 1.5;
 }
 
 /* Quiz messages should span full width */
