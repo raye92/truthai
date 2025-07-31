@@ -9,8 +9,7 @@ import {
   createAnswer, 
   addAnswerToQuestion, 
   addQuestionToQuiz, 
-  updateQuestionInQuiz,
-  addProvidersToAnswer
+  updateQuestionInQuiz
 } from '../components/Quiz/utils';
 import './QuizPage.css';
 

@@ -22,21 +22,6 @@ export function createAnswer(answer: string, provider: string): Answer {
   };
 }
 
-
-export function createProvider(name: string): string {
-  return name;
-}
-
-/**
- * Creates a new Answer with multiple providers
- */
-export function createAnswerWithProviders(answer: string, providers: string[]): Answer {
-  return {
-    answer: answer.trim(),
-    providers: [...providers]
-  };
-}
-
 /**
  * Adds a provider to an existing answer
  */
@@ -49,19 +34,6 @@ export function addProviderToAnswer(answer: Answer, provider: string): Answer {
     };
   }
   return answer;
-}
-
-/**
- * Adds multiple providers to an existing answer
- */
-export function addProvidersToAnswer(answer: Answer, providers: string[]): Answer {
-  let updatedAnswer = { ...answer };
-  
-  for (const provider of providers) {
-    updatedAnswer = addProviderToAnswer(updatedAnswer, provider);
-  }
-  
-  return updatedAnswer;
 }
 
 /**
@@ -88,7 +60,7 @@ export function addAnswerToQuestion(question: Question, answer: Answer): Questio
     // Merge providers if answer already exists
     const updatedAnswers = question.answers.map(existing => 
       existing.answer === answer.answer
-        ? addProvidersToAnswer(existing, answer.providers)
+        ? answer.providers.reduce((acc, provider) => addProviderToAnswer(acc, provider), existing)
         : existing
     );
     
