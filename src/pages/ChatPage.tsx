@@ -1,7 +1,7 @@
 import { ChatInput } from "../components/ChatInput";
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
-import { Logo } from "../assets/Logo";
+import { Logo } from "../assets/Icons";
 import './ChatPage.css';
 
 export function ChatPage() {

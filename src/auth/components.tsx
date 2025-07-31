@@ -11,7 +11,7 @@ import {
   Control,
 } from "react-hook-form";
 import { signInWithRedirect } from 'aws-amplify/auth';
-import { Logo } from "../assets/Logo";
+import { Logo } from "../assets/Icons";
 
 const styles = {
   viewHeader: { marginBottom: 16 },

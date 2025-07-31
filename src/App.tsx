@@ -4,7 +4,7 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
 import { ChatPage } from "./pages/ChatPage";
 import { QuizPage } from "./pages/QuizPage";
-import { Logo } from "./assets/Logo";
+import { Logo, ChatIcon } from "./assets/Icons";
 import "./App.css";
 
 export default function App() {
@@ -56,6 +56,7 @@ export default function App() {
               className={`nav-link ${location.pathname === '/' || location.pathname === '/quiz' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
+              <Logo width={20} height={20} fill="currentColor" />
               Curate Mode
             </Link>
             <Link
@@ -63,6 +64,7 @@ export default function App() {
               className={`nav-link ${location.pathname === '/chat' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
+              <ChatIcon width={20} height={20} fill="currentColor" />
               Chat
             </Link>
           </nav>
