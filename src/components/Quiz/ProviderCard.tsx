@@ -1,9 +1,8 @@
-import { Provider } from "./types";
 import { OpenAIIcon, GeminiIcon, GoogleIcon } from "../../assets/Icons";
 import './Quiz.css';
 
 interface ProviderCardProps {
-  provider: Provider;
+  providerName: string;
   index: number;
   choiceClass?: string;
 }
@@ -15,14 +14,14 @@ const ProviderLogos = {
   "Gemini Google Grounded": <GoogleIcon width={20} height={20} />,
 };
 
-export function ProviderCard({ provider, index, choiceClass }: ProviderCardProps) {
+export function ProviderCard({ providerName, index, choiceClass }: ProviderCardProps) {
   // Only use logos for known AI providers
-  const logo = ProviderLogos[provider.name as keyof typeof ProviderLogos];
+  const logo = ProviderLogos[providerName as keyof typeof ProviderLogos];
 
   return (
-    <div className={`quiz-provider-card ${choiceClass || ''}`} title={`${provider.name} - Vote #${index + 1}`}>
+    <div className={`quiz-provider-card ${choiceClass || ''}`} title={`${providerName} - Vote #${index + 1}`}>
       {logo}
-      <span className="quiz-provider-name">{provider.name}</span>
+      <span className="quiz-provider-name">{providerName}</span>
     </div>
   );
 }

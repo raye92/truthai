@@ -3,12 +3,21 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { Quiz } from '../components/Quiz/Quiz';
 import { Quiz as QuizType, Question as QuizQuestion, Answer as QuizAnswer } from '../components/Quiz/types';
+import { 
+  createQuiz, 
+  createQuestion, 
+  createAnswer, 
+  addAnswerToQuestion, 
+  addQuestionToQuiz, 
+  updateQuestionInQuiz,
+  addProvidersToAnswer
+} from '../components/Quiz/utils';
 import './QuizPage.css';
 
 const client = generateClient<Schema>();
 
 export function QuizPage() {
-  const [quiz, setQuiz] = useState<QuizType>({ questions: [] });
+  const [quiz, setQuiz] = useState<QuizType>(createQuiz());
   const [newQuestion, setNewQuestion] = useState('');
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
   
@@ -56,21 +65,21 @@ export function QuizPage() {
     const fullPrompt = `${INSTRUCTION_PROMPT}\n\nQuestion: ${question}`;
     
     const providers = [
-      { name: "GPT", url: "https://openai.com" },
-      { name: "Gemini", url: "https://gemini.google.com" },
-      { name: "Gemini Google Grounded", url: "https://gemini.google.com" }
+      "GPT",
+      "Gemini", 
+      "Gemini Google Grounded"
     ];
 
     // Query each provider separately so results show up individually
-    const queryProvider = async (provider: typeof providers[0], index: number) => {
+    const queryProvider = async (provider: string, index: number) => {
       try {
         let result;
         
-        if (provider.name === "GPT") {
+        if (provider === "GPT") {
           result = await client.queries.promptGpt({ prompt: fullPrompt });
-        } else if (provider.name === "Gemini") {
+        } else if (provider === "Gemini") {
           result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: false });
-        } else if (provider.name === "Gemini Google Grounded") {
+        } else if (provider === "Gemini Google Grounded") {
           result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: true });
         }
 
@@ -82,39 +91,17 @@ export function QuizPage() {
             const questionIndex = prevQuiz.questions.length - 1; // Latest question
             if (questionIndex < 0) return prevQuiz;
             
-            const newQuestions = [...prevQuiz.questions];
-            const questionToUpdate = { ...newQuestions[questionIndex] };
+            const questionToUpdate = prevQuiz.questions[questionIndex];
+            const newAnswer = createAnswer(response, provider);
+            const updatedQuestion = addAnswerToQuestion(questionToUpdate, newAnswer);
             
-            const existingAnswer = questionToUpdate.answers.find(a => a.answer === response);
-            
-            if (existingAnswer) {
-              // Add provider to existing answer
-              const providerExists = existingAnswer.providers.some(p => p.name === provider.name);
-              if (!providerExists) {
-                questionToUpdate.answers = questionToUpdate.answers.map(answer => 
-                  answer.answer === response
-                    ? { ...answer, providers: [...answer.providers, provider] }
-                    : answer
-                );
-                questionToUpdate.totalProviders += 1;
-              }
-            } else {
-              // Create new answer
-              questionToUpdate.answers = [
-                ...questionToUpdate.answers,
-                { answer: response, providers: [provider] }
-              ];
-              questionToUpdate.totalProviders += 1;
-            }
-            
-            newQuestions[questionIndex] = questionToUpdate;
-            return { ...prevQuiz, questions: newQuestions };
+            return updateQuestionInQuiz(prevQuiz, questionIndex, updatedQuestion);
           });
         } else {
-          console.error(`Error from ${provider.name}:`, result?.errors);
+          console.error(`Error from ${provider}:`, result?.errors);
         }
       } catch (error) {
-        console.error(`Error querying ${provider.name}:`, error);
+        console.error(`Error querying ${provider}:`, error);
       }
     };
 
@@ -140,13 +127,8 @@ export function QuizPage() {
     }
 
     // Add the question first
-    setQuiz(prevQuiz => ({
-      ...prevQuiz,
-      questions: [
-        ...prevQuiz.questions,
-        { text: newQuestion.trim(), answers: [], totalProviders: 0 }
-      ]
-    }));
+    const newQuestionObj = createQuestion(newQuestion);
+    setQuiz(prevQuiz => addQuestionToQuiz(prevQuiz, newQuestionObj));
     
     const questionText = newQuestion.trim();
     setNewQuestion('');
