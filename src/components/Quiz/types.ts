@@ -6,6 +6,7 @@ export interface Provider {
 export interface Answer {
   answer: string;
   providers: Provider[];
+  key?: string; // Optional key, will default to A, B, C, D... if not provided
 }
 
 export interface Question {

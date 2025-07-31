@@ -3,7 +3,6 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { Quiz } from '../components/Quiz/Quiz';
 import { Quiz as QuizType, Question as QuizQuestion, Answer as QuizAnswer } from '../components/Quiz/types';
-import { getAIProviders } from '../components/Quiz/ProviderCard';
 import './QuizPage.css';
 
 const client = generateClient<Schema>();
@@ -19,16 +18,17 @@ export function QuizPage() {
 
     # Instructions
     * Only output JSON format
-    * Your response should only be answers with no additional formatting or commentary
     * Label responses with the question number and answer as key-value pairs
+    * If question number is not specified, start numbering from 1
+    * Your response should not have additional formatting or commentary
 
     # Examples
     <question id="single-question">
     Question 10
     When it comes to predicting a person’s career success as an adult, how informative are traditional IQ tests?
-      They are only marginally reliable in predicting the success of business executives. 
-      They are totally unreliable in predicting the success of business executives. 
-      They are moderately reliable in predicting the success of business executives. 
+      They are only marginally reliable in predicting the success of business executives.
+      They are totally unreliable in predicting the success of business executives.
+      They are moderately reliable in predicting the success of business executives.
       They are highly reliable in predicting the success of business executives.
     </question>
 
@@ -48,7 +48,7 @@ export function QuizPage() {
     "1": Sub-Saharan Africa
     "2": 4
     }
-    </assistant_response>`;
+  </assistant_response>`;
 
   const queryAIProviders = async (question: string) => {
     setIsGeneratingAnswers(true);

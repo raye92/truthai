@@ -54,9 +54,8 @@ export function Question({ question, questionNumber }: QuestionProps) {
           const percentage = getPercentage(providerCount);
           const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
           
-          // Generate answer key based on the answer text or index
-          let answerKey = String.fromCharCode(65 + index); // A, B, C, D...
-          console.log("ANSwer KEY", answerKey);
+          // Use provided key or default to A, B, C, D...
+          const answerKey = answer.key || String.fromCharCode(65 + index);
 
           return (
             <Answer

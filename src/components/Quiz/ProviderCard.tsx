@@ -26,12 +26,3 @@ export function ProviderCard({ provider, index, choiceClass }: ProviderCardProps
     </div>
   );
 }
-
-// Helper function to get AI providers only
-export function getAIProviders(): Provider[] {
-  return [
-    { name: "GPT", url: "https://openai.com" },
-    { name: "Gemini", url: "https://gemini.google.com" },
-    { name: "Gemini Google Grounded", url: "https://gemini.google.com" },
-  ];
-}
