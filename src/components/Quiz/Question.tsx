@@ -45,7 +45,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
       <div className="quiz-question-header">
         <div className="quiz-question-number">{questionNumber}</div>
         <h3 className="quiz-question-title">{question.text}</h3>
-        <p className="quiz-question-total">Current models: <span className="quiz-question-total-number">{totalProviders}</span></p>
+        <p className="quiz-question-total">Current Answers: <span className="quiz-question-total-number">{totalProviders}</span></p>
       </div>
 
       <div className={answersClassName}>
