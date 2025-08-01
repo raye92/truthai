@@ -10,12 +10,17 @@ export const handler: Schema['promptGemini']['functionHandler'] = async (event, 
     const ai = new GoogleGenAI({});
 
     // Configure generation settings based on whether grounding is requested
-    let config = {};
+    let config: any = {
+        thinkingConfig: {
+            thinkingBudget: 0 // Disables thinking
+        }
+    };
     if (useGrounding) {
         const groundingTool = {
             googleSearch: {},
         };
         config = {
+            ...config,
             tools: [groundingTool],
         };
     }
