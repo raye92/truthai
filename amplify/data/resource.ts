@@ -2,6 +2,7 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { testTickle } from '../functions/test/resource';
 import { promptGpt } from '../functions/q-openai/resource';
 import { promptGemini } from '../functions/q-gemini/resource';
+import { promptLayout } from '../functions/q-layout/resource';
 import { postConfirmation } from "../auth/post-confirmation/resource";
 
 const schema = a.schema({
@@ -70,6 +71,14 @@ const schema = a.schema({
     .returns(a.string())
     .authorization((allow: any) => [allow.publicApiKey()])
     .handler(a.handler.function(promptGemini)),
+  promptLayout: a 
+    .query()
+    .arguments({
+      prompt: a.string(),
+    })
+    .returns(a.string())
+    .authorization((allow: any) => [allow.publicApiKey()])
+    .handler(a.handler.function(promptLayout)),
   testMonkey: a
     .query()
     .arguments({  name: a.string()  })

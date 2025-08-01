@@ -1,4 +1,4 @@
-//======== AI SLOP ========
+//======== CLEANUP ========
 import { Quiz, Question, Answer } from './types';
 
 export function createQuiz(): Quiz {
@@ -99,4 +99,4 @@ export function updateQuestionInQuiz(quiz: Quiz, questionIndex: number, updatedQ
     questions: newQuestions
   };
 } 
-//======== AI SLOP ========
+//======== CLEANUP ========
