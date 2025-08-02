@@ -15,10 +15,10 @@ export function createQuestion(text: string): Question {
   };
 }
 
-export function createAnswer(answer: string, provider: string): Answer {
+export function createAnswer(answer: string, provider?: string): Answer {
   return {
     answer: answer.trim(),
-    providers: [provider]
+    providers: provider ? [provider] : []
   };
 }
 

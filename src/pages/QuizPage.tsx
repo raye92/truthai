@@ -58,19 +58,31 @@ export function QuizPage() {
     }
   </assistant_response>`;
 
-  // Function that prints numbers every second for exactly 5 seconds and returns a promise
-  const runLayoutPrompt = (): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      let counter = 1;
-      const interval = setInterval(() => {
-        console.log(counter);
-        counter++;
-        if (counter > 5) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 1000);
-    });
+  // Calls the q-layout Lambda to parse questions and choices
+  interface LayoutChoice { key: string; text: string }
+  interface LayoutItem { question: string; questionNumber: string; choices: LayoutChoice[] }
+
+  const runLayoutPrompt = async (promptText: string): Promise<LayoutItem[]> => {
+    try {
+      const result = await client.queries.promptLayout({ prompt: promptText });
+      if (!result || result.errors) {
+        console.error('Layout prompt error:', result?.errors);
+        return [];
+      }
+      const raw = (result.data ?? '').trim();
+      if (!raw) return [];
+      let parsed: LayoutItem[] = [];
+      try {
+        parsed = JSON.parse(raw);
+      } catch (err) {
+        console.error('Failed to parse layout JSON:', err, raw);
+        return [];
+      }
+      return parsed;
+    } catch (err) {
+      console.error('Layout prompt exception:', err);
+      return [];
+    }
   };
 
   const queryAIProviders = async (question: string) => {
@@ -78,14 +90,16 @@ export function QuizPage() {
     
     const fullPrompt = `${INSTRUCTION_PROMPT}\n\nQuestion: ${question}`;
     
+    // Kick off layout prompt concurrently
+    const layoutDonePromise = runLayoutPrompt(question);
+
     const providers = [
       "GPT",
       "Gemini", 
       "Gemini Google Grounded"
     ];
 
-    // Kick off layout prompt and get a promise that resolves when done
-    const layoutDone = runLayoutPrompt();
+
 
     // Query each provider separately so results show up individually
     const queryProvider = async (provider: string) => {
@@ -103,12 +117,12 @@ export function QuizPage() {
         if (result && !result.errors && result.data && result.data.trim()) {
           const response = result.data.trim();
           
-          // Wait until layout prompt completes
-          await layoutDone;
+          // Wait for layout prompt to finish before adding answers
+          await layoutDonePromise;
 
           console.log(`Adding answer from ${provider}:`, response.substring(0, 100) + (response.length > 100 ? '...' : ''));
           
-          // Add answer once allowed and on lambda function completion
+          // Add answer after layout is ready
           setQuiz(prevQuiz => {
             const questionIndex = prevQuiz.questions.length - 1; // Latest question
             if (questionIndex < 0) return prevQuiz;
@@ -127,7 +141,7 @@ export function QuizPage() {
       }
     };
 
-    // Start all queries simultaneously but delay adding answers until layout prompt is finished
+    // Start all provider queries simultaneously
     const promises = providers.map((provider) => queryProvider(provider));
     
     try {
@@ -140,23 +154,37 @@ export function QuizPage() {
   };
 
   const handleAddQuestion = async () => {
-    if (!newQuestion.trim()) return;
-    
-    const existingQuestion = quiz.questions.find(q => q.text === newQuestion.trim());
-    if (existingQuestion) {
-      alert('This question already exists!');
+    const input = newQuestion.trim();
+    if (!input) return;
+
+    // Parse layout using the q-layout Lambda
+    const layoutItems = await runLayoutPrompt(input);
+    if (layoutItems.length === 0) {
+      alert('Could not parse question layout.');
       return;
     }
 
-    // Add the question first
-    const newQuestionObj = createQuestion(newQuestion);
-    setQuiz(prevQuiz => addQuestionToQuiz(prevQuiz, newQuestionObj));
-    
-    const questionText = newQuestion.trim();
     setNewQuestion('');
-    
-    // Then query AI providers for answers
-    await queryAIProviders(questionText);
+
+    for (const item of layoutItems) {
+      const questionText = item.question !== 'No question provided' ? item.question : input;
+
+      // Skip duplicate questions
+      if (quiz.questions.some(q => q.text === questionText)) continue;
+
+      let questionObj = createQuestion(questionText);
+
+      for (const choice of item.choices) {
+        let answerObj = createAnswer(choice.text);
+        answerObj = { ...answerObj, key: choice.key.toUpperCase() };
+        questionObj = addAnswerToQuestion(questionObj, answerObj);
+      }
+
+      setQuiz(prevQuiz => addQuestionToQuiz(prevQuiz, questionObj));
+
+      // Kick off provider queries for this question (do not await to allow parallelism)
+      queryAIProviders(questionText);
+    }
   };
 
   return (
