@@ -24,11 +24,10 @@
 }
 
 .quiz-page-content {
-  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .add-question-section {

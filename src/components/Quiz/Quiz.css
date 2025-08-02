@@ -2,18 +2,7 @@
   width: 100%;
   margin: 0 auto;
 }
-.quiz-header {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-.quiz-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: #000000;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0;
-}
+
 .quiz-total {
   font-size: 1.125rem;
   color: #6b7280;
