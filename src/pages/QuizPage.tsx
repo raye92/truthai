@@ -33,7 +33,7 @@ export function QuizPage() {
     # Examples
     <question id="single-question">
     Question 10
-    When it comes to predicting a person’s career success as an adult, how informative are traditional IQ tests?
+    When it comes to predicting a person's career success as an adult, how informative are traditional IQ tests?
       They are only marginally reliable in predicting the success of business executives.
       They are totally unreliable in predicting the success of business executives.
       They are moderately reliable in predicting the success of business executives.
@@ -58,6 +58,21 @@ export function QuizPage() {
     }
   </assistant_response>`;
 
+  // Function that prints numbers every second for exactly 5 seconds and returns a promise
+  const runLayoutPrompt = (): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      let counter = 1;
+      const interval = setInterval(() => {
+        console.log(counter);
+        counter++;
+        if (counter > 5) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 1000);
+    });
+  };
+
   const queryAIProviders = async (question: string) => {
     setIsGeneratingAnswers(true);
     
@@ -69,8 +84,11 @@ export function QuizPage() {
       "Gemini Google Grounded"
     ];
 
+    // Kick off layout prompt and get a promise that resolves when done
+    const layoutDone = runLayoutPrompt();
+
     // Query each provider separately so results show up individually
-    const queryProvider = async (provider: string, index: number) => {
+    const queryProvider = async (provider: string) => {
       try {
         let result;
         
@@ -85,7 +103,12 @@ export function QuizPage() {
         if (result && !result.errors && result.data && result.data.trim()) {
           const response = result.data.trim();
           
-          // Add answer as it arrives
+          // Wait until layout prompt completes
+          await layoutDone;
+
+          console.log(`Adding answer from ${provider}:`, response.substring(0, 100) + (response.length > 100 ? '...' : ''));
+          
+          // Add answer once allowed and on lambda function completion
           setQuiz(prevQuiz => {
             const questionIndex = prevQuiz.questions.length - 1; // Latest question
             if (questionIndex < 0) return prevQuiz;
@@ -104,8 +127,8 @@ export function QuizPage() {
       }
     };
 
-    // Start all queries simultaneously but process results as they arrive
-    const promises = providers.map((provider, index) => queryProvider(provider, index));
+    // Start all queries simultaneously but delay adding answers until layout prompt is finished
+    const promises = providers.map((provider) => queryProvider(provider));
     
     try {
       await Promise.allSettled(promises);

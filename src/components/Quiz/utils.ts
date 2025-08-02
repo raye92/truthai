@@ -98,5 +98,14 @@ export function updateQuestionInQuiz(quiz: Quiz, questionIndex: number, updatedQ
     ...quiz,
     questions: newQuestions
   };
-} 
+}
+
+/**
+ * Reassigns the key of an answer at the specified index.
+ */
+export function changeAnswerKey(answers: Answer[], answerIndex: number, newKey: string): Answer[] {
+  const upperKey = newKey.toUpperCase();
+  return answers.map((answer, index) => index === answerIndex ? { ...answer, key: upperKey } : answer);
+}
+
 //======== CLEANUP ========

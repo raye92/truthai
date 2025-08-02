@@ -1,4 +1,6 @@
-import { Question as QuestionType } from "./types";
+import { useState, useEffect } from 'react';
+import { Question as QuestionType, Answer as AnswerType } from "./types";
+import { changeAnswerKey } from "./utils";
 import { Answer } from "./Answer";
 import './Quiz.css';
 
@@ -8,17 +10,63 @@ interface QuestionProps {
 }
 
 export function Question({ question, questionNumber }: QuestionProps) {
+
+  // Local copy of answers so we can mutate keys for testing without affecting parent
+  const [answers, setAnswers] = useState<AnswerType[]>(() => [...question.answers]);
+
+  // Keep local answers in sync if parent changes
+  useEffect(() => {
+    setAnswers([...question.answers]);
+  }, [question.answers]);
+
+  // Produce a list of answers with a displayKey (auto-filled when blank) and sorted alphabetically.
+  const displayAnswers = (() => {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const used = new Set<string>();
+
+    // Collect used keys from non-blank answers
+    answers.forEach(ans => {
+      if (ans.key && /^[A-Z]$/i.test(ans.key)) {
+        used.add(ans.key.toUpperCase());
+      }
+    });
+
+    // Build display list, assigning temporary letters for blanks
+    let alphaIdx = 0;
+    const derived = answers.map(ans => {
+      let displayKey = ans.key ? ans.key.toUpperCase() : '';
+      if (!displayKey) {
+        while (alphaIdx < alphabet.length && used.has(alphabet[alphaIdx])) {
+          alphaIdx++;
+        }
+        displayKey = alphabet[alphaIdx] || '?';
+        used.add(displayKey);
+        alphaIdx++;
+      }
+      return { answer: ans, displayKey };
+    });
+
+    // Sort alphabetically by the display key
+    derived.sort((a, b) => a.displayKey.localeCompare(b.displayKey));
+
+    // Debug print
+    console.log(
+      'Normalized answers →',
+      derived.map(d => `${d.displayKey}: ${d.answer.answer}`)
+    );
+
+    return derived;
+  })();
+
   const totalProviders = question.totalProviders;
-  
-  // Find the maximum number of providers for any answer
-  const maxProviders = Math.max(...question.answers.map(answer => answer.providers.length));
-  
-  // Find winning answers (those with the most providers)
-  const winningAnswers = question.answers.filter(
+
+  // Compute values
+  const maxProviders = answers.length > 0 ? Math.max(...answers.map(a => a.providers.length)) : 0;
+
+  const winningAnswers = answers.filter(
     answer => answer.providers.length === maxProviders && maxProviders > 0
   );
 
-  // Calculate percentages
   const getPercentage = (providerCount: number) => {
     return totalProviders > 0 ? Math.round((providerCount / totalProviders) * 100) : 0;
   };
@@ -37,7 +85,15 @@ export function Question({ question, questionNumber }: QuestionProps) {
     return '';
   };
 
-  const gridClass = getBalancedGridClass(question.answers.length);
+  const handleKeyChange = (targetAnswer: AnswerType, newKey: string) => {
+    setAnswers(prev => {
+      const idx = prev.indexOf(targetAnswer);
+      if (idx === -1) return prev;
+      return changeAnswerKey(prev, idx, newKey);
+    });
+  };
+
+  const gridClass = getBalancedGridClass(answers.length);
   const answersClassName = `quiz-answers${gridClass ? ` ${gridClass}` : ''}`;
 
   return (
@@ -49,13 +105,10 @@ export function Question({ question, questionNumber }: QuestionProps) {
       </div>
 
       <div className={answersClassName}>
-        {question.answers.map((answer, index) => {
+        {displayAnswers.map(({ answer, displayKey }, idx) => {
           const providerCount = answer.providers.length;
           const percentage = getPercentage(providerCount);
           const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
-          
-          // Use provided key or default to A, B, C, D...
-          const answerKey = answer.key || String.fromCharCode(65 + index);
 
           return (
             <Answer
@@ -64,7 +117,8 @@ export function Question({ question, questionNumber }: QuestionProps) {
               isWinning={isWinning}
               percentage={percentage}
               maxProviders={maxProviders}
-              answerKey={answerKey}
+              answerKey={displayKey}
+              onKeyChange={(newKey) => handleKeyChange(answer, newKey)}
             />
           );
         })}
