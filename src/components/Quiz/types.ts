@@ -1,11 +1,7 @@
-export interface Provider {
-  name: string;
-  url: string;
-}
-
 export interface Answer {
   answer: string;
-  providers: Provider[];
+  providers: string[];
+  key?: string; // Optional key, will default to A, B, C, D... if not provided
 }
 
 export interface Question {

@@ -476,6 +476,20 @@
             }
           }
         },
+        "promptLayout": {
+          "name": "promptLayout",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "prompt": {
+              "name": "prompt",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            }
+          }
+        },
         "testMonkey": {
           "name": "testMonkey",
           "isArray": false,

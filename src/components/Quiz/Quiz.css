@@ -58,6 +58,7 @@
 .quiz-question-total {
   color: #6b7280;
   margin-left: auto;
+  text-align: right;
 }
 .quiz-question-total-number {
   font-weight: 600;
