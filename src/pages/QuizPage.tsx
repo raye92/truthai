@@ -74,7 +74,8 @@ export function QuizPage() {
       if (!raw) return [];
       let parsed: LayoutItem[] = [];
       try {
-        parsed = JSON.parse(raw);
+        const json = JSON.parse(raw);
+        parsed = Array.isArray(json) ? json : [json];
       } catch (err) {
         console.error('Failed to parse layout JSON:', err, raw);
         return [];

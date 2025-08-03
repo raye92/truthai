@@ -96,14 +96,10 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
 }
-.quiz-answer-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-left: auto;
-  min-width: 80px;
-}
+
 .quiz-answer-key {
   width: 2.25rem;
   text-align: center;
@@ -114,6 +110,8 @@
 .quiz-answer-text {
   font-weight: 600;
   font-size: 1rem;
+  word-break: break-word;
+  max-width: 100%;
 }
 .quiz-answer-crown {
   min-width: 130px;
