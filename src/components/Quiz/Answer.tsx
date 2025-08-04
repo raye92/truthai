@@ -72,16 +72,14 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
         }}
       > 
       <div style={styles.quizAnswerHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={styles.quizAnswerKey}>
-            {answerKey}
-            {/* ======== TESTING ======== */}
-            <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
-          </div>
-          <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
-          {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
+        <div style={styles.quizAnswerKey}>
+          {answerKey}
+          {/* ======== TESTING ======== */}
+          <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto' }}>
+        <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
+        {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
+        <div style={styles.quizAnswerConfidence}>
           <span style={styles.quizAnswerSubtext}>Confidence score:</span>
           <span style={styles.quizAnswerPercent}>{percentage}%</span>
         </div>
@@ -118,11 +116,9 @@ const styles = {
   },
   quizAnswerHeader: {
     display: 'flex',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: '0.5rem',
     marginBottom: '0.5rem',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap' as const,
     width: '100%',
   },
   quizAnswerKey: {
@@ -136,17 +132,24 @@ const styles = {
     fontWeight: '600',
     fontSize: '1rem',
     wordBreak: 'break-word' as const,
-    maxWidth: '100%',
+    flex: '1 1 auto',
+    minWidth: '0',
   },
   quizAnswerCrown: {
     minWidth: '130px',
     color: '#f59e0b',
     fontWeight: '600',
     fontSize: '0.95rem',
-    marginLeft: '0.5rem',
+    flexShrink: '0',
+  },
+  quizAnswerConfidence: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-end',
+    flexShrink: '0',
+    marginLeft: 'auto',
   },
   quizAnswerPercent: {
-    marginLeft: '0.25rem',
     fontSize: '1rem',
     fontWeight: 'bold',
     textAlign: 'right' as const,
