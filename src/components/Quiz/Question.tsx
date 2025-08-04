@@ -47,12 +47,6 @@ export function Question({ question, questionNumber }: QuestionProps) {
     // Sort alphabetically by the display key
     derived.sort((a, b) => a.displayKey.localeCompare(b.displayKey));
 
-    // Debug print
-    console.log(
-      'Normalized answers →',
-      derived.map(d => `${d.displayKey}: ${d.answer.answer}`)
-    );
-
     return derived;
   }, [answers]); // Only re-calculate when 'answers' changes
 
@@ -72,7 +66,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
   // Calculate optimal grid layout to avoid uneven distribution
   const getBalancedGridStyle = (answerCount: number) => {
     const baseStyle = { ...styles.quizAnswers };
-    
+
     if (answerCount === 4) {
       return { ...baseStyle, gridTemplateColumns: 'repeat(2, 1fr)' }; // 2x2 instead of 3+1
     }
@@ -170,13 +164,6 @@ const styles = {
     width: '100%',
     justifyItems: 'stretch',
     alignItems: 'stretch',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-    '@media (max-width: 768px)': {
-      gridTemplateColumns: '1fr',
-      gap: '0.75rem',
-    },
-    '@media (min-width: 769px) and (max-width: 1200px)': {
-      gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-    },
+    gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', // Responsive adjustments moved to external CSS
   },
 };

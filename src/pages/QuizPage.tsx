@@ -86,14 +86,9 @@ export function QuizPage() {
     }
   };
 
-  const queryAIProviders = async (question: string) => {
-    setIsGeneratingAnswers(true);
-    
+  const queryAIProviders = async (question: string, layoutDonePromise?: Promise<LayoutItem[]>) => {
     const fullPrompt = `${INSTRUCTION_PROMPT}\n\nQuestion: ${question}`;
     
-    // Kick off layout prompt concurrently
-    const layoutDonePromise = runLayoutPrompt(question);
-
     const providers = [
       "GPT",
       "Gemini", 
@@ -158,12 +153,17 @@ export function QuizPage() {
 
     setIsGeneratingAnswers(true);
 
-    // Parse layout using the q-layout Lambda
-    const layoutItems = await runLayoutPrompt(input);
+    // Start the layout prompt and immediately kick off provider queries using the SAME input text
+    const layoutPromise = runLayoutPrompt(input);
+    queryAIProviders(input, layoutPromise); // Fire-and-forget – we do not await it here
+
+    // Wait for the layout prompt so we can build the question(s)
+    const layoutItems = await layoutPromise;
+
     if (layoutItems.length === 0) {
-      console.log("response:", runLayoutPrompt(input));
-      alert('Could not parse question layout.');
+      console.log('Layout prompt returned no items for input:', input);
       setIsGeneratingAnswers(false);
+      alert('Could not parse question layout.');
       return;
     }
 
@@ -172,8 +172,8 @@ export function QuizPage() {
     for (const item of layoutItems) {
       const questionText = item.question !== 'No question provided' ? item.question : input;
 
-      // Skip duplicate questions
-      if (quiz.questions.some(q => q.text === questionText)) continue;
+      // Skip duplicates
+      if (quiz.questions.some((q) => q.text === questionText)) continue;
 
       let questionObj = createQuestion(questionText);
 
@@ -183,10 +183,8 @@ export function QuizPage() {
         questionObj = addAnswerToQuestion(questionObj, answerObj);
       }
 
-      setQuiz(prevQuiz => addQuestionToQuiz(prevQuiz, questionObj));
-
-      // Kick off provider queries for this question (do not await to allow parallelism)
-      queryAIProviders(questionText);
+      // Add the new question to the quiz state
+      setQuiz((prevQuiz) => addQuestionToQuiz(prevQuiz, questionObj));
     }
     setIsGeneratingAnswers(false);
   };
