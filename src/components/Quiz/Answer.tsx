@@ -43,10 +43,10 @@ export function Answer({
       className="answer-card"
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ 
-        duration: 0.4, 
+      transition={{
+        duration: 0.4,
         delay: index * 0.1,
-        ease: "easeOutCubic"
+        ease: "easeOut"
       }}
       whileHover={{ 
         y: -4,
