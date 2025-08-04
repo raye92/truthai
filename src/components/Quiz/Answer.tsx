@@ -1,3 +1,4 @@
+import { useRef, useLayoutEffect, useState } from 'react';
 import { Answer as AnswerType } from "./types";
 import { ProviderCard } from "./ProviderCard";
 
@@ -8,12 +9,25 @@ interface AnswerProps {
   maxProviders: number;
   answerKey: string;
   onKeyChange: (newKey: string) => void;
+  forceFullRow?: boolean;
 }
 
-export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange }: AnswerProps) {
+export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false }: AnswerProps) {
   const providerCount = answer.providers.length;
   const leading = (providerCount / maxProviders) == 1 ? 1 : 0;
   const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
+  
+  const textRef = useRef<HTMLDivElement>(null);
+  const [isTall, setIsTall] = useState(false);
+
+  useLayoutEffect(() => {
+    if (textRef.current) {
+      const style = getComputedStyle(textRef.current);
+      const lineHeight = parseFloat(style.lineHeight || '16');
+      const threshold = lineHeight * 3; // approximate height for 3 lines
+      setIsTall(textRef.current.offsetHeight > threshold);
+    }
+  }, [answer.answer]);
   
   // Get color class based on winning status
   const getChoiceClass = () => {
@@ -51,7 +65,12 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
   };
 
   return (
-    <div style={isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer}> 
+    <div
+        style={{
+          ...(isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer),
+          ...((isTall || forceFullRow) ? { gridColumn: '1 / -1' } : {}),
+        }}
+      > 
       <div style={styles.quizAnswerHeader}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <div style={styles.quizAnswerKey}>
@@ -59,7 +78,7 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
             {/* ======== TESTING ======== */}
             <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
           </div>
-          <div style={styles.quizAnswerText}>{answer.answer}</div>
+          <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
           {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto' }}>

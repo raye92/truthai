@@ -63,7 +63,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
     return totalProviders > 0 ? Math.round((providerCount / totalProviders) * 100) : 0;
   };
 
-  // Calculate optimal grid layout to avoid uneven distribution
+  // UNUSED
   const getBalancedGridStyle = (answerCount: number) => {
     const baseStyle = { ...styles.quizAnswers };
 
@@ -87,7 +87,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
     });
   };
 
-  const answersStyle = getBalancedGridStyle(answers.length);
+  const answersStyle = styles.quizAnswers;
 
   return (
     <div style={styles.quizQuestion}>
@@ -164,6 +164,6 @@ const styles = {
     width: '100%',
     justifyItems: 'stretch',
     alignItems: 'stretch',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', // Responsive adjustments moved to external CSS
+    gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))',
   },
 };
