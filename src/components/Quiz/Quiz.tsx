@@ -9,9 +9,6 @@ interface QuizProps {
 export function Quiz({ quiz }: QuizProps) {
   return (
     <div className="quiz-root">
-      <div className="quiz-header">
-        <h1 className="quiz-title">Curated Answers</h1>
-      </div>
       <div className="quiz-questions">
         {quiz.questions.map((question, index) => (
           <Question

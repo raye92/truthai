@@ -69,11 +69,13 @@ export function QuizPage() {
         console.error('Layout prompt error:', result?.errors);
         return [];
       }
+      console.log('Layout prompt result:', result.data);
       const raw = (result.data ?? '').trim();
       if (!raw) return [];
       let parsed: LayoutItem[] = [];
       try {
-        parsed = JSON.parse(raw);
+        const json = JSON.parse(raw);
+        parsed = Array.isArray(json) ? json : [json];
       } catch (err) {
         console.error('Failed to parse layout JSON:', err, raw);
         return [];
@@ -157,10 +159,14 @@ export function QuizPage() {
     const input = newQuestion.trim();
     if (!input) return;
 
+    setIsGeneratingAnswers(true);
+
     // Parse layout using the q-layout Lambda
     const layoutItems = await runLayoutPrompt(input);
     if (layoutItems.length === 0) {
+      console.log("response:", runLayoutPrompt(input));
       alert('Could not parse question layout.');
+      setIsGeneratingAnswers(false);
       return;
     }
 
@@ -185,6 +191,7 @@ export function QuizPage() {
       // Kick off provider queries for this question (do not await to allow parallelism)
       queryAIProviders(questionText);
     }
+    setIsGeneratingAnswers(false);
   };
 
   return (
@@ -203,7 +210,7 @@ export function QuizPage() {
               onChange={(e) => setNewQuestion(e.target.value)}
               placeholder="Enter a new question..."
               className="question-input"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddQuestion()}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddQuestion()}
               disabled={isGeneratingAnswers}
             />
             <button onClick={handleAddQuestion} className="add-question-btn" disabled={isGeneratingAnswers}>

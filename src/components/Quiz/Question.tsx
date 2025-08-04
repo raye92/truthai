@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
 import { Answer } from "./Answer";
@@ -20,7 +20,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
   }, [question.answers]);
 
   // Produce a list of answers with a displayKey (auto-filled when blank) and sorted alphabetically.
-  const displayAnswers = (() => {
+  const displayAnswers = useMemo(() => {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const used = new Set<string>();
 
@@ -56,7 +56,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
     );
 
     return derived;
-  })();
+  }, [answers]); // Only re-calculate when 'answers' changes
 
   const totalProviders = question.totalProviders;
 

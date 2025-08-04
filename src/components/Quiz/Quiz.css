@@ -2,18 +2,7 @@
   width: 100%;
   margin: 0 auto;
 }
-.quiz-header {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-.quiz-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: #000000;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0;
-}
+
 .quiz-total {
   font-size: 1.125rem;
   color: #6b7280;
@@ -107,14 +96,10 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
 }
-.quiz-answer-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-left: auto;
-  min-width: 80px;
-}
+
 .quiz-answer-key {
   width: 2.25rem;
   text-align: center;
@@ -125,6 +110,8 @@
 .quiz-answer-text {
   font-weight: 600;
   font-size: 1rem;
+  word-break: break-word;
+  max-width: 100%;
 }
 .quiz-answer-crown {
   min-width: 130px;
