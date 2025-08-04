@@ -5,7 +5,6 @@ import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
 import { Answer } from "./Answer";
 import 'react-grid-layout/css/styles.css';
-import 'react-grid-layout/css/resizable.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
