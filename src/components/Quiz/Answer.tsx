@@ -18,6 +18,7 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
   const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
   
   const textRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
   const [isTall, setIsTall] = useState(false);
 
   useLayoutEffect(() => {
@@ -86,10 +87,15 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
       </div>
       {providerCount > 0 ? (
         <div style={styles.quizAnswerBarContainer}>
-          <div style={styles.quizAnswerBarBg}>
+          <div style={styles.quizAnswerBarBg} ref={barRef}>
             <div style={getBarStyle()}>
               {answer.providers.map((provider, index) => (
-                <ProviderCard key={`${provider}-${index}`} providerName={provider} index={index} choiceClass={getChoiceClass()} />
+                <ProviderCard 
+                  key={`${provider}-${index}`} 
+                  providerName={provider} 
+                  index={index} 
+                  choiceClass={getChoiceClass()}
+                />
               ))}
             </div>
           </div>
@@ -117,7 +123,7 @@ const styles = {
   quizAnswerHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.5rem',
+    gap: '0.75rem',
     marginBottom: '0.5rem',
     width: '100%',
   },
@@ -191,7 +197,8 @@ const styles = {
     alignItems: 'center',
     gap: '0.25rem',
     padding: '0.25rem',
-    flexWrap: 'wrap' as const,
+    flexWrap: 'nowrap' as const,
     border: '2px solid transparent',
+    minWidth: '0',
   },
 };
