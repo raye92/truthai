@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
 import { Answer } from "./Answer";
-import './Quiz.css';
 
 interface QuestionProps {
   question: QuestionType;
@@ -10,7 +9,6 @@ interface QuestionProps {
 }
 
 export function Question({ question, questionNumber }: QuestionProps) {
-
   // Local copy of answers so we can mutate keys for testing without affecting parent
   const [answers, setAnswers] = useState<AnswerType[]>(() => [...question.answers]);
 
@@ -72,17 +70,19 @@ export function Question({ question, questionNumber }: QuestionProps) {
   };
 
   // Calculate optimal grid layout to avoid uneven distribution
-  const getBalancedGridClass = (answerCount: number) => {
+  const getBalancedGridStyle = (answerCount: number) => {
+    const baseStyle = { ...styles.quizAnswers };
+    
     if (answerCount === 4) {
-      return 'balanced-4'; // 2x2 instead of 3+1
+      return { ...baseStyle, gridTemplateColumns: 'repeat(2, 1fr)' }; // 2x2 instead of 3+1
     }
     if (answerCount === 6) {
-      return 'balanced-6'; // 3x2 instead of 4+2
+      return { ...baseStyle, gridTemplateColumns: 'repeat(3, 1fr)' }; // 3x2 instead of 4+2
     }
     if (answerCount === 5 || answerCount === 7) {
-      return 'force-balanced'; // Use smaller minmax to distribute more evenly
+      return { ...baseStyle, gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }; // Use smaller minmax to distribute more evenly
     }
-    return '';
+    return baseStyle;
   };
 
   const handleKeyChange = (targetAnswer: AnswerType, newKey: string) => {
@@ -93,18 +93,17 @@ export function Question({ question, questionNumber }: QuestionProps) {
     });
   };
 
-  const gridClass = getBalancedGridClass(answers.length);
-  const answersClassName = `quiz-answers${gridClass ? ` ${gridClass}` : ''}`;
+  const answersStyle = getBalancedGridStyle(answers.length);
 
   return (
-    <div className="quiz-question">
-      <div className="quiz-question-header">
-        <div className="quiz-question-number">{questionNumber}</div>
-        <h3 className="quiz-question-title">{question.text}</h3>
-        <p className="quiz-question-total">Current Answers: <span className="quiz-question-total-number">{totalProviders}</span></p>
+    <div style={styles.quizQuestion}>
+      <div style={styles.quizQuestionHeader}>
+        <div style={styles.quizQuestionNumber}>{questionNumber}</div>
+        <h3 style={styles.quizQuestionTitle}>{question.text}</h3>
+        <p style={styles.quizQuestionTotal}>Current Answers: <span style={styles.quizQuestionTotalNumber}>{totalProviders}</span></p>
       </div>
 
-      <div className={answersClassName}>
+      <div style={answersStyle}>
         {displayAnswers.map(({ answer, displayKey }, idx) => {
           const providerCount = answer.providers.length;
           const percentage = getPercentage(providerCount);
@@ -126,3 +125,58 @@ export function Question({ question, questionNumber }: QuestionProps) {
     </div>
   );
 }
+
+const styles = {
+  quizQuestion: {
+    background: '#fff',
+    borderRadius: '1.25rem',
+    padding: '1.5rem',
+    paddingTop: '1rem',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+  },
+  quizQuestionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+  },
+  quizQuestionNumber: {
+    width: '2.5rem',
+    height: '2.5rem',
+    background: '#3b82f6',
+    color: '#fff',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    fontSize: '1.25rem',
+  },
+  quizQuestionTitle: {
+    fontSize: '1.5rem',
+    fontWeight: '600',
+  },
+  quizQuestionTotal: {
+    color: '#6b7280',
+    marginLeft: 'auto',
+    textAlign: 'right' as const,
+  },
+  quizQuestionTotalNumber: {
+    fontWeight: '600',
+  },
+  quizAnswers: {
+    display: 'grid',
+    gap: '1rem',
+    width: '100%',
+    justifyItems: 'stretch',
+    alignItems: 'stretch',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '0.75rem',
+    },
+    '@media (min-width: 769px) and (max-width: 1200px)': {
+      gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+    },
+  },
+};

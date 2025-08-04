@@ -1,5 +1,4 @@
 import { FormEvent, useState } from "react";
-import "./ChatInput.css";
 import type { ChatOptions } from "../hooks/useChat";
 
 interface ChatInputProps {
@@ -25,38 +24,104 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     setInput("");
   };
 
+  const getInputStyle = () => {
+    const baseStyle = { ...styles.chatInput };
+    if (isLoading) {
+      return {
+        ...baseStyle,
+        background: '#f9fafb',
+        color: '#9ca3af',
+      };
+    }
+    return baseStyle;
+  };
+
+  const getModelSelectStyle = () => {
+    const baseStyle = { ...styles.modelSelect };
+    if (isLoading) {
+      return {
+        ...baseStyle,
+        background: '#f9fafb',
+        cursor: 'not-allowed',
+      };
+    }
+    return baseStyle;
+  };
+
+  const getSendButtonStyle = () => {
+    const baseStyle = { ...styles.sendButton };
+    if (isLoading || !input.trim()) {
+      return {
+        ...baseStyle,
+        background: '#d1d5db',
+        cursor: 'not-allowed',
+      };
+    }
+    return baseStyle;
+  };
+
+  const getCheckboxStyle = () => {
+    if (isLoading) {
+      return {
+        cursor: 'not-allowed',
+      };
+    }
+    return {
+      cursor: 'pointer',
+    };
+  };
+
   return (
-    <div className="chat-input-container">
+    <div style={styles.chatInputContainer}>
       {selectedModel === "gemini" && (
-        <div className="grounding-option-top">
-          <label className="grounding-label">
+        <div style={styles.groundingOptionTop}>
+          <label style={styles.groundingLabel}>
             <input
               type="checkbox"
               checked={useGrounding}
               onChange={(e) => setUseGrounding(e.target.checked)}
               disabled={isLoading}
+              style={getCheckboxStyle()}
             />
             Google Search Grounding
           </label>
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="chat-input-form">
+      <form onSubmit={handleSubmit} style={styles.chatInputForm}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
-          className="chat-input"
+          style={getInputStyle()}
           disabled={isLoading}
+          onFocus={(e) => {
+            e.target.style.outline = 'none';
+            e.target.style.borderColor = '#3b82f6';
+            e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = '#d1d5db';
+            e.target.style.boxShadow = 'none';
+          }}
         />
         
-        <div className="model-selector">
+        <div style={styles.modelSelector}>
           <select 
             value={selectedModel} 
             onChange={(e) => setSelectedModel(e.target.value as "chatgpt" | "gemini")}
             disabled={isLoading}
-            className="model-select"
+            style={getModelSelectStyle()}
+            onFocus={(e) => {
+              e.target.style.outline = 'none';
+              e.target.style.borderColor = '#3b82f6';
+              e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#d1d5db';
+              e.target.style.boxShadow = 'none';
+            }}
           >
             <option value="chatgpt">ChatGPT</option>
             <option value="gemini">Gemini</option>
@@ -66,7 +131,17 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="send-button"
+          style={getSendButtonStyle()}
+          onMouseEnter={(e) => {
+            if (!isLoading && input.trim()) {
+              e.currentTarget.style.background = '#2563eb';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isLoading && input.trim()) {
+              e.currentTarget.style.background = '#3b82f6';
+            }
+          }}
         >
           Send
         </button>
@@ -74,3 +149,62 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     </div>
   );
 }
+
+const styles = {
+  chatInputContainer: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0.25rem',
+    padding: '0px 10px',
+  },
+  groundingOptionTop: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: '0.5rem 0',
+  },
+  groundingLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.375rem',
+    fontSize: '0.875rem',
+    color: '#374151',
+    cursor: 'pointer',
+  },
+  chatInputForm: {
+    display: 'flex',
+    gap: '0.75rem',
+    alignItems: 'center',
+  },
+  chatInput: {
+    flex: 1,
+    padding: '0.75rem 1rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '1rem',
+    background: 'white',
+    transition: 'border-color 0.2s',
+  },
+  modelSelector: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  modelSelect: {
+    padding: '0.75rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    background: 'white',
+    cursor: 'pointer',
+    minWidth: '100px',
+  },
+  sendButton: {
+    padding: '0.75rem 1.5rem',
+    background: '#3b82f6',
+    color: 'white',
+    border: 'none',
+    borderRadius: '0.375rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+};

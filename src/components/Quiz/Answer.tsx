@@ -1,6 +1,5 @@
 import { Answer as AnswerType } from "./types";
 import { ProviderCard } from "./ProviderCard";
-import './Quiz.css';
 
 interface AnswerProps {
   answer: AnswerType;
@@ -34,27 +33,44 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
     }
   };
 
+  const getBarStyle = () => {
+    const baseStyle = { ...styles.quizAnswerBar, width: `${height}%` };
+    if (isWinning) {
+      return {
+        ...baseStyle,
+        borderColor: '#f59e0b',
+        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+      };
+    } else {
+      return {
+        ...baseStyle,
+        borderColor: '#6b7280',
+        background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+      };
+    }
+  };
+
   return (
-    <div className={`quiz-answer${isWinning ? ' quiz-answer-winning' : ''}`}> 
-      <div className="quiz-answer-header">
+    <div style={isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer}> 
+      <div style={styles.quizAnswerHeader}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div className="quiz-answer-key">
+          <div style={styles.quizAnswerKey}>
             {answerKey}
             {/* ======== TESTING ======== */}
             <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
           </div>
-          <div className="quiz-answer-text">{answer.answer}</div>
-          {isWinning && <div className="quiz-answer-crown">👑 BEST ANSWER</div>}
+          <div style={styles.quizAnswerText}>{answer.answer}</div>
+          {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto' }}>
-          <span className="quiz-answer-subtext">Confidence score:</span>
-          <span className="quiz-answer-percent">{percentage}%</span>
+          <span style={styles.quizAnswerSubtext}>Confidence score:</span>
+          <span style={styles.quizAnswerPercent}>{percentage}%</span>
         </div>
       </div>
       {providerCount > 0 ? (
-        <div className="quiz-answer-bar-container">
-          <div className="quiz-answer-bar-bg">
-            <div className={`quiz-answer-bar ${getChoiceClass()}`} style={{ width: `${height}%` }}>
+        <div style={styles.quizAnswerBarContainer}>
+          <div style={styles.quizAnswerBarBg}>
+            <div style={getBarStyle()}>
               {answer.providers.map((provider, index) => (
                 <ProviderCard key={`${provider}-${index}`} providerName={provider} index={index} choiceClass={getChoiceClass()} />
               ))}
@@ -62,8 +78,98 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
           </div>
         </div>
       ) : (
-        <div className="quiz-answer-no-providers">No Answers</div>
+        <div style={styles.quizAnswerNoProviders}>No Answers</div>
       )}
     </div>
   );
 }
+
+const styles = {
+  quizAnswer: {
+    padding: '0.75rem',
+    borderRadius: '1rem',
+    background: '#f3f4f6',
+    transition: 'box-shadow 0.3s',
+    marginBottom: '0.5rem',
+  },
+  quizAnswerWinning: {
+    background: '#fff6e6',
+    border: '2px solid #fdc58a',
+    boxShadow: '0 2px 8px #fde68a33',
+  },
+  quizAnswerHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '0.5rem',
+    marginBottom: '0.5rem',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap' as const,
+    width: '100%',
+  },
+  quizAnswerKey: {
+    width: '2.25rem',
+    textAlign: 'center' as const,
+    fontWeight: 'bold',
+    fontSize: '1.1rem',
+    color: '#000000',
+  },
+  quizAnswerText: {
+    fontWeight: '600',
+    fontSize: '1rem',
+    wordBreak: 'break-word' as const,
+    maxWidth: '100%',
+  },
+  quizAnswerCrown: {
+    minWidth: '130px',
+    color: '#f59e0b',
+    fontWeight: '600',
+    fontSize: '0.95rem',
+    marginLeft: '0.5rem',
+  },
+  quizAnswerPercent: {
+    marginLeft: '0.25rem',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    textAlign: 'right' as const,
+  },
+  quizAnswerSubtext: {
+    fontSize: '0.8rem',
+    color: '#6b7280',
+    textAlign: 'right' as const,
+  },
+  quizAnswerProviders: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '0.5rem',
+    marginBottom: '0.5rem',
+  },
+  quizAnswerNoProviders: {
+    color: '#6b7280',
+    fontStyle: 'italic',
+    fontSize: '0.875rem',
+    padding: '0.5rem',
+  },
+  quizAnswerBarContainer: {
+    position: 'relative' as const,
+    marginTop: '0.5rem',
+  },
+  quizAnswerBarBg: {
+    width: '100%',
+    background: '#e5e7eb',
+    borderRadius: '0.75rem',
+    height: '3rem',
+    overflow: 'hidden',
+    position: 'relative' as const,
+  },
+  quizAnswerBar: {
+    height: '100%',
+    borderRadius: '0.75rem',
+    transition: 'width 0.7s',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    padding: '0.25rem',
+    flexWrap: 'wrap' as const,
+    border: '2px solid transparent',
+  },
+};

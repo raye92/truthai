@@ -11,7 +11,6 @@ import {
   addQuestionToQuiz, 
   updateQuestionInQuiz
 } from '../components/Quiz/utils';
-import './QuizPage.css';
 
 const client = generateClient<Schema>();
 
@@ -100,8 +99,6 @@ export function QuizPage() {
       "Gemini", 
       "Gemini Google Grounded"
     ];
-
-
 
     // Query each provider separately so results show up individually
     const queryProvider = async (provider: string) => {
@@ -195,42 +192,52 @@ export function QuizPage() {
   };
 
   return (
-    <div className="quiz-page">
-      <div className="quiz-page-header">
-        <h1>Curate Mode</h1>
-        <p>Add questions to Curate AI answers</p>
+    <div style={styles.quizPage}>
+      <div style={styles.quizPageHeader}>
+        <h1 style={styles.quizPageHeaderH1}>Curate Mode</h1>
+        <p style={styles.quizPageHeaderP}>Add questions to Curate AI answers</p>
       </div>
 
-      <div className="quiz-page-content">
-        <div className="add-question-section">
-          <div className="question-input-group">
+      <div style={styles.quizPageContent}>
+        <div style={styles.addQuestionSection}>
+          <div style={styles.questionInputGroup}>
             <input
               type="text"
               value={newQuestion}
               onChange={(e) => setNewQuestion(e.target.value)}
               placeholder="Enter a new question..."
-              className="question-input"
+              style={{
+                ...styles.questionInput,
+                ...(isGeneratingAnswers ? styles.questionInputDisabled : {})
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleAddQuestion()}
               disabled={isGeneratingAnswers}
             />
-            <button onClick={handleAddQuestion} className="add-question-btn" disabled={isGeneratingAnswers}>
+            <button 
+              onClick={handleAddQuestion} 
+              style={{
+                ...styles.addQuestionBtn,
+                ...(isGeneratingAnswers ? styles.addQuestionBtnDisabled : {})
+              }}
+              disabled={isGeneratingAnswers}
+            >
               {isGeneratingAnswers ? 'Generating Answers...' : 'Add Question'}
             </button>
           </div>
 
           {isGeneratingAnswers && (
-            <div className="loading-indicator">
-              <p>🤖 Querying AI providers for answers...</p>
+            <div style={styles.loadingIndicator}>
+              <p style={styles.loadingIndicatorP}>🤖 Querying AI providers for answers...</p>
             </div>
           )}
         </div>
 
-        <div className="quiz-display-section">
+        <div style={styles.quizDisplaySection}>
           {quiz.questions.length > 0 ? (
             <Quiz quiz={quiz} />
           ) : (
-            <div className="empty-quiz-state">
-              <p>No questions added yet. Add your first question above!</p>
+            <div style={styles.emptyQuizState}>
+              <p style={styles.emptyQuizStateP}>No questions added yet. Add your first question above!</p>
             </div>
           )}
         </div>
@@ -238,3 +245,109 @@ export function QuizPage() {
     </div>
   );
 }
+
+const styles = {
+  quizPage: {
+    height: '100vh',
+    overflowY: 'auto' as const,
+    padding: '2rem',
+    background: 'white',
+  },
+  quizPageHeader: {
+    textAlign: 'center' as const,
+    marginBottom: '2rem',
+  },
+  quizPageHeaderH1: {
+    fontSize: '2.5rem',
+    fontWeight: 700,
+    color: '#1f2937',
+    margin: '0 0',
+  },
+  quizPageHeaderP: {
+    color: '#6b7280',
+    fontSize: '1.125rem',
+    margin: 0,
+  },
+  quizPageContent: {
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '1rem',
+  },
+  addQuestionSection: {
+    background: '#f9fafb',
+    borderRadius: '1rem',
+    padding: '1rem',
+    border: '1px solid #e5e7eb',
+  },
+  questionInputGroup: {
+    display: 'flex',
+    gap: '0.75rem',
+  },
+  questionInput: {
+    flex: 1,
+    minWidth: '200px',
+    padding: '0.75rem 1rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.5rem',
+    fontSize: '1rem',
+    background: 'white',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+  },
+  questionInputDisabled: {
+    background: '#f3f4f6',
+    color: '#9ca3af',
+    cursor: 'not-allowed',
+  },
+  addQuestionBtn: {
+    padding: '0.75rem 1.5rem',
+    background: '#3b82f6',
+    color: 'white',
+    border: 'none',
+    borderRadius: '0.5rem',
+    fontSize: '1rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s, transform 0.1s',
+    whiteSpace: 'nowrap' as const,
+  },
+  addQuestionBtnDisabled: {
+    background: '#9ca3af',
+    cursor: 'not-allowed',
+    transform: 'none',
+  },
+  quizDisplaySection: {
+    background: 'white',
+    borderRadius: '1rem',
+    padding: '1.5rem',
+    border: '1px solid #e5e7eb',
+    minHeight: '400px',
+  },
+  emptyQuizState: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '200px',
+    color: '#9ca3af',
+    fontStyle: 'italic',
+    textAlign: 'center' as const,
+  },
+  emptyQuizStateP: {
+    margin: 0,
+    fontSize: '1.125rem',
+  },
+  loadingIndicator: {
+    marginTop: '1rem',
+    padding: '1rem',
+    background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)',
+    borderRadius: '0.5rem',
+    textAlign: 'center' as const,
+    border: '1px solid #d1d5db',
+  },
+  loadingIndicatorP: {
+    margin: 0,
+    color: '#374151',
+    fontWeight: 500,
+    animation: 'pulse 2s infinite',
+  },
+};

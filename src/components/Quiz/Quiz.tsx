@@ -1,6 +1,5 @@
 import { Quiz as QuizType } from "./types";
 import { Question } from "./Question";
-import './Quiz.css';
 
 interface QuizProps {
   quiz: QuizType;
@@ -8,8 +7,8 @@ interface QuizProps {
 
 export function Quiz({ quiz }: QuizProps) {
   return (
-    <div className="quiz-root">
-      <div className="quiz-questions">
+    <div style={styles.quizRoot}>
+      <div style={styles.quizQuestions}>
         {quiz.questions.map((question, index) => (
           <Question
             key={`question-${index}`}
@@ -21,3 +20,15 @@ export function Quiz({ quiz }: QuizProps) {
     </div>
   );
 }
+
+const styles = {
+  quizRoot: {
+    width: '100%',
+    margin: '0 auto',
+  },
+  quizQuestions: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '1rem',
+  },
+};
