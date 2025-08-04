@@ -186,7 +186,6 @@ export function QuizPage() {
       // Add the new question to the quiz state
       setQuiz((prevQuiz) => addQuestionToQuiz(prevQuiz, questionObj));
     }
-    setIsGeneratingAnswers(false);
   };
 
   return (
