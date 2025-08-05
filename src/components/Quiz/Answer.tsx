@@ -30,7 +30,7 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
     }
   }, [answer.answer]);
   
-  // Get color class based on winning status
+  
   const getChoiceClass = () => {
     return isWinning ? 'winning' : 'non-winning';
   };
