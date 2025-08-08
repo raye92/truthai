@@ -1,3 +1,4 @@
+import { useRef, useLayoutEffect, useState } from 'react';
 import { Answer as AnswerType } from "./types";
 import { ProviderCard } from "./ProviderCard";
 
@@ -8,12 +9,26 @@ interface AnswerProps {
   maxProviders: number;
   answerKey: string;
   onKeyChange: (newKey: string) => void;
+  forceFullRow?: boolean;
 }
 
-export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange }: AnswerProps) {
+export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false }: AnswerProps) {
   const providerCount = answer.providers.length;
   const leading = (providerCount / maxProviders) == 1 ? 1 : 0;
   const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
+  
+  const textRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const [isTall, setIsTall] = useState(false);
+
+  useLayoutEffect(() => {
+    if (textRef.current) {
+      const style = getComputedStyle(textRef.current);
+      const lineHeight = parseFloat(style.lineHeight || '16');
+      const threshold = lineHeight * 3; // approximate height for 3 lines
+      setIsTall(textRef.current.offsetHeight > threshold);
+    }
+  }, [answer.answer]);
   
   // Get color class based on winning status
   const getChoiceClass = () => {
@@ -51,28 +66,36 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
   };
 
   return (
-    <div style={isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer}> 
+    <div
+        style={{
+          ...(isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer),
+          ...((isTall || forceFullRow) ? { gridColumn: '1 / -1' } : {}),
+        }}
+      > 
       <div style={styles.quizAnswerHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={styles.quizAnswerKey}>
-            {answerKey}
-            {/* ======== TESTING ======== */}
-            <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
-          </div>
-          <div style={styles.quizAnswerText}>{answer.answer}</div>
-          {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
+        <div style={styles.quizAnswerKey}>
+          {answerKey}
+          {/* ======== TESTING ======== */}
+          <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto' }}>
+        <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
+        {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
+        <div style={styles.quizAnswerConfidence}>
           <span style={styles.quizAnswerSubtext}>Confidence score:</span>
           <span style={styles.quizAnswerPercent}>{percentage}%</span>
         </div>
       </div>
       {providerCount > 0 ? (
         <div style={styles.quizAnswerBarContainer}>
-          <div style={styles.quizAnswerBarBg}>
+          <div style={styles.quizAnswerBarBg} ref={barRef}>
             <div style={getBarStyle()}>
               {answer.providers.map((provider, index) => (
-                <ProviderCard key={`${provider}-${index}`} providerName={provider} index={index} choiceClass={getChoiceClass()} />
+                <ProviderCard 
+                  key={`${provider}-${index}`} 
+                  providerName={provider} 
+                  index={index} 
+                  choiceClass={getChoiceClass()}
+                />
               ))}
             </div>
           </div>
@@ -99,11 +122,9 @@ const styles = {
   },
   quizAnswerHeader: {
     display: 'flex',
-    alignItems: 'flex-start',
-    gap: '0.5rem',
+    alignItems: 'center',
+    gap: '0.75rem',
     marginBottom: '0.5rem',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap' as const,
     width: '100%',
   },
   quizAnswerKey: {
@@ -117,17 +138,24 @@ const styles = {
     fontWeight: '600',
     fontSize: '1rem',
     wordBreak: 'break-word' as const,
-    maxWidth: '100%',
+    flex: '1 1 auto',
+    minWidth: '0',
   },
   quizAnswerCrown: {
     minWidth: '130px',
     color: '#f59e0b',
     fontWeight: '600',
     fontSize: '0.95rem',
-    marginLeft: '0.5rem',
+    flexShrink: '0',
+  },
+  quizAnswerConfidence: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-end',
+    flexShrink: '0',
+    marginLeft: 'auto',
   },
   quizAnswerPercent: {
-    marginLeft: '0.25rem',
     fontSize: '1rem',
     fontWeight: 'bold',
     textAlign: 'right' as const,
@@ -169,7 +197,8 @@ const styles = {
     alignItems: 'center',
     gap: '0.25rem',
     padding: '0.25rem',
-    flexWrap: 'wrap' as const,
+    flexWrap: 'nowrap' as const,
     border: '2px solid transparent',
+    minWidth: '0',
   },
 };

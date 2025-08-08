@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
-import { Answer } from "./Answer";
+import { AnswerGrid } from "./AnswerGrid";
 
 interface QuestionProps {
   question: QuestionType;
@@ -59,26 +59,6 @@ export function Question({ question, questionNumber }: QuestionProps) {
     answer => answer.providers.length === maxProviders && maxProviders > 0
   );
 
-  const getPercentage = (providerCount: number) => {
-    return totalProviders > 0 ? Math.round((providerCount / totalProviders) * 100) : 0;
-  };
-
-  // Calculate optimal grid layout to avoid uneven distribution
-  const getBalancedGridStyle = (answerCount: number) => {
-    const baseStyle = { ...styles.quizAnswers };
-
-    if (answerCount === 4) {
-      return { ...baseStyle, gridTemplateColumns: 'repeat(2, 1fr)' }; // 2x2 instead of 3+1
-    }
-    if (answerCount === 6) {
-      return { ...baseStyle, gridTemplateColumns: 'repeat(3, 1fr)' }; // 3x2 instead of 4+2
-    }
-    if (answerCount === 5 || answerCount === 7) {
-      return { ...baseStyle, gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }; // Use smaller minmax to distribute more evenly
-    }
-    return baseStyle;
-  };
-
   const handleKeyChange = (targetAnswer: AnswerType, newKey: string) => {
     setAnswers(prev => {
       const idx = prev.indexOf(targetAnswer);
@@ -86,8 +66,6 @@ export function Question({ question, questionNumber }: QuestionProps) {
       return changeAnswerKey(prev, idx, newKey);
     });
   };
-
-  const answersStyle = getBalancedGridStyle(answers.length);
 
   return (
     <div style={styles.quizQuestion}>
@@ -97,25 +75,13 @@ export function Question({ question, questionNumber }: QuestionProps) {
         <p style={styles.quizQuestionTotal}>Current Answers: <span style={styles.quizQuestionTotalNumber}>{totalProviders}</span></p>
       </div>
 
-      <div style={answersStyle}>
-        {displayAnswers.map(({ answer, displayKey }, idx) => {
-          const providerCount = answer.providers.length;
-          const percentage = getPercentage(providerCount);
-          const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
-
-          return (
-            <Answer
-              key={answer.answer}
-              answer={answer}
-              isWinning={isWinning}
-              percentage={percentage}
-              maxProviders={maxProviders}
-              answerKey={displayKey}
-              onKeyChange={(newKey) => handleKeyChange(answer, newKey)}
-            />
-          );
-        })}
-      </div>
+      <AnswerGrid
+        displayAnswers={displayAnswers}
+        winningAnswers={winningAnswers}
+        maxProviders={maxProviders}
+        totalProviders={totalProviders}
+        onKeyChange={handleKeyChange}
+      />
     </div>
   );
 }
@@ -157,13 +123,5 @@ const styles = {
   },
   quizQuestionTotalNumber: {
     fontWeight: '600',
-  },
-  quizAnswers: {
-    display: 'grid',
-    gap: '1rem',
-    width: '100%',
-    justifyItems: 'stretch',
-    alignItems: 'stretch',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', // Responsive adjustments moved to external CSS
   },
 };
