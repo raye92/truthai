@@ -70,7 +70,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
   return (
     <div style={styles.quizQuestion}>
       <div style={styles.quizQuestionHeader}>
-        <div style={styles.quizQuestionNumber}>{questionNumber}</div>
+        <div style={styles.quizQuestionNumber}>{question.questionNumber ?? questionNumber}</div>
         <h3 style={styles.quizQuestionTitle}>{question.text}</h3>
         <p style={styles.quizQuestionTotal}>Current Answers: <span style={styles.quizQuestionTotalNumber}>{totalProviders}</span></p>
       </div>

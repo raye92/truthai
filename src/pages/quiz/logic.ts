@@ -155,12 +155,12 @@ export const handleAddQuestion = async (
 
   const rawLayout = await runLayoutPrompt(input);
   let layoutItems = parseLayoutPrompt(rawLayout);
+  console.log('Raw items:', rawLayout);
   let effectiveLayoutJson = rawLayout;
-  if (layoutItems.length === 0) {
-    layoutItems = [
-      { question: input, questionNumber: 1, choices: [] }
-    ];
-    effectiveLayoutJson = JSON.stringify(layoutItems);
+  if (layoutItems.length === 0) { // If no layout items, create a single question w/ original input
+    effectiveLayoutJson = JSON.stringify([
+        { question: input, questionNumber: 1, choices: [] }
+    ]);
   }
 
   setNewQuestion('');
@@ -175,7 +175,7 @@ export const handleAddQuestion = async (
 
     if (quiz.questions.some((q) => q.text === questionText)) continue;
 
-    let questionObj = createQuestion(questionText);
+    let questionObj = createQuestion(questionText, item.questionNumber);
     for (const choice of item.choices) {
       let answerObj = createAnswer(choice.text);
       answerObj = { ...answerObj, key: choice.key.toUpperCase() };
