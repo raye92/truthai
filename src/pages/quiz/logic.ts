@@ -7,8 +7,8 @@ import type { LayoutItem } from "./types.ts";
 
 const client = generateClient<Schema>();
 
-export const INSTRUCTION_PROMPT = `# Identity
-    You are a helpful quiz-taking assistant that reads JSON question payloads and replies strictly in JSON.
+export const instructionPrompt = `# Identity
+    You are a helpful quiz-taking assistant that reads JSON question payloads and answers strictly in JSON.
 
     # Input format
     - The content between <question> and </question> will be either a single JSON object or an array of JSON objects.
@@ -22,6 +22,80 @@ export const INSTRUCTION_PROMPT = `# Identity
     - If exactly one choice is correct: return the chosen choice TEXT (not the key).
     - If multiple choices are correct: return an array of the chosen choice TEXT strings.
     - Do not include explanations or any extra formatting.`;
+
+/* ======== UNUSED ========
+    # Examples
+    <question id="single-question-no-choices">
+      {
+        "question": "Who wrote 'To Kill a Mockingbird'?",
+        "questionNumber": "1",
+        "choices": []
+      }
+    </question> 
+    
+    <assistant_response id="single-question-no-choices">
+    {
+      "1": "Harper Lee"
+    }
+    </assistant_response>
+    
+    <question id="single-question-multiple-answers">
+      {
+        "question": "Which of the following are prime numbers?",
+        "questionNumber": "2",
+        "choices": [
+          { "key": "A", "text": "2" },
+          { "key": "B", "text": "3" },
+          { "key": "C", "text": "4" },
+          { "key": "D", "text": "5" }
+        ]
+      }
+    </question> 
+    
+    <assistant_response id="single-question-multiple-answers">
+    {
+      "2": ["2", "3", "5"]
+    }
+    </assistant_response>
+    
+    <question id="multi-question-mixed">
+      [
+        {
+          "question": "What is the square root of 144?",
+          "questionNumber": "3",
+          "choices": []
+        },
+        {
+          "question": "What is the capital of Japan?",
+          "questionNumber": "4",
+          "choices": [
+            { "key": "A", "text": "Kyoto" },
+            { "key": "B", "text": "Osaka" },
+            { "key": "C", "text": "Tokyo" },
+            { "key": "D", "text": "Hiroshima" }
+          ]
+        },
+        {
+          "question": "Which animals are mammals?",
+          "questionNumber": "5",
+          "choices": [
+            { "key": "A", "text": "Dolphin" },
+            { "key": "B", "text": "Crocodile" },
+            { "key": "C", "text": "Bat" },
+            { "key": "D", "text": "Penguin" }
+          ]
+        }
+      ]
+    </question> 
+    
+    <assistant_response id="multi-question-mixed">
+    {
+      "3": "12",
+      "4": "Tokyo",
+      "5": ["Dolphin", "Bat"]
+    }
+    </assistant_response>
+======== UNUSED ======== */
 
 // Fetch raw layout string from backend
 export const runLayoutPrompt = async (promptText: string): Promise<string> => {
@@ -59,7 +133,7 @@ export const queryAIProviders = async (
   setQuiz: React.Dispatch<React.SetStateAction<QuizType>>,
   setIsGeneratingAnswers: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const fullPrompt = `${INSTRUCTION_PROMPT}\n\n<question id="user">\n${layoutJsonString}\n</question>`;
+  const fullPrompt = `${instructionPrompt}\n\n<question id="user">\n${layoutJsonString}\n</question>`;
 
   const providers = [
     "GPT",
