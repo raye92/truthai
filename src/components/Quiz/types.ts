@@ -8,6 +8,7 @@ export interface Question {
   text: string;
   answers: Answer[];
   totalProviders: number;
+  questionNumber?: string | number;
 }
 
 export interface Quiz {
