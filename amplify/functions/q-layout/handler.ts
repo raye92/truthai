@@ -12,46 +12,54 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
     // Hardcoded instruction prompt
     const instructionPrompt = `
         # Identity
-        You are a text extraction model. Convert raw text containing questions and multiple-choice answers into a structured JSON format.
+        You are a text extraction model. Convert raw text containing questions and multiple-choice answers into a structured separate questions and choices in JSON format.
 
         # Input:
-        A single block of unstructured text with questions and answers. Choices may or may not be present, and choices may have various key styling. 
+        Text with questions and answers. One or many questions may be present. Choices may or may not be present, and choices may have various key styling. 
 
         # Output:
         A single JSON array of objects. Each object represents a question and must include:
         "question": The question text. Use "No question provided" if absent.
-        "questionNumber": The question number as a string, or sequential numbers starting from "1" if not provided.
+        "questionNumber": The question number as a string, or if not provided, assign it by continuing sequentially from the last known number across the entire input (starting from "1" if no numbers have been seen yet).
         "choices": An array (empty if no choices) of choice objects each containing:
-        "key": The choice key, normalized to an uppercase letter (e.g., "A"). Assign sequentially if missing.
-        "text": The exact choice text.
+        "key": Existing Keys: (e.g., a), x., II), it is extracted into text equivalent (a, x, II). The original association between the key and its text is always maintained.
+        Missing Keys: If a choice has no key, a sequential uppercase letter (A, B, C...) is assigned to it.
+        "text": The choice text.
 
         # Examples
-        <question id="standard-and-alphabetical-keys">
+        <question id="alphabetical-in-order">
         1. What is the capital of France?
-        A) London
-        B) Berlin
-        C) Paris
+        a) London
+        b) Berlin
+        c) Paris
+        </question>
 
+        <assistant_response id="alphabetical-in-order">
+        [
+        {
+            "question": "What is the capital of France?",
+            "questionNumber": 1,
+            "choices": [
+            { "key": "a", "text": "London" },
+            { "key": "b", "text": "Berlin" },
+            { "key": "c", "text": "Paris" }
+            ]
+        }
+        ]
+        </assistant_response>
+
+        <question id="out-of-order-alphabetical">
         2. Which of the following are primary colors?
         C) Red
         A) Green
         B) Blue
         </question>
 
-        <assistant_response id="standard-and-non-alphabetical-keys">
+        <assistant_response id="out-of-order-alphabetical">
         [
         {
-            "question": "What is the capital of France?",
-            "questionNumber": "1",
-            "choices": [
-            { "key": "A", "text": "London" },
-            { "key": "B", "text": "Berlin" },
-            { "key": "C", "text": "Paris" }
-            ]
-        },
-        {
             "question": "Which of the following are primary colors?",
-            "questionNumber": "2",
+            "questionNumber": 2,
             "choices": [
             { "key": "C", "text": "Red" },
             { "key": "A", "text": "Green" },
@@ -61,53 +69,60 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
         ]
         </assistant_response>
 
-        <question id="missing-numbers-and-keys">
+        <question id="missing-numbers">
         Which of the following is a mammal?
         - Dolphin
         - Shark
-
-        Question 5:
-        i) Lion
-        ii) Tiger
         </question>
 
-        <assistant_response id="missing-numbers-and-keys">
+        <assistant_response id="missing-numbers">
         [
         {
             "question": "Which of the following is a mammal?",
-            "questionNumber": "1",
+            "questionNumber": 1,
             "choices": [
             { "key": "A", "text": "Dolphin" },
             { "key": "B", "text": "Shark" }
-            ]
-        },
-        {
-            "question": "Question 5:",
-            "questionNumber": "5",
-            "choices": [
-            { "key": "A", "text": "Lion" },
-            { "key": "B", "text": "Tiger" }
             ]
         }
         ]
         </assistant_response>
 
-        <question id="no-choices-present">
+        <question id="no-question">
+        Question 5:
+        i) Lion
+        ii) Tiger
+        </question>
+
+        <assistant_response id="no-question">
+        [
+        {
+            "question": "No question provided",
+            "questionNumber": 5,
+            "choices": [
+            { "key": "i", "text": "Lion" },
+            { "key": "ii", "text": "Tiger" }
+            ]
+        }
+        ]
+        </assistant_response>
+
+        <question id="multiple-no-choices">
         Q9. Describe the process of photosynthesis.
 
         What is the square root of 144?
         </question>
 
-        <assistant_response id="no-choices-present">
+        <assistant_response id="multiple-no-choices">
         [
         {
             "question": "Describe the process of photosynthesis.",
-            "questionNumber": "9",
+            "questionNumber": 9,
             "choices": []
         },
         {
             "question": "What is the square root of 144?",
-            "questionNumber": "10",
+            "questionNumber": 10,
             "choices": []
         }
         ]
