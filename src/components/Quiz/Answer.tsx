@@ -35,19 +35,6 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
     return isWinning ? 'winning' : 'non-winning';
   };
 
-  // ======== TESTING ========
-  // Prompt-based key reassignment for quick testing
-  const handleKeyChange = () => {
-    const raw = prompt('Enter new key letter (A-Z) or leave blank:', answerKey);
-    if (raw === null) return; // user cancelled
-    const trimmed = raw.trim();
-    if (trimmed === '' || /^[A-Z]$/i.test(trimmed)) {
-      onKeyChange(trimmed.toUpperCase());
-    } else {
-      alert('Invalid key. Please enter a single letter A-Z or leave blank.');
-    }
-  };
-
   const getBarStyle = () => {
     const baseStyle = { ...styles.quizAnswerBar, width: `${height}%` };
     if (isWinning) {
@@ -75,8 +62,6 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
       <div style={styles.quizAnswerHeader}>
         <div style={styles.quizAnswerKey}>
           {answerKey}
-          {/* ======== TESTING ======== */}
-          <button onClick={handleKeyChange} title="Change key" style={{ marginLeft: '0.25rem', cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
         </div>
         <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
         {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}

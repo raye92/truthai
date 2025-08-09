@@ -2,13 +2,13 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
 import { createAnswer, createQuestion, addAnswerToQuestion, addQuestionToQuiz, updateQuestionInQuiz } from "../../components/Quiz/utils";
 import type { Quiz as QuizType } from "../../components/Quiz/types";
-import { stripCodeFences } from "../../utils/stringUtils";
+import { stripCodeFences, extractAssistantResponse } from "../../utils/stringUtils";
 import type { LayoutItem } from "./types.ts";
 
 const client = generateClient<Schema>();
 
-export const INSTRUCTION_PROMPT = `# Identity
-    You are a helpful quiz-taking assistant that reads JSON question payloads and replies strictly in JSON.
+export const instructionPrompt = `# Identity
+    You are a helpful quiz-taking assistant that reads JSON question payloads and answers strictly in JSON.
 
     # Input format
     - The content between <question> and </question> will be either a single JSON object or an array of JSON objects.
@@ -22,6 +22,80 @@ export const INSTRUCTION_PROMPT = `# Identity
     - If exactly one choice is correct: return the chosen choice TEXT (not the key).
     - If multiple choices are correct: return an array of the chosen choice TEXT strings.
     - Do not include explanations or any extra formatting.`;
+
+/* ======== UNUSED ========
+    # Examples
+    <question id="single-question-no-choices">
+      {
+        "question": "Who wrote 'To Kill a Mockingbird'?",
+        "questionNumber": "1",
+        "choices": []
+      }
+    </question> 
+    
+    <assistant_response id="single-question-no-choices">
+    {
+      "1": "Harper Lee"
+    }
+    </assistant_response>
+    
+    <question id="single-question-multiple-answers">
+      {
+        "question": "Which of the following are prime numbers?",
+        "questionNumber": "2",
+        "choices": [
+          { "key": "A", "text": "2" },
+          { "key": "B", "text": "3" },
+          { "key": "C", "text": "4" },
+          { "key": "D", "text": "5" }
+        ]
+      }
+    </question> 
+    
+    <assistant_response id="single-question-multiple-answers">
+    {
+      "2": ["2", "3", "5"]
+    }
+    </assistant_response>
+    
+    <question id="multi-question-mixed">
+      [
+        {
+          "question": "What is the square root of 144?",
+          "questionNumber": "3",
+          "choices": []
+        },
+        {
+          "question": "What is the capital of Japan?",
+          "questionNumber": "4",
+          "choices": [
+            { "key": "A", "text": "Kyoto" },
+            { "key": "B", "text": "Osaka" },
+            { "key": "C", "text": "Tokyo" },
+            { "key": "D", "text": "Hiroshima" }
+          ]
+        },
+        {
+          "question": "Which animals are mammals?",
+          "questionNumber": "5",
+          "choices": [
+            { "key": "A", "text": "Dolphin" },
+            { "key": "B", "text": "Crocodile" },
+            { "key": "C", "text": "Bat" },
+            { "key": "D", "text": "Penguin" }
+          ]
+        }
+      ]
+    </question> 
+    
+    <assistant_response id="multi-question-mixed">
+    {
+      "3": "12",
+      "4": "Tokyo",
+      "5": ["Dolphin", "Bat"]
+    }
+    </assistant_response>
+======== UNUSED ======== */
 
 // Fetch raw layout string from backend
 export const runLayoutPrompt = async (promptText: string): Promise<string> => {
@@ -42,7 +116,8 @@ export const runLayoutPrompt = async (promptText: string): Promise<string> => {
 // Parse raw layout string into structured items for UI
 export const parseLayoutPrompt = (rawLayout: string): LayoutItem[] => {
   if (!rawLayout) return [];
-  const cleaned = stripCodeFences(rawLayout);
+  const inner = extractAssistantResponse(rawLayout);
+  const cleaned = stripCodeFences(inner ?? rawLayout);
   try {
     const json = JSON.parse(cleaned);
     return Array.isArray(json) ? json : [json];
@@ -59,7 +134,7 @@ export const queryAIProviders = async (
   setQuiz: React.Dispatch<React.SetStateAction<QuizType>>,
   setIsGeneratingAnswers: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const fullPrompt = `${INSTRUCTION_PROMPT}\n\n<question id="user">\n${layoutJsonString}\n</question>`;
+  const fullPrompt = `${instructionPrompt}\n\n<question id="user">\n${layoutJsonString}\n</question>`;
 
   const providers = [
     "GPT",
@@ -155,12 +230,11 @@ export const handleAddQuestion = async (
 
   const rawLayout = await runLayoutPrompt(input);
   let layoutItems = parseLayoutPrompt(rawLayout);
-  let effectiveLayoutJson = rawLayout;
-  if (layoutItems.length === 0) {
+  console.log('Raw items:', rawLayout, layoutItems);
+  if (layoutItems.length === 0) { // If no layout items, create a single question w/ original input
     layoutItems = [
-      { question: input, questionNumber: 1, choices: [] }
-    ];
-    effectiveLayoutJson = JSON.stringify(layoutItems);
+        { question: input, questionNumber: 1, choices: [] }
+    ]
   }
 
   setNewQuestion('');
@@ -175,7 +249,7 @@ export const handleAddQuestion = async (
 
     if (quiz.questions.some((q) => q.text === questionText)) continue;
 
-    let questionObj = createQuestion(questionText);
+    let questionObj = createQuestion(questionText, item.questionNumber);
     for (const choice of item.choices) {
       let answerObj = createAnswer(choice.text);
       answerObj = { ...answerObj, key: choice.key.toUpperCase() };
@@ -186,7 +260,7 @@ export const handleAddQuestion = async (
   }
 
   if (layoutItems.length > 0) {
-    await queryAIProviders(effectiveLayoutJson, questionTextMap, setQuiz, setIsGeneratingAnswers);
+    await queryAIProviders(JSON.stringify(layoutItems), questionTextMap, setQuiz, setIsGeneratingAnswers);
   }
 };
 
