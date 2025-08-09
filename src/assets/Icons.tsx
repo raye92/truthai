@@ -42,6 +42,7 @@ export const GeminiIcon: React.FC<IconProps> = ({
       viewBox="0 0 1024 1024" 
       width={width} 
       height={height} 
+      style={{ minWidth: width, minHeight: height }}
       className={className}
     >
       <path 
@@ -64,6 +65,7 @@ export const GoogleIcon: React.FC<IconProps> = ({
       viewBox="0 0 1024 1024" 
       width={width} 
       height={height} 
+      style={{ minWidth: width, minHeight: height }}
       className={className}
     >
       <path 
@@ -86,6 +88,7 @@ export const ChatIcon: React.FC<IconProps> = ({
       viewBox="0 0 1024 1024"
       width={width} 
       height={height} 
+      style={{ minWidth: width, minHeight: height }}
       className={className}
     >
       <path 
@@ -108,6 +111,7 @@ export const OpenAIIcon: React.FC<IconProps> = ({
       viewBox="0 0 1024 1024" 
       width={width} 
       height={height} 
+      style={{ minWidth: width, minHeight: height }}
       className={className}
     >
       <path 

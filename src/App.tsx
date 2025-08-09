@@ -3,7 +3,7 @@ import { Routes, Route, useLocation, Link } from "react-router-dom";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
 import { ChatPage } from "./pages/ChatPage";
-import { QuizPage } from "./pages/QuizPage";
+import { QuizPage } from "./pages/quiz";
 import { Logo, ChatIcon } from "./assets/Icons";
 import "./App.css";
 

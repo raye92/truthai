@@ -3,10 +3,14 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import { motion } from "framer-motion";
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
+<<<<<<< HEAD
 import { Answer } from "./Answer";
 import 'react-grid-layout/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+=======
+import { AnswerGrid } from "./AnswerGrid";
+>>>>>>> origin/main
 
 interface QuestionProps {
   question: QuestionType;
@@ -64,10 +68,13 @@ export function Question({ question, questionNumber }: QuestionProps) {
     answer => answer.providers.length === maxProviders && maxProviders > 0
   );
 
+<<<<<<< HEAD
   const getPercentage = (providerCount: number) => {
     return totalProviders > 0 ? Math.round((providerCount / totalProviders) * 100) : 0;
   };
 
+=======
+>>>>>>> origin/main
   const handleKeyChange = (targetAnswer: AnswerType, newKey: string) => {
     setAnswers(prev => {
       const idx = prev.indexOf(targetAnswer);
@@ -76,6 +83,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
     });
   };
 
+<<<<<<< HEAD
   // Generate dynamic grid layout based on answer count
   const generateLayout = (answerCount: number) => {
     const layouts = {
@@ -231,6 +239,24 @@ export function Question({ question, questionNumber }: QuestionProps) {
         </motion.div>
       )}
     </motion.div>
+=======
+  return (
+    <div style={styles.quizQuestion}>
+      <div style={styles.quizQuestionHeader}>
+        <div style={styles.quizQuestionNumber}>{question.questionNumber ?? questionNumber}</div>
+        <h3 style={styles.quizQuestionTitle}>{question.text}</h3>
+        <p style={styles.quizQuestionTotal}>Current Answers: <span style={styles.quizQuestionTotalNumber}>{totalProviders}</span></p>
+      </div>
+
+      <AnswerGrid
+        displayAnswers={displayAnswers}
+        winningAnswers={winningAnswers}
+        maxProviders={maxProviders}
+        totalProviders={totalProviders}
+        onKeyChange={handleKeyChange}
+      />
+    </div>
+>>>>>>> origin/main
   );
 }
 
@@ -296,6 +322,7 @@ const styles = {
     color: '#059669',
     fontWeight: '600',
   },
+<<<<<<< HEAD
   answerCount: {
     fontSize: '0.95rem',
     color: '#6b7280',
@@ -342,4 +369,6 @@ const styles = {
     color: '#6b7280',
     maxWidth: '400px',
   },
+=======
+>>>>>>> origin/main
 };

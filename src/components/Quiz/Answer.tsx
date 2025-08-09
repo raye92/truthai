@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { motion } from "framer-motion";
+=======
+import { useRef, useLayoutEffect, useState } from 'react';
+>>>>>>> origin/main
 import { Answer as AnswerType } from "./types";
 import { ProviderCard } from "./ProviderCard";
 
@@ -9,6 +13,7 @@ interface AnswerProps {
   maxProviders: number;
   answerKey: string;
   onKeyChange: (newKey: string) => void;
+<<<<<<< HEAD
   index: number;
 }
 
@@ -21,8 +26,15 @@ export function Answer({
   onKeyChange, 
   index 
 }: AnswerProps) {
+=======
+  forceFullRow?: boolean;
+}
+
+export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false }: AnswerProps) {
+>>>>>>> origin/main
   const providerCount = answer.providers.length;
   
+<<<<<<< HEAD
   // Handle key change with prompt
   const handleKeyChange = () => {
     const raw = prompt('Enter new key letter (A-Z) or leave blank:', answerKey);
@@ -103,6 +115,75 @@ export function Answer({
       <div className="confidence-section" style={styles.confidenceSection}>
         <div className="confidence-label" style={styles.confidenceLabel}>
           Confidence Score
+=======
+  const textRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const [isTall, setIsTall] = useState(false);
+
+  useLayoutEffect(() => {
+    if (textRef.current) {
+      const style = getComputedStyle(textRef.current);
+      const lineHeight = parseFloat(style.lineHeight || '16');
+      const threshold = lineHeight * 3; // approximate height for 3 lines
+      setIsTall(textRef.current.offsetHeight > threshold);
+    }
+  }, [answer.answer]);
+  
+  
+  const getChoiceClass = () => {
+    return isWinning ? 'winning' : 'non-winning';
+  };
+
+  const getBarStyle = () => {
+    const baseStyle = { ...styles.quizAnswerBar, width: `${height}%` };
+    if (isWinning) {
+      return {
+        ...baseStyle,
+        borderColor: '#f59e0b',
+        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+      };
+    } else {
+      return {
+        ...baseStyle,
+        borderColor: '#6b7280',
+        background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+      };
+    }
+  };
+
+  return (
+    <div
+        style={{
+          ...(isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer),
+          ...((isTall || forceFullRow) ? { gridColumn: '1 / -1' } : {}),
+        }}
+      > 
+      <div style={styles.quizAnswerHeader}>
+        <div style={styles.quizAnswerKey}>
+          {answerKey}
+        </div>
+        <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
+        {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
+        <div style={styles.quizAnswerConfidence}>
+          <span style={styles.quizAnswerSubtext}>Confidence score:</span>
+          <span style={styles.quizAnswerPercent}>{percentage}%</span>
+        </div>
+      </div>
+      {providerCount > 0 ? (
+        <div style={styles.quizAnswerBarContainer}>
+          <div style={styles.quizAnswerBarBg} ref={barRef}>
+            <div style={getBarStyle()}>
+              {answer.providers.map((provider, index) => (
+                <ProviderCard 
+                  key={`${provider}-${index}`} 
+                  providerName={provider} 
+                  index={index} 
+                  choiceClass={getChoiceClass()}
+                />
+              ))}
+            </div>
+          </div>
+>>>>>>> origin/main
         </div>
         
         <div className="confidence-display" style={styles.confidenceDisplay}>
@@ -201,10 +282,57 @@ const styles = {
   },
   answerHeader: {
     display: 'flex',
+<<<<<<< HEAD
     alignItems: 'flex-start',
     gap: '16px',
   },
   answerKeySection: {
+=======
+    alignItems: 'center',
+    gap: '0.75rem',
+    marginBottom: '0.5rem',
+    width: '100%',
+  },
+  quizAnswerKey: {
+    width: '2.25rem',
+    textAlign: 'center' as const,
+    fontWeight: 'bold',
+    fontSize: '1.1rem',
+    color: '#000000',
+  },
+  quizAnswerText: {
+    fontWeight: '600',
+    fontSize: '1rem',
+    wordBreak: 'break-word' as const,
+    flex: '1 1 auto',
+    minWidth: '0',
+  },
+  quizAnswerCrown: {
+    minWidth: '130px',
+    color: '#f59e0b',
+    fontWeight: '600',
+    fontSize: '0.95rem',
+    flexShrink: '0',
+  },
+  quizAnswerConfidence: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-end',
+    flexShrink: '0',
+    marginLeft: 'auto',
+  },
+  quizAnswerPercent: {
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    textAlign: 'right' as const,
+  },
+  quizAnswerSubtext: {
+    fontSize: '0.8rem',
+    color: '#6b7280',
+    textAlign: 'right' as const,
+  },
+  quizAnswerProviders: {
+>>>>>>> origin/main
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
@@ -325,6 +453,7 @@ const styles = {
   },
   providersGrid: {
     display: 'flex',
+<<<<<<< HEAD
     flexWrap: 'wrap' as const,
     gap: '8px',
   },
@@ -346,5 +475,13 @@ const styles = {
     height: '100%',
     borderTopLeftRadius: '16px',
     borderBottomLeftRadius: '16px',
+=======
+    alignItems: 'center',
+    gap: '0.25rem',
+    padding: '0.25rem',
+    flexWrap: 'nowrap' as const,
+    border: '2px solid transparent',
+    minWidth: '0',
+>>>>>>> origin/main
   },
 };

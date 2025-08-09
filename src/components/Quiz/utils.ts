@@ -7,11 +7,12 @@ export function createQuiz(): Quiz {
   };
 }
 
-export function createQuestion(text: string): Question {
+export function createQuestion(text: string, questionNumber?: string | number): Question {
   return {
     text: text.trim(),
     answers: [],
-    totalProviders: 0
+    totalProviders: 0,
+    questionNumber,
   };
 }
 
