@@ -10,29 +10,109 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
     const ai = new GoogleGenAI({});
 
     // Hardcoded instruction prompt
-    const instructionPrompt = `Extract all questions and their answer choices from the input text. Return a JSON array of objects, each with:
-        "question": The exact question text, or "No question provided" if choices appear without a question.
-        "questionNumber": The given question number, or start numbering from 1 if no number is present.
-        "choices": A list of choices in the format { "key": [uppercase letter], "text": [choice text] }.
+    const instructionPrompt = `
+        # Identity
+        You are a text extraction model. Convert raw text containing questions and multiple-choice answers into a structured JSON format.
 
-        Instructions:
-        Identify each question and its immediately following choices.
-        Assign the question number, if not present start numbering from 1.
-        Normalize all choice keys to uppercase letters (e.g., "A)", "a.", "(a)" → "A").
-        If a choice lacks a key, assign one sequentially starting from "A".
-        If choices appear without a preceding question, set "question": "No question provided".
-        Each question may have zero or more choices.
+        # Input:
+        A single block of unstructured text with questions and answers. Choices may or may not be present, and choices may have various key styling. 
 
-        Output Format:
+        # Output:
+        A single JSON array of objects. Each object represents a question and must include:
+        "question": The question text. Use "No question provided" if absent.
+        "questionNumber": The question number as a string, or sequential numbers starting from "1" if not provided.
+        "choices": An array (empty if no choices) of choice objects each containing:
+        "key": The choice key, normalized to an uppercase letter (e.g., "A"). Assign sequentially if missing.
+        "text": The exact choice text.
+
+        # Examples
+        <question id="standard-and-alphabetical-keys">
+        1. What is the capital of France?
+        A) London
+        B) Berlin
+        C) Paris
+
+        2. Which of the following are primary colors?
+        C) Red
+        A) Green
+        B) Blue
+        </question>
+
+        <assistant_response id="standard-and-non-alphabetical-keys">
+        [
         {
-        "question": "[Question text or 'No question provided']",
-        "questionNumber": "[Question number or 'No question number provided']",
-        "choices": [
-            { "key": "A", "text": "[Choice text]" },
-            { "key": "B", "text": "[Choice text]" }
-        ]
+            "question": "What is the capital of France?",
+            "questionNumber": "1",
+            "choices": [
+            { "key": "A", "text": "London" },
+            { "key": "B", "text": "Berlin" },
+            { "key": "C", "text": "Paris" }
+            ]
+        },
+        {
+            "question": "Which of the following are primary colors?",
+            "questionNumber": "2",
+            "choices": [
+            { "key": "C", "text": "Red" },
+            { "key": "A", "text": "Green" },
+            { "key": "B", "text": "Blue" }
+            ]
         }
-        Do not include explanations or wrap the JSON in code blocks. Output only the JSON array.`;
+        ]
+        </assistant_response>
+
+        <question id="missing-numbers-and-keys">
+        Which of the following is a mammal?
+        - Dolphin
+        - Shark
+
+        Question 5:
+        i) Lion
+        ii) Tiger
+        </question>
+
+        <assistant_response id="missing-numbers-and-keys">
+        [
+        {
+            "question": "Which of the following is a mammal?",
+            "questionNumber": "1",
+            "choices": [
+            { "key": "A", "text": "Dolphin" },
+            { "key": "B", "text": "Shark" }
+            ]
+        },
+        {
+            "question": "Question 5:",
+            "questionNumber": "5",
+            "choices": [
+            { "key": "A", "text": "Lion" },
+            { "key": "B", "text": "Tiger" }
+            ]
+        }
+        ]
+        </assistant_response>
+
+        <question id="no-choices-present">
+        Q9. Describe the process of photosynthesis.
+
+        What is the square root of 144?
+        </question>
+
+        <assistant_response id="no-choices-present">
+        [
+        {
+            "question": "Describe the process of photosynthesis.",
+            "questionNumber": "9",
+            "choices": []
+        },
+        {
+            "question": "What is the square root of 144?",
+            "questionNumber": "10",
+            "choices": []
+        }
+        ]
+        </assistant_response>`;
+    
     const fullPrompt = `${instructionPrompt}\n\n${prompt}`;
 
     // Configure generation settings with thinking disabled
