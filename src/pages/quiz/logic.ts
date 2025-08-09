@@ -2,7 +2,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
 import { createAnswer, createQuestion, addAnswerToQuestion, addQuestionToQuiz, updateQuestionInQuiz } from "../../components/Quiz/utils";
 import type { Quiz as QuizType } from "../../components/Quiz/types";
-import { stripCodeFences } from "../../utils/stringUtils";
+import { stripCodeFences, extractAssistantResponse } from "../../utils/stringUtils";
 import type { LayoutItem } from "./types.ts";
 
 const client = generateClient<Schema>();
@@ -116,7 +116,8 @@ export const runLayoutPrompt = async (promptText: string): Promise<string> => {
 // Parse raw layout string into structured items for UI
 export const parseLayoutPrompt = (rawLayout: string): LayoutItem[] => {
   if (!rawLayout) return [];
-  const cleaned = stripCodeFences(rawLayout);
+  const inner = extractAssistantResponse(rawLayout);
+  const cleaned = stripCodeFences(inner ?? rawLayout);
   try {
     const json = JSON.parse(cleaned);
     return Array.isArray(json) ? json : [json];
@@ -229,12 +230,11 @@ export const handleAddQuestion = async (
 
   const rawLayout = await runLayoutPrompt(input);
   let layoutItems = parseLayoutPrompt(rawLayout);
-  console.log('Raw items:', rawLayout);
-  let effectiveLayoutJson = rawLayout;
+  console.log('Raw items:', rawLayout, layoutItems);
   if (layoutItems.length === 0) { // If no layout items, create a single question w/ original input
-    effectiveLayoutJson = JSON.stringify([
+    layoutItems = [
         { question: input, questionNumber: 1, choices: [] }
-    ]);
+    ]
   }
 
   setNewQuestion('');
@@ -260,7 +260,7 @@ export const handleAddQuestion = async (
   }
 
   if (layoutItems.length > 0) {
-    await queryAIProviders(effectiveLayoutJson, questionTextMap, setQuiz, setIsGeneratingAnswers);
+    await queryAIProviders(JSON.stringify(layoutItems), questionTextMap, setQuiz, setIsGeneratingAnswers);
   }
 };
 

@@ -10,4 +10,15 @@ export function stripCodeFences(text: string): string {
     .trim();
 }
 
+export function extractAssistantResponse(text: string): string | null {
+  const source = String(text ?? '');
+  const regex = /<assistant_response\b[^>]*>([\s\S]*?)<\/assistant_response>/gi;
+  let match: RegExpExecArray | null;
+  let lastInner: string | null = null;
+  while ((match = regex.exec(source)) !== null) {
+    lastInner = match[1];
+  }
+  return lastInner?.trim() || null;
+}
+
 

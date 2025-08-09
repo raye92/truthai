@@ -3,18 +3,12 @@ import { Quiz } from '../../components/Quiz/Quiz';
 import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
+import { Logo } from '../../assets/Icons';
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
   const [newQuestion, setNewQuestion] = useState('');
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
-
-  // ======== TESTING ========
-  const loadTestQuiz = () => {
-    // retain existing testing helper in the component file
-    // You can bring over or reimplement the testing data here if still needed
-  };
-  // ======== TESTING ========
 
   const handleAddQuestion = async () => {
     await handleAddQuestionLogic(newQuestion, quiz, setQuiz, setNewQuestion, setIsGeneratingAnswers);
@@ -50,18 +44,22 @@ export function QuizPage() {
               }}
               disabled={isGeneratingAnswers}
             >
-              {isGeneratingAnswers ? 'Generating Answers...' : 'Add Question'}
+              {isGeneratingAnswers ? (
+                <div style={styles.loadingButtonContent}>
+                  <span style={styles.loadingLogo}>
+                    <Logo
+                      width={30}
+                      height={30}
+                      fill="#ffffff"
+                    />
+                  </span>
+                  <span>Generating...</span>
+                </div>
+              ) : (
+                'Add Question'
+              )}
             </button>
-            {/* ======== TESTING ======== */}
-            <button onClick={loadTestQuiz} style={styles.testButton}>Load Test Quiz</button>
-            {/* ======== TESTING ======== */}
           </div>
-
-          {isGeneratingAnswers && (
-            <div style={styles.loadingIndicator}>
-              <p style={styles.loadingIndicatorP}>🤖 Querying AI providers for answers...</p>
-            </div>
-          )}
         </div>
 
         <div style={styles.quizDisplaySection}>
@@ -142,23 +140,28 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.2s, transform 0.1s',
     whiteSpace: 'nowrap' as const,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
   },
   addQuestionBtnDisabled: {
     background: '#9ca3af',
     cursor: 'not-allowed',
     transform: 'none',
   },
-  testButton: {
-    padding: '0.75rem 1.5rem',
-    background: '#10b981',
-    color: 'white',
-    border: 'none',
-    borderRadius: '0.5rem',
-    fontSize: '1rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s, transform 0.1s',
-    whiteSpace: 'nowrap' as const,
+  loadingButtonContent: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    lineHeight: 1,
+  },
+  loadingLogo: {
+    animation: 'pulse 1.5s infinite ease-in-out',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    lineHeight: 1,
+    flexShrink: 0,
   },
   quizDisplaySection: {
     background: 'white',
@@ -179,20 +182,6 @@ const styles = {
   emptyQuizStateP: {
     margin: 0,
     fontSize: '1.125rem',
-  },
-  loadingIndicator: {
-    marginTop: '1rem',
-    padding: '1rem',
-    background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)',
-    borderRadius: '0.5rem',
-    textAlign: 'center' as const,
-    border: '1px solid #d1d5db',
-  },
-  loadingIndicatorP: {
-    margin: 0,
-    color: '#374151',
-    fontWeight: 500,
-    animation: 'pulse 2s infinite',
   },
 };
 

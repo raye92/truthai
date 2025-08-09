@@ -242,3 +242,12 @@
     font-size: 13px;
   }
 }
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.25;
+  }
+}
