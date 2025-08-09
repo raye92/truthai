@@ -3,7 +3,7 @@ import type { Schema } from "../../../amplify/data/resource";
 import { createAnswer, createQuestion, addAnswerToQuestion, addQuestionToQuiz, updateQuestionInQuiz } from "../../components/Quiz/utils";
 import type { Quiz as QuizType } from "../../components/Quiz/types";
 import { stripCodeFences, extractAssistantResponse } from "../../utils/stringUtils";
-import type { LayoutItem } from "./types.ts";
+import type { LayoutItem, LayoutItemWithoutKeys } from "./types.ts";
 
 const client = generateClient<Schema>();
 
@@ -127,6 +127,16 @@ export const parseLayoutPrompt = (rawLayout: string): LayoutItem[] => {
   }
 };
 
+// Remove key property from choices in layout items
+const removeKeyFromChoices = (layoutItems: LayoutItem[]): LayoutItemWithoutKeys[] => {
+  return layoutItems.map(item => ({
+    ...item,
+    choices: item.choices.map(choice => ({
+      text: choice.text
+    }))
+  }));
+};
+
 // Query AI providers and map responses back into quiz state
 export const queryAIProviders = async (
   layoutJsonString: string,
@@ -238,7 +248,9 @@ export const handleAddQuestion = async (
   }
 
   setNewQuestion('');
-
+  let withoutKey = removeKeyFromChoices(layoutItems);
+  
+  // Create questions and answers from layout items
   const questionTextMap: Record<string, string> = {};
   for (const item of layoutItems) {
     const questionText = item.question !== 'No question provided' ? item.question : input;
@@ -260,7 +272,7 @@ export const handleAddQuestion = async (
   }
 
   if (layoutItems.length > 0) {
-    await queryAIProviders(JSON.stringify(layoutItems), questionTextMap, setQuiz, setIsGeneratingAnswers);
+    await queryAIProviders(JSON.stringify(withoutKey), questionTextMap, setQuiz, setIsGeneratingAnswers);
   }
 };
 
