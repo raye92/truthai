@@ -81,7 +81,7 @@ const styles = {
     height: '100vh',
     overflowY: 'auto' as const,
     padding: '2rem',
-    background: 'white',
+    background: '#0f172a',
   },
   quizPageHeader: {
     textAlign: 'center' as const,
@@ -90,11 +90,11 @@ const styles = {
   quizPageHeaderH1: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    color: '#1f2937',
+    color: '#e2e8f0',
     margin: '0 0',
   },
   quizPageHeaderP: {
-    color: '#6b7280',
+    color: '#94a3b8',
     fontSize: '1.125rem',
     margin: 0,
   },
@@ -105,10 +105,10 @@ const styles = {
     gap: '1rem',
   },
   addQuestionSection: {
-    background: '#f9fafb',
+    background: '#1e293b',
     borderRadius: '1rem',
     padding: '1rem',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #475569',
   },
   questionInputGroup: {
     display: 'flex',
@@ -118,15 +118,16 @@ const styles = {
     flex: 1,
     minWidth: '200px',
     padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #475569',
     borderRadius: '0.5rem',
     fontSize: '1rem',
-    background: 'white',
+    background: '#334155',
+    color: '#e2e8f0',
     transition: 'border-color 0.2s, box-shadow 0.2s',
   },
   questionInputDisabled: {
-    background: '#f3f4f6',
-    color: '#9ca3af',
+    background: '#1e293b',
+    color: '#64748b',
     cursor: 'not-allowed',
   },
   addQuestionBtn: {
@@ -145,7 +146,7 @@ const styles = {
     gap: '0.5rem',
   },
   addQuestionBtnDisabled: {
-    background: '#9ca3af',
+    background: '#64748b',
     cursor: 'not-allowed',
     transform: 'none',
   },
@@ -164,10 +165,10 @@ const styles = {
     flexShrink: 0,
   },
   quizDisplaySection: {
-    background: 'white',
+    background: '#1e293b',
     borderRadius: '1rem',
     padding: '1.5rem',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #475569',
     minHeight: '400px',
   },
   emptyQuizState: {
@@ -175,7 +176,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '200px',
-    color: '#9ca3af',
+    color: '#94a3b8',
     fontStyle: 'italic',
     textAlign: 'center' as const,
   },

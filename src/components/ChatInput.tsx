@@ -29,8 +29,8 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
-        color: '#9ca3af',
+        background: '#1e293b',
+        color: '#64748b',
       };
     }
     return baseStyle;
@@ -41,7 +41,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
+        background: '#1e293b',
         cursor: 'not-allowed',
       };
     }
@@ -53,7 +53,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading || !input.trim()) {
       return {
         ...baseStyle,
-        background: '#d1d5db',
+        background: '#475569',
         cursor: 'not-allowed',
       };
     }
@@ -167,7 +167,7 @@ const styles = {
     alignItems: 'center',
     gap: '0.375rem',
     fontSize: '0.875rem',
-    color: '#374151',
+    color: '#cbd5e1',
     cursor: 'pointer',
   },
   chatInputForm: {
@@ -178,10 +178,11 @@ const styles = {
   chatInput: {
     flex: 1,
     padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #475569',
     borderRadius: '0.375rem',
     fontSize: '1rem',
-    background: 'white',
+    background: '#1e293b',
+    color: '#e2e8f0',
     transition: 'border-color 0.2s',
   },
   modelSelector: {
@@ -190,10 +191,11 @@ const styles = {
   },
   modelSelect: {
     padding: '0.75rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #475569',
     borderRadius: '0.375rem',
     fontSize: '0.875rem',
-    background: 'white',
+    background: '#1e293b',
+    color: '#e2e8f0',
     cursor: 'pointer',
     minWidth: '100px',
   },
