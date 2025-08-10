@@ -29,8 +29,8 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
-        color: '#9ca3af',
+        background: '#2d3748',
+        color: '#6b7280',
       };
     }
     return baseStyle;
@@ -41,7 +41,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
+        background: '#2d3748',
         cursor: 'not-allowed',
       };
     }
@@ -167,7 +167,7 @@ const styles = {
     alignItems: 'center',
     gap: '0.375rem',
     fontSize: '0.875rem',
-    color: '#374151',
+    color: '#d1d5db',
     cursor: 'pointer',
   },
   chatInputForm: {
@@ -178,10 +178,11 @@ const styles = {
   chatInput: {
     flex: 1,
     padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #4b5563',
     borderRadius: '0.375rem',
     fontSize: '1rem',
-    background: 'white',
+    background: '#374151',
+    color: '#f9fafb',
     transition: 'border-color 0.2s',
   },
   modelSelector: {
@@ -190,10 +191,11 @@ const styles = {
   },
   modelSelect: {
     padding: '0.75rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #4b5563',
     borderRadius: '0.375rem',
     fontSize: '0.875rem',
-    background: 'white',
+    background: '#374151',
+    color: '#f9fafb',
     cursor: 'pointer',
     minWidth: '100px',
   },
