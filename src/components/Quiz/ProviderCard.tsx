@@ -52,13 +52,13 @@ export function ProviderCard({ providerName, index, choiceClass, showLogoOnly: p
       return {
         ...baseStyle,
         background: '#f59e0b',
-        borderColor: '#d97706',
+        borderColor: '#b45309',
       };
     } else if (choiceClass === 'non-winning') {
       return {
         ...baseStyle,
-        background: '#6b7280',
-        borderColor: '#4b5563',
+        background: '#334155',
+        borderColor: '#1f2937',
       };
     }
     return baseStyle;
@@ -80,11 +80,11 @@ const styles = {
     borderRadius: '0.375rem',
     fontSize: '0.85rem',
     fontWeight: '600',
-    color: 'white',
+    color: '#f8fafc',
     minWidth: '20px',
     height: '2.25rem',
     transition: 'transform 0.2s, box-shadow 0.2s',
-    border: '1px solid rgba(255, 255, 255, 0.3)',
+    border: '1px solid rgba(148, 163, 184, 0.3)',
     flex: '1 1 0%',
     justifyContent: 'center',
   },

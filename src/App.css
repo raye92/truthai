@@ -1,7 +1,7 @@
 .app-container {
   display: flex;
   height: 100vh;
-  background: #f9fafb;
+  background: #0b1120;
   position: relative;
 }
 
@@ -11,7 +11,7 @@
   top: 20px;
   width: 48px;
   height: 48px;
-  background: #1f2937;
+  background: #111827;
   border: none;
   color: white;
   cursor: pointer;
@@ -25,7 +25,7 @@
 }
 
 .sidebar-toggle:hover {
-  background: #374151;
+  background: #1f2937;
   transform: scale(1.05);
 }
 
@@ -36,8 +36,8 @@
 
 .sidebar {
   width: 280px;
-  background: #1f2937;
-  color: white;
+  background: #0f172a;
+  color: #e5e7eb;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -75,23 +75,23 @@
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   text-decoration: none;
-  color: #d1d5db;
+  color: #cbd5e1;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  border: 1px solid #4b5563;
+  border: 1px solid #334155;
 }
 
 .nav-link:hover {
-  background: #374151;
-  color: white;
-  border-color: #4b5563;
+  background: #111827;
+  color: #f8fafc;
+  border-color: #475569;
 }
 
 .nav-link.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #2563eb;
+  background: #1d4ed8;
+  color: #f8fafc;
+  border-color: #1e40af;
 }
 
 .logo-container {
@@ -107,14 +107,14 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: white;
+  color: #f8fafc;
   letter-spacing: -0.025em;
 }
 
 .app-title p {
   margin: 0.25rem 0 0 0;
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: #94a3b8;
   font-weight: 400;
 }
 
@@ -125,9 +125,9 @@
 .sign-out-btn {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: #374151;
-  color: white;
-  border: 1px solid #4b5563;
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #334155;
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -136,8 +136,8 @@
 }
 
 .sign-out-btn:hover {
-  background: #4b5563;
-  border-color: #6b7280;
+  background: #1f2937;
+  border-color: #475569;
 }
 
 .sign-in-button {
@@ -145,9 +145,9 @@
   top: 20px;
   left: 88px;
   z-index: 1000;
-  background: #374151;
-  color: white;
-  border: 1px solid #4b5563;
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #334155;
   width: 96px;
   height: 48px;
   border-radius: 8px;
@@ -159,8 +159,8 @@
 }
 
 .sign-in-button:hover {
-  background: #4b5563;
-  border-color: #6b7280;
+  background: #1f2937;
+  border-color: #475569;
   transform: translateY(-1px);
   box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
 }
@@ -168,9 +168,9 @@
 .sign-in-btn {
   width: 100%;
   padding: 12px 16px;
-  background: #374151;
-  color: white;
-  border: 1px solid #4b5563;
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #334155;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -179,8 +179,8 @@
 }
 
 .sign-in-btn:hover {
-  background: #4b5563;
-  border-color: #6b7280;
+  background: #1f2937;
+  border-color: #475569;
 }
 
 .user-info {
@@ -190,7 +190,7 @@
 .welcome-text {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #d1d5db;
+  color: #cbd5e1;
   text-align: center;
 }
 

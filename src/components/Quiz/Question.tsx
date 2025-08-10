@@ -88,12 +88,12 @@ export function Question({ question, questionNumber }: QuestionProps) {
 
 const styles = {
   quizQuestion: {
-    background: '#fff',
+    background: '#0f172a',
     borderRadius: '1.25rem',
     padding: '1.5rem',
     paddingTop: '1rem',
-    border: '1px solid #e5e7eb',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    border: '1px solid #334155',
+    boxShadow: '0 2px 8px rgba(2,6,23,0.6)',
   },
   quizQuestionHeader: {
     display: 'flex',
@@ -103,8 +103,8 @@ const styles = {
   quizQuestionNumber: {
     width: '2.5rem',
     height: '2.5rem',
-    background: '#3b82f6',
-    color: '#fff',
+    background: '#1d4ed8',
+    color: '#f8fafc',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -115,13 +115,15 @@ const styles = {
   quizQuestionTitle: {
     fontSize: '1.5rem',
     fontWeight: '600',
+    color: '#e5e7eb',
   },
   quizQuestionTotal: {
-    color: '#6b7280',
+    color: '#94a3b8',
     marginLeft: 'auto',
     textAlign: 'right' as const,
   },
   quizQuestionTotalNumber: {
     fontWeight: '600',
+    color: '#f8fafc',
   },
 };

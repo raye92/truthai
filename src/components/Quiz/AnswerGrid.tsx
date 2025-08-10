@@ -123,5 +123,6 @@ const styles = {
   answerWrapper: {
     flex: '1 1 auto',
     minWidth: '0',
+    color: '#e5e7eb',
   },
 }; 

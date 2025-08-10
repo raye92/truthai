@@ -41,13 +41,13 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
       return {
         ...baseStyle,
         borderColor: '#f59e0b',
-        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+        background: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)',
       };
     } else {
       return {
         ...baseStyle,
-        borderColor: '#6b7280',
-        background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+        borderColor: '#334155',
+        background: 'linear-gradient(135deg, #334155 0%, #1f2937 100%)',
       };
     }
   };
@@ -96,14 +96,14 @@ const styles = {
   quizAnswer: {
     padding: '0.75rem',
     borderRadius: '1rem',
-    background: '#f3f4f6',
+    background: '#0b1324',
     transition: 'box-shadow 0.3s',
     marginBottom: '0.5rem',
   },
   quizAnswerWinning: {
-    background: '#fff6e6',
+    background: '#1f2937',
     border: '2px solid #fdc58a',
-    boxShadow: '0 2px 8px #fde68a33',
+    boxShadow: '0 2px 8px #fde68a55',
   },
   quizAnswerHeader: {
     display: 'flex',
@@ -117,7 +117,7 @@ const styles = {
     textAlign: 'center' as const,
     fontWeight: 'bold',
     fontSize: '1.1rem',
-    color: '#000000',
+    color: '#f8fafc',
   },
   quizAnswerText: {
     fontWeight: '600',
@@ -125,6 +125,7 @@ const styles = {
     wordBreak: 'break-word' as const,
     flex: '1 1 auto',
     minWidth: '0',
+    color: '#e5e7eb',
   },
   quizAnswerCrown: {
     minWidth: '130px',
@@ -144,10 +145,11 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 'bold',
     textAlign: 'right' as const,
+    color: '#f8fafc',
   },
   quizAnswerSubtext: {
     fontSize: '0.8rem',
-    color: '#6b7280',
+    color: '#94a3b8',
     textAlign: 'right' as const,
   },
   quizAnswerProviders: {
@@ -157,7 +159,7 @@ const styles = {
     marginBottom: '0.5rem',
   },
   quizAnswerNoProviders: {
-    color: '#6b7280',
+    color: '#94a3b8',
     fontStyle: 'italic',
     fontSize: '0.875rem',
     padding: '0.5rem',
@@ -168,7 +170,7 @@ const styles = {
   },
   quizAnswerBarBg: {
     width: '100%',
-    background: '#e5e7eb',
+    background: '#0b1324',
     borderRadius: '0.75rem',
     height: '3rem',
     overflow: 'hidden',

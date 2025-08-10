@@ -26,7 +26,7 @@ export function ChatPage() {
               <Logo
                 width={24}
                 height={24}
-                fill="#000000ff"
+                fill="#60a5fa"
               />
             </span>
             <span style={styles.loadingIndicatorSpan}>Aggregating responses from multiple LLMs...</span>
@@ -45,12 +45,13 @@ const styles = {
     flexDirection: 'column' as const,
     height: '100vh',
     overflow: 'hidden',
+    background: '#0b1120',
   },
   messagesContainer: {
     flex: 1,
     overflowY: 'auto' as const,
     padding: '2rem',
-    background: 'white',
+    background: '#0b1120',
   },
   emptyState: {
     display: 'flex',
@@ -58,12 +59,12 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    color: '#6b7280',
+    color: '#94a3b8',
     fontStyle: 'italic',
     textAlign: 'center' as const,
   },
   chatLogoTitle: {
-    color: '#1f2937',
+    color: '#e5e7eb',
     textShadow: 'none',
     margin: '0 0 20px 0',
     fontSize: '2.5rem',
@@ -82,7 +83,7 @@ const styles = {
     margin: '1rem 0',
   },
   loadingIndicatorSpan: {
-    color: '#6b7280',
+    color: '#94a3b8',
     fontStyle: 'italic',
     marginLeft: '10px',
   },

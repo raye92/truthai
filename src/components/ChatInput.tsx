@@ -29,8 +29,8 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
-        color: '#9ca3af',
+        background: '#0f172a',
+        color: '#64748b',
       };
     }
     return baseStyle;
@@ -41,7 +41,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading) {
       return {
         ...baseStyle,
-        background: '#f9fafb',
+        background: '#0f172a',
         cursor: 'not-allowed',
       };
     }
@@ -53,7 +53,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     if (isLoading || !input.trim()) {
       return {
         ...baseStyle,
-        background: '#d1d5db',
+        background: '#334155',
         cursor: 'not-allowed',
       };
     }
@@ -98,11 +98,11 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
           disabled={isLoading}
           onFocus={(e) => {
             e.target.style.outline = 'none';
-            e.target.style.borderColor = '#3b82f6';
-            e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+            e.target.style.borderColor = '#60a5fa';
+            e.target.style.boxShadow = '0 0 0 3px rgba(96, 165, 250, 0.15)';
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = '#d1d5db';
+            e.target.style.borderColor = '#334155';
             e.target.style.boxShadow = 'none';
           }}
         />
@@ -115,11 +115,11 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
             style={getModelSelectStyle()}
             onFocus={(e) => {
               e.target.style.outline = 'none';
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = '#60a5fa';
+              e.target.style.boxShadow = '0 0 0 2px rgba(96, 165, 250, 0.15)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = '#334155';
               e.target.style.boxShadow = 'none';
             }}
           >
@@ -134,12 +134,12 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
           style={getSendButtonStyle()}
           onMouseEnter={(e) => {
             if (!isLoading && input.trim()) {
-              e.currentTarget.style.background = '#2563eb';
+              e.currentTarget.style.background = '#1d4ed8';
             }
           }}
           onMouseLeave={(e) => {
             if (!isLoading && input.trim()) {
-              e.currentTarget.style.background = '#3b82f6';
+              e.currentTarget.style.background = '#2563eb';
             }
           }}
         >
@@ -167,7 +167,7 @@ const styles = {
     alignItems: 'center',
     gap: '0.375rem',
     fontSize: '0.875rem',
-    color: '#374151',
+    color: '#94a3b8',
     cursor: 'pointer',
   },
   chatInputForm: {
@@ -178,10 +178,11 @@ const styles = {
   chatInput: {
     flex: 1,
     padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #334155',
     borderRadius: '0.375rem',
     fontSize: '1rem',
-    background: 'white',
+    background: '#0f172a',
+    color: '#e5e7eb',
     transition: 'border-color 0.2s',
   },
   modelSelector: {
@@ -190,17 +191,18 @@ const styles = {
   },
   modelSelect: {
     padding: '0.75rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #334155',
     borderRadius: '0.375rem',
     fontSize: '0.875rem',
-    background: 'white',
+    background: '#0f172a',
+    color: '#e5e7eb',
     cursor: 'pointer',
     minWidth: '100px',
   },
   sendButton: {
     padding: '0.75rem 1.5rem',
-    background: '#3b82f6',
-    color: 'white',
+    background: '#2563eb',
+    color: '#f8fafc',
     border: 'none',
     borderRadius: '0.375rem',
     fontWeight: '500',

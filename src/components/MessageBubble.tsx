@@ -50,8 +50,8 @@ const styles = {
   },
   modelBadge: {
     fontSize: '0.75rem',
-    background: '#f3f4f6',
-    color: '#6b7280',
+    background: '#111827',
+    color: '#94a3b8',
     padding: '0.125rem 0.5rem',
     borderRadius: '0.25rem',
     fontWeight: '500',
@@ -64,14 +64,14 @@ const styles = {
     lineHeight: 1.5,
   },
   userMessageBubble: {
-    background: '#3b82f6',
-    color: 'white',
+    background: '#1d4ed8',
+    color: '#f8fafc',
     borderBottomRightRadius: '0.25rem',
   },
   assistantMessageBubble: {
-    background: 'white',
-    color: '#1f2937',
-    border: '1px solid #e5e7eb',
+    background: '#0f172a',
+    color: '#e5e7eb',
+    border: '1px solid #334155',
     borderBottomLeftRadius: '0.25rem',
   },
 };
