@@ -81,7 +81,7 @@ const styles = {
     height: '100vh',
     overflowY: 'auto' as const,
     padding: '2rem',
-    background: 'white',
+    background: '#111827',
   },
   quizPageHeader: {
     textAlign: 'center' as const,
@@ -90,11 +90,11 @@ const styles = {
   quizPageHeaderH1: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    color: '#1f2937',
+    color: '#f9fafb',
     margin: '0 0',
   },
   quizPageHeaderP: {
-    color: '#6b7280',
+    color: '#9ca3af',
     fontSize: '1.125rem',
     margin: 0,
   },
@@ -105,10 +105,10 @@ const styles = {
     gap: '1rem',
   },
   addQuestionSection: {
-    background: '#f9fafb',
+    background: '#1f2937',
     borderRadius: '1rem',
     padding: '1rem',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #374151',
   },
   questionInputGroup: {
     display: 'flex',
@@ -118,15 +118,16 @@ const styles = {
     flex: 1,
     minWidth: '200px',
     padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
+    border: '1px solid #4b5563',
     borderRadius: '0.5rem',
     fontSize: '1rem',
-    background: 'white',
+    background: '#374151',
+    color: '#f9fafb',
     transition: 'border-color 0.2s, box-shadow 0.2s',
   },
   questionInputDisabled: {
-    background: '#f3f4f6',
-    color: '#9ca3af',
+    background: '#2d3748',
+    color: '#6b7280',
     cursor: 'not-allowed',
   },
   addQuestionBtn: {
@@ -164,10 +165,10 @@ const styles = {
     flexShrink: 0,
   },
   quizDisplaySection: {
-    background: 'white',
+    background: '#1f2937',
     borderRadius: '1rem',
     padding: '1.5rem',
-    border: '1px solid #e5e7eb',
+    border: '1px solid #374151',
     minHeight: '400px',
   },
   emptyQuizState: {
@@ -175,7 +176,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '200px',
-    color: '#9ca3af',
+    color: '#6b7280',
     fontStyle: 'italic',
     textAlign: 'center' as const,
   },
@@ -184,5 +185,3 @@ const styles = {
     fontSize: '1.125rem',
   },
 };
-
-
