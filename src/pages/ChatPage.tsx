@@ -50,7 +50,7 @@ const styles = {
     flex: 1,
     overflowY: 'auto' as const,
     padding: '2rem',
-    background: 'white',
+    background: '#0f172a',
   },
   emptyState: {
     display: 'flex',
@@ -58,12 +58,12 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    color: '#6b7280',
+    color: '#94a3b8',
     fontStyle: 'italic',
     textAlign: 'center' as const,
   },
   chatLogoTitle: {
-    color: '#1f2937',
+    color: '#e2e8f0',
     textShadow: 'none',
     margin: '0 0 20px 0',
     fontSize: '2.5rem',
@@ -82,7 +82,7 @@ const styles = {
     margin: '1rem 0',
   },
   loadingIndicatorSpan: {
-    color: '#6b7280',
+    color: '#94a3b8',
     fontStyle: 'italic',
     marginLeft: '10px',
   },

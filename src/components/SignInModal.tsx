@@ -28,10 +28,10 @@ export function SignInModal({ isOpen, onClose }: SignInModalProps) {
           style={styles.signInModalClose} 
           onClick={onClose}
           onMouseEnter={(e) => {
-            (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+            (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 65, 85, 0.9)';
           }}
           onMouseLeave={(e) => {
-            (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(30, 41, 59, 0.9)';
           }}
         >
           ×
@@ -49,7 +49,7 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -68,8 +68,8 @@ const styles = {
     position: 'absolute' as const,
     top: '10px',
     right: '10px',
-    background: 'rgba(255, 255, 255, 0.8)',
-    border: 'none',
+    background: 'rgba(30, 41, 59, 0.9)',
+    border: '1px solid #475569',
     borderRadius: '50%',
     width: '32px',
     height: '32px',
@@ -79,7 +79,7 @@ const styles = {
     cursor: 'pointer',
     fontSize: '20px',
     fontWeight: 'bold',
-    color: '#333',
+    color: '#e2e8f0',
     zIndex: 1001,
     transition: 'background-color 0.2s',
   },
