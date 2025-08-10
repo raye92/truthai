@@ -88,12 +88,12 @@ export function Question({ question, questionNumber }: QuestionProps) {
 
 const styles = {
   quizQuestion: {
-    background: '#fff',
+    background: '#1f2937',
     borderRadius: '1.25rem',
     padding: '1.5rem',
     paddingTop: '1rem',
-    border: '1px solid #e5e7eb',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    border: '1px solid #374151',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
   },
   quizQuestionHeader: {
     display: 'flex',
@@ -115,13 +115,15 @@ const styles = {
   quizQuestionTitle: {
     fontSize: '1.5rem',
     fontWeight: '600',
+    color: '#f9fafb',
   },
   quizQuestionTotal: {
-    color: '#6b7280',
+    color: '#9ca3af',
     marginLeft: 'auto',
     textAlign: 'right' as const,
   },
   quizQuestionTotalNumber: {
     fontWeight: '600',
+    color: '#f9fafb',
   },
 };
