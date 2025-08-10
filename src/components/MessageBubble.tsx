@@ -50,8 +50,8 @@ const styles = {
   },
   modelBadge: {
     fontSize: '0.75rem',
-    background: '#f3f4f6',
-    color: '#6b7280',
+    background: '#374151',
+    color: '#9ca3af',
     padding: '0.125rem 0.5rem',
     borderRadius: '0.25rem',
     fontWeight: '500',
@@ -69,9 +69,9 @@ const styles = {
     borderBottomRightRadius: '0.25rem',
   },
   assistantMessageBubble: {
-    background: 'white',
-    color: '#1f2937',
-    border: '1px solid #e5e7eb',
+    background: '#374151',
+    color: '#f9fafb',
+    border: '1px solid #4b5563',
     borderBottomLeftRadius: '0.25rem',
   },
 };
