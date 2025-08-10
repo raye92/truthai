@@ -119,7 +119,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
               e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = '#4b5563';
               e.target.style.boxShadow = 'none';
             }}
           >
