@@ -96,14 +96,14 @@ const styles = {
   quizAnswer: {
     padding: '0.75rem',
     borderRadius: '1rem',
-    background: '#f3f4f6',
+    background: '#374151',
     transition: 'box-shadow 0.3s',
     marginBottom: '0.5rem',
   },
   quizAnswerWinning: {
-    background: '#fff6e6',
-    border: '2px solid #fdc58a',
-    boxShadow: '0 2px 8px #fde68a33',
+    background: '#2d1b0e',
+    border: '2px solid #f59e0b',
+    boxShadow: '0 2px 8px #f59e0b33',
   },
   quizAnswerHeader: {
     display: 'flex',
@@ -117,7 +117,7 @@ const styles = {
     textAlign: 'center' as const,
     fontWeight: 'bold',
     fontSize: '1.1rem',
-    color: '#000000',
+    color: '#f9fafb',
   },
   quizAnswerText: {
     fontWeight: '600',
@@ -125,6 +125,7 @@ const styles = {
     wordBreak: 'break-word' as const,
     flex: '1 1 auto',
     minWidth: '0',
+    color: '#f9fafb',
   },
   quizAnswerCrown: {
     minWidth: '130px',
@@ -144,10 +145,11 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 'bold',
     textAlign: 'right' as const,
+    color: '#f9fafb',
   },
   quizAnswerSubtext: {
     fontSize: '0.8rem',
-    color: '#6b7280',
+    color: '#9ca3af',
     textAlign: 'right' as const,
   },
   quizAnswerProviders: {
@@ -157,7 +159,7 @@ const styles = {
     marginBottom: '0.5rem',
   },
   quizAnswerNoProviders: {
-    color: '#6b7280',
+    color: '#9ca3af',
     fontStyle: 'italic',
     fontSize: '0.875rem',
     padding: '0.5rem',
@@ -168,7 +170,7 @@ const styles = {
   },
   quizAnswerBarBg: {
     width: '100%',
-    background: '#e5e7eb',
+    background: '#1f2937',
     borderRadius: '0.75rem',
     height: '3rem',
     overflow: 'hidden',
