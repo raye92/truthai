@@ -105,7 +105,7 @@ const styles = {
     height: '2.5rem',
     background: '#3b82f6',
     color: '#fff',
-    borderRadius: '50%',
+    borderRadius: '0.5rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
