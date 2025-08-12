@@ -5,7 +5,6 @@ import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
 import { Logo } from '../../assets/Icons';
 import { MessageInput } from '../../components/Input';
-import { SubmitButton } from '../../components/SubmitButton';
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
@@ -24,39 +23,18 @@ export function QuizPage() {
       </div>
 
       <div style={styles.quizPageContent}>
-        <div style={styles.addQuestionSection}>
-          <div style={styles.questionInputGroup}>
-            <MessageInput
-              value={newQuestion}
-              onChange={setNewQuestion}
-              placeholder="Enter a new question..."
-              disabled={isGeneratingAnswers}
-              isLoading={isGeneratingAnswers}
-              onEnterPress={handleAddQuestion}
-              style={!isGeneratingAnswers ? { background: '#334155' } : {}}
-            />
-            <SubmitButton
-              label={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
-              type="button"
-              isInvalid={!newQuestion.trim()}
-              disabled={isGeneratingAnswers}
-              isLoading={isGeneratingAnswers}
-              onClick={handleAddQuestion}
-              loadingContent={
-                <div style={styles.loadingButtonContent}>
-                  <span style={styles.loadingLogo}>
-                    <Logo
-                      width={30}
-                      height={30}
-                      fill="#ffffff"
-                    />
-                  </span>
-                  <span>Generating...</span>
-                </div>
-              }
-            />
-          </div>
-        </div>
+        <MessageInput
+          value={newQuestion}
+          onChange={setNewQuestion}
+          placeholder="Enter a new question..."
+          disabled={isGeneratingAnswers}
+          isLoading={isGeneratingAnswers}
+          onEnterPress={handleAddQuestion}
+          style={isGeneratingAnswers ? { background: '#334155' } : {}}
+          showModelSelect={false}
+          showSubmitButton
+          submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
+        />
 
         <div style={styles.quizDisplaySection}>
           {quiz.questions.length > 0 ? (
@@ -99,30 +77,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '1rem',
-  },
-  addQuestionSection: {
-    background: '#1e293b',
-    borderRadius: '1rem',
-    padding: '1rem',
-    border: '1px solid #475569',
-  },
-  questionInputGroup: {
-    display: 'flex',
-    gap: '0.75rem',
-  },
-  loadingButtonContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    lineHeight: 1,
-  },
-  loadingLogo: {
-    animation: 'pulse 1.5s infinite ease-in-out',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    lineHeight: 1,
-    flexShrink: 0,
   },
   quizDisplaySection: {
     background: '#1e293b',

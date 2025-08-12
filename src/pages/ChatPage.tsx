@@ -1,10 +1,22 @@
-import { ChatInput } from "../components/ChatInputBar";
+import { useState } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
+import { MessageInput } from "../components/Input";
 
 export function ChatPage() {
   const { messages, isLoading, sendMessage } = useChat();
+  // Local state previously handled inside ChatInputBar
+  const [input, setInput] = useState("");
+  type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
+  const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
+
+  const handleSend = () => {
+    if (!input.trim() || isLoading) return;
+    const baseModel = selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt';
+    sendMessage(input, { model: baseModel, useGrounding: selectedModel === 'gemini_grounding' ? true : undefined });
+    setInput("");
+  };
 
   return (
     <div style={styles.chatPage}>
@@ -34,7 +46,19 @@ export function ChatPage() {
         )}
       </div>
 
-      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
+      <div style={styles.inputBarWrapper}>
+        <MessageInput
+          value={input}
+          onChange={setInput}
+          placeholder="Type your message..."
+          disabled={isLoading}
+          isLoading={isLoading}
+          onEnterPress={handleSend}
+          showModelSelect
+          model={selectedModel}
+          onModelChange={setSelectedModel}
+        />
+      </div>
     </div>
   );
 }
@@ -88,5 +112,9 @@ const styles = {
   },
   loadingLogo: {
     animation: 'pulse 1.5s infinite ease-in-out',
+  },
+  inputBarWrapper: {
+    padding: '16px 16px',
+    background: '#0f172a',
   },
 };

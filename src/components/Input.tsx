@@ -7,15 +7,15 @@ export interface MessageInputProps {
   placeholder?: string;
   isLoading?: boolean;
   style?: React.CSSProperties;
-  onEnterPress?: () => void; // optional: submit on Enter
-  showSubmitButton?: boolean; // new: show footer submit button
-  submitLabel?: string; // new: customize button label
-  maxHeight?: number; // new: max auto-resize height in px before scrolling
+  onEnterPress?: () => void;
+  showSubmitButton?: boolean;
+  submitLabel?: string;
+  maxHeight?: number;
+  showModelSelect?: boolean;
+  model?: 'chatgpt' | 'gemini' | 'gemini_grounding';
+  onModelChange?: (model: 'chatgpt' | 'gemini' | 'gemini_grounding') => void;
 }
 
-/**
- * Reusable text message input with consistent styling & focus ring.
- */
 export const MessageInput: React.FC<MessageInputProps> = ({
   value,
   onChange,
@@ -27,6 +27,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   showSubmitButton = true,
   submitLabel = 'Send',
   maxHeight = 240,
+  showModelSelect = false,
+  model = 'chatgpt',
+  onModelChange,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -35,12 +38,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
-    border: '1px solid #475569',
-    borderRadius: '0.375rem',
-    background: '#1e293b',
+    border: '2px solid #475569',
+    borderRadius: '0.75rem',
     padding: '0.5rem 0.75rem 0.5rem',
     transition: 'border-color 0.2s, box-shadow 0.2s',
-    ...(isFocused ? { borderColor: '#3b82f6', boxShadow: '0 0 0 3px rgba(59,130,246,0.1)' } : { boxShadow: 'none' }),
+    ...(isFocused
+      ? { borderColor: '#3b82f6', boxShadow: '0 0 0 3px rgba(59,130,246,0.1)' }
+      : { borderColor: '#475569', boxShadow: 'none' }
+    ),
     ...(isLoading ? { opacity: 0.9 } : {}),
     ...style,
   };
@@ -65,10 +70,29 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     display: showSubmitButton ? 'flex' : 'none',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: '0.5rem',
-    paddingTop: '0.5rem',
-    borderTop: '1px solid #334155',
     gap: '1rem',
+  };
+
+  const rightGroupStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  };
+
+  const selectStyle: React.CSSProperties = {
+    display: showModelSelect ? 'block' : 'none',
+    padding: '0.5rem 0.75rem',
+    border: '1px solid #475569',
+    borderRadius: '0.375rem',
+    fontSize: '0.9rem',
+    background: '#1e293b',
+    color: '#e2e8f0',
+    cursor: (disabled || isLoading) ? 'not-allowed' : 'pointer',
+    width: '125px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    height: '40px',
   };
 
   const hintStyle: React.CSSProperties = {
@@ -131,22 +155,42 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       {showSubmitButton && (
         <div style={innerFooterStyle}>
           <span style={hintStyle}>Shift+Enter for newline</span>
-          <button
-            type="button"
-            disabled={disabled || isLoading || !value.trim()}
-            onClick={() => {
-              if (onEnterPress && value.trim() && !disabled && !isLoading) onEnterPress();
-            }}
-            style={submitBtnStyle}
-            onMouseEnter={(e) => {
-              if (!(disabled || isLoading || !value.trim())) e.currentTarget.style.background = '#2563eb';
-            }}
-            onMouseLeave={(e) => {
-              if (!(disabled || isLoading || !value.trim())) e.currentTarget.style.background = '#3b82f6';
-            }}
-          >
-            {submitLabel}
-          </button>
+          <div style={rightGroupStyle}>
+            <select
+              value={model}
+              onChange={(e) => onModelChange && onModelChange(e.target.value as any)}
+              style={selectStyle}
+              disabled={disabled || isLoading}
+              onFocus={(e) => {
+                if (!disabled && !isLoading) {
+                  (e.target as HTMLSelectElement).style.borderColor = '#3b82f6';
+                }
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLSelectElement).style.borderColor = '#475569';
+              }}
+            >
+              <option value="chatgpt">ChatGPT</option>
+              <option value="gemini">Gemini</option>
+              <option value="gemini_grounding" title="Gemini + Google Search">Gemini + Google Search</option>
+            </select>
+            <button
+              type="button"
+              disabled={disabled || isLoading || !value.trim()}
+              onClick={() => {
+                if (onEnterPress && value.trim() && !disabled && !isLoading) onEnterPress();
+              }}
+              style={submitBtnStyle}
+              onMouseEnter={(e) => {
+                if (!(disabled || isLoading || !value.trim())) e.currentTarget.style.background = '#2563eb';
+              }}
+              onMouseLeave={(e) => {
+                if (!(disabled || isLoading || !value.trim())) e.currentTarget.style.background = '#3b82f6';
+              }}
+            >
+              {submitLabel}
+            </button>
+          </div>
         </div>
       )}
     </div>
