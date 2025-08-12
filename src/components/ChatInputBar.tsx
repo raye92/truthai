@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { MessageInput } from './MessageInput';
+import { MessageInput } from './Input';
 import { SubmitButton } from './SubmitButton';
 import type { ChatOptions } from "../hooks/useChat";
 

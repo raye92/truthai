@@ -4,7 +4,7 @@ import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
 import { Logo } from '../../assets/Icons';
-import { MessageInput } from '../../components/MessageInput';
+import { MessageInput } from '../../components/Input';
 import { SubmitButton } from '../../components/SubmitButton';
 
 export function QuizPage() {

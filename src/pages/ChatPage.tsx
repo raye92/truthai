@@ -1,4 +1,4 @@
-import { ChatInput } from "../components/ChatInput";
+import { ChatInput } from "../components/ChatInputBar";
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
