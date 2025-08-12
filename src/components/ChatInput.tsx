@@ -1,4 +1,6 @@
 import { FormEvent, useState } from "react";
+import { MessageInput } from './MessageInput';
+import { SubmitButton } from './SubmitButton';
 import type { ChatOptions } from "../hooks/useChat";
 
 interface ChatInputProps {
@@ -7,33 +9,23 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
+  type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [input, setInput] = useState("");
-  const [selectedModel, setSelectedModel] = useState<"chatgpt" | "gemini">("chatgpt");
-  const [useGrounding, setUseGrounding] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<SelectedModel>("chatgpt");
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: FormEvent | null) => {
+    if (e) e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    const baseModel: ChatOptions['model'] = selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt';
+
     const options: ChatOptions = {
-      model: selectedModel,
-      useGrounding: selectedModel === "gemini" ? useGrounding : undefined
+      model: baseModel,
+      useGrounding: selectedModel === 'gemini_grounding' ? true : undefined
     };
 
     onSendMessage(input, options);
     setInput("");
-  };
-
-  const getInputStyle = () => {
-    const baseStyle = { ...styles.chatInput };
-    if (isLoading) {
-      return {
-        ...baseStyle,
-        background: '#1e293b',
-        color: '#64748b',
-      };
-    }
-    return baseStyle;
   };
 
   const getModelSelectStyle = () => {
@@ -48,69 +40,22 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     return baseStyle;
   };
 
-  const getSendButtonStyle = () => {
-    const baseStyle = { ...styles.sendButton };
-    if (isLoading || !input.trim()) {
-      return {
-        ...baseStyle,
-        background: '#475569',
-        cursor: 'not-allowed',
-      };
-    }
-    return baseStyle;
-  };
-
-  const getCheckboxStyle = () => {
-    if (isLoading) {
-      return {
-        cursor: 'not-allowed',
-      };
-    }
-    return {
-      cursor: 'pointer',
-    };
-  };
-
   return (
     <div style={styles.chatInputContainer}>
-      {selectedModel === "gemini" && (
-        <div style={styles.groundingOptionTop}>
-          <label style={styles.groundingLabel}>
-            <input
-              type="checkbox"
-              checked={useGrounding}
-              onChange={(e) => setUseGrounding(e.target.checked)}
-              disabled={isLoading}
-              style={getCheckboxStyle()}
-            />
-            Google Search Grounding
-          </label>
-        </div>
-      )}
-      
       <form onSubmit={handleSubmit} style={styles.chatInputForm}>
-        <input
-          type="text"
+        <MessageInput
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={setInput}
           placeholder="Type your message..."
-          style={getInputStyle()}
           disabled={isLoading}
-          onFocus={(e) => {
-            e.target.style.outline = 'none';
-            e.target.style.borderColor = '#3b82f6';
-            e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = '#d1d5db';
-            e.target.style.boxShadow = 'none';
-          }}
+          isLoading={isLoading}
+          onEnterPress={() => handleSubmit(null)}
         />
         
         <div style={styles.modelSelector}>
           <select 
             value={selectedModel} 
-            onChange={(e) => setSelectedModel(e.target.value as "chatgpt" | "gemini")}
+            onChange={(e) => setSelectedModel(e.target.value as SelectedModel)}
             disabled={isLoading}
             style={getModelSelectStyle()}
             onFocus={(e) => {
@@ -125,26 +70,17 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
           >
             <option value="chatgpt">ChatGPT</option>
             <option value="gemini">Gemini</option>
+            <option value="gemini_grounding" title="Gemini + Google Search">Gemini + Google Search</option>
           </select>
         </div>
         
-        <button
+        <SubmitButton
           type="submit"
-          disabled={isLoading || !input.trim()}
-          style={getSendButtonStyle()}
-          onMouseEnter={(e) => {
-            if (!isLoading && input.trim()) {
-              e.currentTarget.style.background = '#2563eb';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isLoading && input.trim()) {
-              e.currentTarget.style.background = '#3b82f6';
-            }
-          }}
-        >
-          Send
-        </button>
+          label="Send"
+          isInvalid={!input.trim()}
+          disabled={isLoading}
+          isLoading={isLoading}
+        />
       </form>
     </div>
   );
@@ -155,35 +91,12 @@ const styles = {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '0.25rem',
-    padding: '0px 10px',
-  },
-  groundingOptionTop: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    padding: '0.5rem 0',
-  },
-  groundingLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.375rem',
-    fontSize: '0.875rem',
-    color: '#cbd5e1',
-    cursor: 'pointer',
+    padding: '16px 16px',
   },
   chatInputForm: {
     display: 'flex',
     gap: '0.75rem',
     alignItems: 'center',
-  },
-  chatInput: {
-    flex: 1,
-    padding: '0.75rem 1rem',
-    border: '1px solid #475569',
-    borderRadius: '0.375rem',
-    fontSize: '1rem',
-    background: '#1e293b',
-    color: '#e2e8f0',
-    transition: 'border-color 0.2s',
   },
   modelSelector: {
     display: 'flex',
@@ -193,20 +106,14 @@ const styles = {
     padding: '0.75rem',
     border: '1px solid #475569',
     borderRadius: '0.375rem',
-    fontSize: '0.875rem',
+    fontSize: '1rem',
     background: '#1e293b',
     color: '#e2e8f0',
     cursor: 'pointer',
-    minWidth: '100px',
-  },
-  sendButton: {
-    padding: '0.75rem 1.5rem',
-    background: '#3b82f6',
-    color: 'white',
-    border: 'none',
-    borderRadius: '0.375rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
+    width: '125px',
+    height: '48px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };

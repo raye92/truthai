@@ -4,6 +4,8 @@ import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
 import { Logo } from '../../assets/Icons';
+import { MessageInput } from '../../components/MessageInput';
+import { SubmitButton } from '../../components/SubmitButton';
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
@@ -24,27 +26,23 @@ export function QuizPage() {
       <div style={styles.quizPageContent}>
         <div style={styles.addQuestionSection}>
           <div style={styles.questionInputGroup}>
-            <input
-              type="text"
+            <MessageInput
               value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
+              onChange={setNewQuestion}
               placeholder="Enter a new question..."
-              style={{
-                ...styles.questionInput,
-                ...(isGeneratingAnswers ? styles.questionInputDisabled : {})
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddQuestion()}
               disabled={isGeneratingAnswers}
+              isLoading={isGeneratingAnswers}
+              onEnterPress={handleAddQuestion}
+              style={!isGeneratingAnswers ? { background: '#334155' } : {}}
             />
-            <button 
-              onClick={handleAddQuestion} 
-              style={{
-                ...styles.addQuestionBtn,
-                ...(isGeneratingAnswers ? styles.addQuestionBtnDisabled : {})
-              }}
+            <SubmitButton
+              label={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
+              type="button"
+              isInvalid={!newQuestion.trim()}
               disabled={isGeneratingAnswers}
-            >
-              {isGeneratingAnswers ? (
+              isLoading={isGeneratingAnswers}
+              onClick={handleAddQuestion}
+              loadingContent={
                 <div style={styles.loadingButtonContent}>
                   <span style={styles.loadingLogo}>
                     <Logo
@@ -55,10 +53,8 @@ export function QuizPage() {
                   </span>
                   <span>Generating...</span>
                 </div>
-              ) : (
-                'Add Question'
-              )}
-            </button>
+              }
+            />
           </div>
         </div>
 
@@ -113,42 +109,6 @@ const styles = {
   questionInputGroup: {
     display: 'flex',
     gap: '0.75rem',
-  },
-  questionInput: {
-    flex: 1,
-    minWidth: '200px',
-    padding: '0.75rem 1rem',
-    border: '1px solid #475569',
-    borderRadius: '0.5rem',
-    fontSize: '1rem',
-    background: '#334155',
-    color: '#e2e8f0',
-    transition: 'border-color 0.2s, box-shadow 0.2s',
-  },
-  questionInputDisabled: {
-    background: '#1e293b',
-    color: '#64748b',
-    cursor: 'not-allowed',
-  },
-  addQuestionBtn: {
-    padding: '0.75rem 1.5rem',
-    background: '#3b82f6',
-    color: 'white',
-    border: 'none',
-    borderRadius: '0.5rem',
-    fontSize: '1rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s, transform 0.1s',
-    whiteSpace: 'nowrap' as const,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-  },
-  addQuestionBtnDisabled: {
-    background: '#64748b',
-    cursor: 'not-allowed',
-    transform: 'none',
   },
   loadingButtonContent: {
     display: 'flex',

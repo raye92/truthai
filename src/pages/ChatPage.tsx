@@ -26,7 +26,7 @@ export function ChatPage() {
               <Logo
                 width={24}
                 height={24}
-                fill="#000000ff"
+                fill="#94a3b8"
               />
             </span>
             <span style={styles.loadingIndicatorSpan}>Aggregating responses from multiple LLMs...</span>

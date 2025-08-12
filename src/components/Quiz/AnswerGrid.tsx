@@ -40,10 +40,15 @@ export function AnswerGrid({
   // Calculate minimum width for each answer
   const calculateAnswerWidth = (answer: AnswerType, displayKey: string) => {
     const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
-    const baseWidth = 100; // Base width
-    const keyWidth = 60; // Width for the key
+    const baseWidth = 170; // 110 + 20 header margins + 24 answer padding + 16 gap
+    const keyWidth = 40; // Width for the key
     const winningBonus = isWinning ? 140 : 0; // Bonus width if winning
-    const textWidth = Math.ceil(answer.answer.length / 2); // Text length / 2
+    const textWidth = Math.ceil(
+      answer.answer.length > 18
+        ? answer.answer.length * 8 * 0.6
+        : answer.answer.length * 16 * 0.6
+    ); // Text length * 16 font (double line if longer answers)
+    console.log(`Calculating width for answer "${answer.answer}" with key "${displayKey}": baseWidth=${baseWidth}, keyWidth=${keyWidth}, winningBonus=${winningBonus}, textWidth=${textWidth}`);
     
     return baseWidth + keyWidth + winningBonus + textWidth;
   };
@@ -51,28 +56,38 @@ export function AnswerGrid({
   // Group answers into rows based on available width
   const answerRows = useMemo(() => {
     const rows: AnswerRow[] = [];
-    const maxRowWidth = windowWidth - 200; // Maximum width for a row (window width - 200px)
+    const maxRowWidth = windowWidth - 165; // Maximum width for a row (window width - 165px)
+    console.log('maxRowWidth:', maxRowWidth);
     const minGap = 16; // Gap between answers
+    console.log('Starting grouping rows');
     
     let currentRow: AnswerRow = { answers: [], totalWidth: 0 };
+    console.log('Initialized new currentRow');
     
     displayAnswers.forEach(({ answer, displayKey }) => {
       const answerWidth = calculateAnswerWidth(answer, displayKey);
-      const totalWidthWithGap = currentRow.totalWidth + answerWidth + (currentRow.answers.length > 0 ? minGap : 0);
-      
-      // If adding this answer would overflow the row, start a new row
-      if (totalWidthWithGap > maxRowWidth && currentRow.answers.length > 0) {
+      console.log(`Considering answer ${displayKey}, width: ${answerWidth}`);
+      // Width this answer would add including gap if not first in row
+      const widthWithGap = answerWidth + (currentRow.answers.length > 0 ? minGap : 0);
+
+      // If it would overflow, commit current row and start fresh
+      if (currentRow.answers.length > 0 && (currentRow.totalWidth + widthWithGap) > maxRowWidth) {
+        console.log(`Row overflow, pushing row with keys: [${currentRow.answers.map(r => r.displayKey).join(', ')}], totalWidth: ${currentRow.totalWidth}`);
         rows.push(currentRow);
         currentRow = { answers: [], totalWidth: 0 };
+        console.log('Reset currentRow after overflow');
       }
-      
-      // Add answer to current row
+
+      // Recompute gap (new row may have been started)
+      const finalWidthWithGap = answerWidth + (currentRow.answers.length > 0 ? minGap : 0);
       currentRow.answers.push({ answer, displayKey });
-      currentRow.totalWidth = totalWidthWithGap;
+      currentRow.totalWidth += finalWidthWithGap;
+      console.log(`Added answer ${displayKey}, new currentRow totalWidth: ${currentRow.totalWidth}`);
     });
     
     // Add the last row if it has answers
     if (currentRow.answers.length > 0) {
+      console.log(`Pushing final row with keys: [${currentRow.answers.map(r => r.displayKey).join(', ')}], totalWidth: ${currentRow.totalWidth}`);
       rows.push(currentRow);
     }
     
@@ -117,11 +132,11 @@ const styles = {
   row: {
     display: 'flex',
     gap: '1rem',
-    flexWrap: 'wrap' as const,
+    // flexWrap: 'wrap' as const,
     alignItems: 'stretch',
   },
   answerWrapper: {
     flex: '1 1 auto',
     minWidth: '0',
   },
-}; 
+};
