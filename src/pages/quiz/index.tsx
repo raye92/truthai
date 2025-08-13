@@ -3,7 +3,6 @@ import { Quiz } from '../../components/Quiz/Quiz';
 import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
-import { Logo } from '../../assets/Icons';
 import { MessageInput } from '../../components/Input';
 
 export function QuizPage() {
@@ -30,9 +29,7 @@ export function QuizPage() {
           disabled={isGeneratingAnswers}
           isLoading={isGeneratingAnswers}
           onEnterPress={handleAddQuestion}
-          style={isGeneratingAnswers ? { background: '#334155' } : {}}
           showModelSelect={false}
-          showSubmitButton
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
         />
 

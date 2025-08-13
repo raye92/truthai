@@ -21,7 +21,8 @@ export const instructionPrompt = `# Identity
     - If "choices" is empty: return a concise free-form answer string.
     - If exactly one choice is correct: return the chosen choice TEXT (not the key).
     - If multiple choices are correct: return an array of the chosen choice TEXT strings.
-    - Do not include explanations or any extra formatting.`;
+    - Do not include explanations or any extra formatting.
+    - If the text contains quotes, escape them as \" for JSON.`;
 
 /* ======== UNUSED ========
     # Examples
