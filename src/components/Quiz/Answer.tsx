@@ -10,9 +10,10 @@ interface AnswerProps {
   answerKey: string;
   onKeyChange: (newKey: string) => void;
   forceFullRow?: boolean;
+  answerWidth?: number;
 }
 
-export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false }: AnswerProps) {
+export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false, answerWidth }: AnswerProps) {
   const providerCount = answer.providers.length;
   const leading = (providerCount / maxProviders) == 1 ? 1 : 0;
   const height = maxProviders > 0 ? (leading * 50) + ((percentage/2) * leading) + (percentage * (1-leading)) : 0;
@@ -57,6 +58,7 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
         style={{
           ...(isWinning ? { ...styles.quizAnswer, ...styles.quizAnswerWinning } : styles.quizAnswer),
           ...((isTall || forceFullRow) ? { gridColumn: '1 / -1' } : {}),
+          ...(answerWidth ? { minWidth: answerWidth } : {}),
         }}
       > 
       <div style={styles.quizAnswerHeader}>
