@@ -50,21 +50,45 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
   // ========  FILE UPLOAD STATE ========
-  const valueRef = useRef(value);
-  useEffect(() => { valueRef.current = value; }, [value]);
-
   type UploadState = { id: string; file: File; status: 'uploading' | 'done' | 'error'; error?: string };
   const [uploads, setUploads] = useState<UploadState[]>([]);
   const [parsedTexts, setParsedTexts] = useState<{ id: string; text: string }[]>([]);
+  const [userText, setUserText] = useState<string>('');
   // ====================================
 
-  // Sync textarea value with parsed texts array
+  // Parsed text concatenation (hidden from user)
+  const combinedParsed = parsedTexts.map(p => p.text).join('\n\n');
+  // Text shown to user excludes parsed texts now
+  const displayedValue = userText;
+  // Full payload (parsed first, then user input if present)
+  const fullCombined = combinedParsed && userText
+    ? combinedParsed + '\n\n' + userText
+    : combinedParsed || userText;
+
+  // Sync parent with fullCombined while keeping parsed texts hidden in UI
   useEffect(() => {
-    const combined = parsedTexts.map(p => p.text).join('\n\n');
-    if (value !== combined) {
-      onChange(combined);
+    if (value !== fullCombined) {
+      onChange(fullCombined);
     }
-  }, [parsedTexts]);
+    console.log('ALL TEXT:', fullCombined); // Verification log
+  }, [fullCombined, value, onChange]);
+
+  // If parent value changes externally, attempt to re-derive userText
+  useEffect(() => {
+    if (value === fullCombined) return; // already synced
+    if (combinedParsed && value.startsWith(combinedParsed)) {
+      let rest = value.slice(combinedParsed.length);
+      if (rest.startsWith('\n\n')) rest = rest.slice(2);
+      setUserText(rest);
+    } else if (!combinedParsed) {
+      setUserText(value); // everything is user text when no parsed texts
+    } else {
+      // Cannot safely split; treat entire value as user text and drop parsed texts
+      setParsedTexts([]);
+      setUserText(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   const containerStyle: React.CSSProperties = {
     ...baseContainerStyle,
@@ -103,7 +127,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       el.style.height = `${newHeight}px`;
       el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
-  }, [value, maxHeight]);
+  }, [displayedValue, maxHeight]);
 
   // ======== FILE UPLOAD FUNCTIONS ========
   const extractTextFromImage = async (file: File): Promise<string> => {
@@ -185,7 +209,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         setUploads(prev => prev.map(p => p.id === up.id ? { ...p, status: 'done' } : p));
         setParsedTexts(prev => {
           const next = [...prev, { id: up.id, text }];
-            console.log('Parsed texts array:', next.map(t => t.text));
+          console.log('Parsed texts array:', next.map(t => t.text));
           return next;
         });
       } catch (e: any) {
@@ -208,15 +232,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     <div style={containerStyle}>
       <textarea
         ref={ref}
-        value={value}
+        value={displayedValue}
         disabled={disabled}
         placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          setUserText(e.target.value); // Directly update user text only
+        }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        onKeyDown={(e) => {
-          if (onEnterPress && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEnterPress(); }
-        }}
+        onKeyDown={(e) => { if (onEnterPress && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEnterPress(); } }}
         rows={1}
         style={textAreaStyle}
       />
