@@ -39,7 +39,7 @@ export const GeminiIcon: React.FC<IconProps> = ({
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
-      viewBox="100 100 800 800" 
+      viewBox="200 200 600 600" 
       width={width} 
       height={height} 
       style={{ minWidth: width, minHeight: height }}
