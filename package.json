@@ -14,11 +14,14 @@
     "@aws-amplify/ui-react": "^6.5.5",
     "@google/genai": "^1.11.0",
     "aws-amplify": "^6.6.6",
+    "mammoth": "^1.10.0",
     "openai": "^5.1.0",
+    "pdfjs-dist": "^5.4.54",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.60.0",
-    "react-router-dom": "^7.7.1"
+    "react-router-dom": "^7.7.1",
+    "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.16.1",
