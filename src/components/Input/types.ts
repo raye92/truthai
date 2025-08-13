@@ -6,9 +6,7 @@ export interface MessageInputProps {
   disabled?: boolean;
   placeholder?: string;
   isLoading?: boolean;
-  style?: React.CSSProperties;
   onEnterPress?: () => void;
-  showSubmitButton?: boolean;
   submitLabel?: string;
   maxHeight?: number;
   showModelSelect?: boolean;

@@ -29,9 +29,7 @@ export function QuizPage() {
           disabled={isGeneratingAnswers}
           isLoading={isGeneratingAnswers}
           onEnterPress={handleAddQuestion}
-          style={isGeneratingAnswers ? { background: '#334155' } : {}}
           showModelSelect={false}
-          showSubmitButton
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
         />
 
