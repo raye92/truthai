@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { MessageInputProps, UploadState } from './types';
 
 // Extraction helpers (OCR / parsing)
@@ -58,14 +58,17 @@ export const useFileExtraction = () => {
     return `[Unsupported file: ${file.name}]`;
   };
 
-  const handleFiles = async (fileList: FileList | null) => {
+  // Updated to accept FileList or array of Files (e.g., from clipboard paste)
+  const handleFiles = async (fileList: FileList | File[] | null) => {
     if (!fileList) return;
-    const accepted = Array.from(fileList).filter(f => (
+    const files = Array.isArray(fileList) ? fileList : Array.from(fileList);
+    const accepted = files.filter(f => (
       f.type.startsWith('image/') ||
       f.type === 'application/pdf' ||
       f.name.toLowerCase().endsWith('.pdf') ||
       f.name.toLowerCase().endsWith('.docx')
     ));
+    if (!accepted.length) return;
     const newUploads: UploadState[] = accepted.map(f => ({ id: `${Date.now()}-${f.name}-${Math.random()}`, file: f, status: 'uploading' }));
     setUploads(prev => [...prev, ...newUploads]);
     for (const up of newUploads) {
@@ -132,6 +135,29 @@ export const useHiddenParsedText = (value: string, onChange: (v: string) => void
   };
 
   return { userText, setUserText, fullCombined, combinedParsed, clearAll, clearingRef };
+};
+
+// Handle paste of images (returns a callback to attach to textarea onPaste)
+export const usePasteImageHandler = (
+  disabled: boolean,
+  isLoading: boolean,
+  handleFiles: (files: FileList | File[] | null) => void
+) => {
+  return useCallback((e: React.ClipboardEvent<any>) => {
+    if (disabled || isLoading) return;
+    const items = Array.from(e.clipboardData.items || []);
+    const imageFiles: File[] = [];
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const f = item.getAsFile();
+        if (f && f.type.startsWith('image/')) imageFiles.push(f);
+      }
+    }
+    if (imageFiles.length) {
+      e.preventDefault();
+      handleFiles(imageFiles);
+    }
+  }, [disabled, isLoading, handleFiles]);
 };
 
 export const getFileExt = (name: string) => {

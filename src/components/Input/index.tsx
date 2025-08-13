@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { useFileExtraction, useHiddenParsedText } from './logic';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useFileExtraction, useHiddenParsedText, usePasteImageHandler } from './logic';
 import type { MessageInputProps } from './types';
 import { SubmitButton } from './SubmitButton';
 import { ModelSelect } from './ModelSelect';
@@ -28,6 +28,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   // ========  FILE UPLOAD STATE ========
   const { uploads, parsedTexts, handleFiles, removeUpload, setParsedTexts, setUploads } = useFileExtraction();
   const { userText, setUserText, fullCombined, clearAll, clearingRef } = useHiddenParsedText(value, onChange, parsedTexts);
+  const handlePaste = usePasteImageHandler(disabled, isLoading, handleFiles);
 
   // Auto-resize textarea & focus handling
   useEffect(() => { if (disabled && ref.current) ref.current.blur(); }, [disabled]);
@@ -42,6 +43,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   }, [userText, maxHeight]);
 
   const handleSubmit = () => {
+    console.log('Submitting:', fullCombined);
     if (disabled || isLoading) return;
     if (!fullCombined.trim()) return;
     if (onEnterPress) onEnterPress();
@@ -53,12 +55,62 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     setTimeout(() => { clearingRef.current = false; }, 0);
   };
 
+  // Ensure clicks inside container focus textarea (unless clicking remove buttons etc.)
+  const focusTextarea = useCallback(() => {
+    if (ref.current && !disabled) {
+      ref.current.focus();
+    }
+  }, [disabled]);
+
+  // Global typing capture: route keystrokes to textarea even when unfocused
+  useEffect(() => {
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      if (disabled || isLoading) return; // respect disabled/loading
+      if (e.isComposing) return; // ignore IME composing
+
+      // Allow paste shortcut (Cmd/Ctrl+V) to pass through
+      const isPasteShortcut = (e.metaKey || e.ctrlKey) && (e.key === 'v' || e.key === 'V');
+      if (!isPasteShortcut && (e.metaKey || e.ctrlKey || e.altKey)) return; // ignore other shortcuts
+
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (ref.current && document.activeElement === ref.current) return;
+      if (ref.current) ref.current.focus();
+
+      if (e.key === 'Enter') {
+        if (!e.shiftKey && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          handleSubmit();
+        } else if (e.shiftKey) {
+          setUserText(prev => prev + '\n');
+          e.preventDefault();
+        }
+        return;
+      }
+      if (e.key === 'Backspace') {
+        setUserText(prev => prev.slice(0, -1));
+        e.preventDefault();
+        return;
+      }
+      if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+        setUserText(prev => prev + e.key);
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKey);
+    return () => window.removeEventListener('keydown', handleGlobalKey);
+  }, [disabled, isLoading, handleSubmit]);
+
   return (
-    <div style={{
-      ...styles.baseContainer,
-      ...(isFocused ? styles.focus : styles.blur),
-      ...(isLoading ? { opacity: 0.9 } : {}),
-    }}>
+    <div
+      style={{
+        ...styles.baseContainer,
+        ...(isFocused ? styles.focus : styles.blur),
+        ...(isLoading ? { opacity: 0.9 } : {}),
+        cursor: disabled ? 'not-allowed' : 'text'
+      }}
+      onClick={focusTextarea}
+    >
       <textarea
         ref={ref}
         value={userText}
@@ -67,35 +119,37 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         onChange={(e) => setUserText(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        onPaste={handlePaste}
         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
         rows={1}
         style={{ ...styles.textArea, color: isLoading ? '#64748b' : '#e2e8f0', maxHeight }}
       />
-      {(
-        <div style={styles.innerFooter}>
-          <div style={styles.uploadContainer}>
-            <label style={styles.uploadBtn}>
-              <input
-                type="file"
-                multiple
-                style={{ display: 'none' }}
-                onChange={(e) => { handleFiles(e.target.files); if (e.target) e.target.value=''; }}
-                accept="image/*,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                disabled={disabled || isLoading}
-              />
-              Attach Files
-            </label>
+      {/* Make footer elements also focus textarea when clicked */}
+      <div style={styles.innerFooter} onClick={focusTextarea}>
+        <div style={styles.uploadContainer}>
+          <label style={styles.uploadBtn}>
+            <input
+              type="file"
+              multiple
+              style={{ display: 'none' }}
+              onChange={(e) => { handleFiles(e.target.files); if (e.target) e.target.value=''; }}
+              accept="image/*,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              disabled={disabled || isLoading}
+            />
+            Attach Files
+          </label>
+        </div>
+        {uploads.length > 0 ? (
+          <div style={styles.fileList}>
+            {uploads.map(u => (
+              <FileUpload key={u.id} upload={u} onRemove={removeUpload} />
+            ))}
           </div>
-          {uploads.length > 0 ? (
-            <div style={styles.fileList}>
-              {uploads.map(u => (
-                <FileUpload key={u.id} upload={u} onRemove={removeUpload} />
-              ))}
-            </div>
-          ) : (
-            <div style={{ flex: 1 }} />
-          )}
-          <div style={styles.rightGroup}>
+        ) : (
+          <div style={{ flex: 1 }} />
+        )}
+        <div style={styles.rightGroup}>
+          <div onClick={focusTextarea}>
             <ModelSelect
               value={model}
               disabled={disabled}
@@ -103,6 +157,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               show={showModelSelect}
               onChange={onModelChange}
             />
+          </div>
+          <div onClick={focusTextarea}>
             <SubmitButton
               label={submitLabel}
               disabled={disabled || isLoading || !fullCombined.trim()}
@@ -111,7 +167,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             />
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
