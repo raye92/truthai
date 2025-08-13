@@ -149,7 +149,7 @@ export const queryAIProviders = async (
   const providers = [
     "GPT",
     "Gemini",
-    "Gemini Google Grounded"
+    "Gemini Google Search"
   ];
 
   const queryProvider = async (provider: string) => {
@@ -159,7 +159,7 @@ export const queryAIProviders = async (
         result = await client.queries.promptGpt({ prompt: fullPrompt });
       } else if (provider === "Gemini") {
         result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: false });
-      } else if (provider === "Gemini Google Grounded") {
+      } else if (provider === "Gemini Google Search") {
         result = await client.queries.promptGemini({ prompt: fullPrompt, useGrounding: true });
       }
 

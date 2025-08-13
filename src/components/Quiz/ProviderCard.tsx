@@ -12,7 +12,7 @@ interface ProviderCardProps {
 const ProviderLogos = {
   "GPT": <OpenAIIcon/>,
   "Gemini": <GeminiIcon/>,
-  "Gemini Google Grounded": <GoogleIcon/>,
+  "Gemini Google Search": <GoogleIcon/>,
 };
 
 export function ProviderCard({ providerName, index, choiceClass, showLogoOnly: propShowLogoOnly }: ProviderCardProps) {
