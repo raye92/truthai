@@ -14,119 +14,106 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
         # Identity
         You are a text extraction model. Convert raw text containing questions and multiple-choice answers into a structured separate questions and choices in JSON format.
 
-        # Input:
-        Text with questions and answers. One or many questions may be present. Choices may or may not be present, and choices may have various key styling. 
+        # Input
+        Text with questions and answers. One or many questions may be present. Choices may or may not be present, and choices may have various key styling.
 
-        # Output:
-        A single JSON array of objects. Each object represents a question and must include:
-        "question": The question text. Use "No question provided" if absent.
-        "questionNumber": The question number as a string, or if not provided, assign it by continuing sequentially from the last known number across the entire input (starting from "1" if no numbers have been seen yet).
-        "choices": An array (empty if no choices) of choice objects each containing:
-        "key": Existing Keys: (e.g., a), x., II), it is extracted into text equivalent (a, x, II). The original association between the key and its text is always maintained.
-        Missing Keys: If a choice has no key, a sequential uppercase letter (A, B, C...) is assigned to it.
-        "text": The choice text.
+        # Output
+        Return ONLY a JSON array. Each object represents a question and must include:
+        - "question": The question text. Use "No question provided" if absent.
+        - "questionNumber": The question number as a number. If not explicitly provided in the source text, assign it by continuing sequentially from the last known number across the entire input (starting from 1 if no numbers have been seen yet). Preserve explicit numbers if present (e.g., 5, 9, 10).
+        - "choices": An array (empty if no choices) of choice objects each containing:
+            - "key": If a key/prefix exists (e.g., a), b), C) x. i) II) 1.) retain its normalized textual form without trailing punctuation (a, b, C, x, i, II, 1). If a choice has no key, assign a sequential uppercase letter (A, B, C, ...). Do not renumber existing keys. Maintain original association between key and its text.
+            - "text": The choice text trimmed of leading key markers and surrounding whitespace.
+        Do not infer answers. Do not add extraneous fields. Do not wrap in code fences.
 
         # Examples
-        <question id="alphabetical-in-order">
-        1. What is the capital of France?
-        a) London
-        b) Berlin
-        c) Paris
-        </question>
 
-        <assistant_response id="alphabetical-in-order">
+        Example 1 (numbered question, alphabetical choices in order)
+        Input:
+        1. What is the capital of France? a) London b) Berlin c) Paris
+        Output:
         [
-        {
+          {
             "question": "What is the capital of France?",
             "questionNumber": 1,
             "choices": [
-            { "key": "a", "text": "London" },
-            { "key": "b", "text": "Berlin" },
-            { "key": "c", "text": "Paris" }
+              { "key": "a", "text": "London" },
+              { "key": "b", "text": "Berlin" },
+              { "key": "c", "text": "Paris" }
             ]
-        }
+          }
         ]
-        </assistant_response>
 
-        <question id="out-of-order-alphabetical">
-        2. Which of the following are primary colors?
+        Example 2 (alphabetical but out of order in source; preserve given keys)
+        Input:
+        2. Which of the following are primary colors? 
         C) Red
         A) Green
         B) Blue
-        </question>
-
-        <assistant_response id="out-of-order-alphabetical">
+        Output:
         [
-        {
+          {
             "question": "Which of the following are primary colors?",
             "questionNumber": 2,
             "choices": [
-            { "key": "C", "text": "Red" },
-            { "key": "A", "text": "Green" },
-            { "key": "B", "text": "Blue" }
+              { "key": "C", "text": "Red" },
+              { "key": "A", "text": "Green" },
+              { "key": "B", "text": "Blue" }
             ]
-        }
+          }
         ]
-        </assistant_response>
 
-        <question id="missing-numbers">
+        Example 3 (no explicit question number; assign starting at 1; dash bullets with no keys -> assign A, B)
+        Input:
         Which of the following is a mammal?
         - Dolphin
         - Shark
-        </question>
-
-        <assistant_response id="missing-numbers">
+        Output:
         [
-        {
+          {
             "question": "Which of the following is a mammal?",
             "questionNumber": 1,
             "choices": [
-            { "key": "A", "text": "Dolphin" },
-            { "key": "B", "text": "Shark" }
+              { "key": "A", "text": "Dolphin" },
+              { "key": "B", "text": "Shark" }
             ]
-        }
+          }
         ]
-        </assistant_response>
 
-        <question id="no-question">
+        Example 4 (labeled question without text; roman numeral keys)
+        Input:
         Question 5:
         i) Lion
         ii) Tiger
-        </question>
-
-        <assistant_response id="no-question">
+        Output:
         [
-        {
+          {
             "question": "No question provided",
             "questionNumber": 5,
             "choices": [
-            { "key": "i", "text": "Lion" },
-            { "key": "ii", "text": "Tiger" }
+              { "key": "i", "text": "Lion" },
+              { "key": "ii", "text": "Tiger" }
             ]
-        }
+          }
         ]
-        </assistant_response>
 
-        <question id="multiple-no-choices">
-        Q9. Describe the process of photosynthesis.
-
+        Example 5 (multiple questions, one numbered, next unnumbered -> continue numbering)
+        Input:
+        Q9. Describe the process of photosynthesis.\n
         What is the square root of 144?
-        </question>
-
-        <assistant_response id="multiple-no-choices">
+        Output:
         [
-        {
+          {
             "question": "Describe the process of photosynthesis.",
             "questionNumber": 9,
             "choices": []
-        },
-        {
+          },
+          {
             "question": "What is the square root of 144?",
             "questionNumber": 10,
             "choices": []
-        }
-        ]
-        </assistant_response>`;
+          }
+        ]`;
     
     const fullPrompt = `${instructionPrompt}\n\n${prompt}`;
 
@@ -144,4 +131,4 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
     });
 
     return response.text ?? null;
-}; 
+};

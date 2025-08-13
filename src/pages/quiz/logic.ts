@@ -2,7 +2,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
 import { createAnswer, createQuestion, addAnswerToQuestion, addQuestionToQuiz, updateQuestionInQuiz } from "../../components/Quiz/utils";
 import type { Quiz as QuizType } from "../../components/Quiz/types";
-import { stripCodeFences, extractAssistantResponse } from "../../utils/stringUtils";
+import { stripCodeFences } from "../../utils/stringUtils";
 import type { LayoutItem, LayoutItemWithoutKeys } from "./types.ts";
 
 const client = generateClient<Schema>();
@@ -116,8 +116,7 @@ export const runLayoutPrompt = async (promptText: string): Promise<string> => {
 // Parse raw layout string into structured items for UI
 export const parseLayoutPrompt = (rawLayout: string): LayoutItem[] => {
   if (!rawLayout) return [];
-  const inner = extractAssistantResponse(rawLayout);
-  const cleaned = stripCodeFences(inner ?? rawLayout);
+  const cleaned = stripCodeFences(rawLayout);
   try {
     const json = JSON.parse(cleaned);
     return Array.isArray(json) ? json : [json];

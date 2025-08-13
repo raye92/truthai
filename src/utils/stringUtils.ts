@@ -9,8 +9,8 @@ export function stripCodeFences(text: string): string {
     .replace(/\s*```$/, '')
     .trim();
 }
-
-export function extractAssistantResponse(text: string): string | null {
+// ======== UNUSED ========
+export function extractAssistantResponse(text: string): string | null { 
   const source = String(text ?? '');
   const regex = /<assistant_response\b[^>]*>([\s\S]*?)<\/assistant_response>/gi;
   let match: RegExpExecArray | null;
