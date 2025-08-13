@@ -48,7 +48,6 @@ export function AnswerGrid({
         ? answer.answer.length * 8 * 0.6
         : answer.answer.length * 16 * 0.6
     ); // Text length * 16 font (double line if longer answers)
-    console.log(`Calculating width for answer "${answer.answer}" with key "${displayKey}": baseWidth=${baseWidth}, keyWidth=${keyWidth}, winningBonus=${winningBonus}, textWidth=${textWidth}`);
     
     return baseWidth + keyWidth + winningBonus + textWidth;
   };
@@ -57,37 +56,24 @@ export function AnswerGrid({
   const answerRows = useMemo(() => {
     const rows: AnswerRow[] = [];
     const maxRowWidth = windowWidth - 165; // Maximum width for a row (window width - 165px)
-    console.log('maxRowWidth:', maxRowWidth);
-    const minGap = 16; // Gap between answers
-    console.log('Starting grouping rows');
     
     let currentRow: AnswerRow = { answers: [], totalWidth: 0 };
-    console.log('Initialized new currentRow');
     
     displayAnswers.forEach(({ answer, displayKey }) => {
       const answerWidth = calculateAnswerWidth(answer, displayKey);
-      console.log(`Considering answer ${displayKey}, width: ${answerWidth}`);
-      // Width this answer would add including gap if not first in row
-      const widthWithGap = answerWidth + (currentRow.answers.length > 0 ? minGap : 0);
 
-      // If it would overflow, commit current row and start fresh
-      if (currentRow.answers.length > 0 && (currentRow.totalWidth + widthWithGap) > maxRowWidth) {
-        console.log(`Row overflow, pushing row with keys: [${currentRow.answers.map(r => r.displayKey).join(', ')}], totalWidth: ${currentRow.totalWidth}`);
+      // If adding this answer would overflow, commit current row and start fresh
+      if (currentRow.answers.length > 0 && currentRow.totalWidth + answerWidth > maxRowWidth) {
         rows.push(currentRow);
         currentRow = { answers: [], totalWidth: 0 };
-        console.log('Reset currentRow after overflow');
       }
 
-      // Recompute gap (new row may have been started)
-      const finalWidthWithGap = answerWidth + (currentRow.answers.length > 0 ? minGap : 0);
       currentRow.answers.push({ answer, displayKey });
-      currentRow.totalWidth += finalWidthWithGap;
-      console.log(`Added answer ${displayKey}, new currentRow totalWidth: ${currentRow.totalWidth}`);
+      currentRow.totalWidth += answerWidth; // update running total
     });
     
     // Add the last row if it has answers
     if (currentRow.answers.length > 0) {
-      console.log(`Pushing final row with keys: [${currentRow.answers.map(r => r.displayKey).join(', ')}], totalWidth: ${currentRow.totalWidth}`);
       rows.push(currentRow);
     }
     
@@ -102,9 +88,10 @@ export function AnswerGrid({
             const providerCount = answer.providers.length;
             const percentage = getPercentage(providerCount);
             const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
+            const answerWidth = calculateAnswerWidth(answer, displayKey);
 
             return (
-              <div key={answer.answer} style={styles.answerWrapper}>
+              <div key={answer.answer} style={{ ...styles.answerWrapper, minWidth: answerWidth }}>
                 <Answer
                   answer={answer}
                   isWinning={isWinning}
@@ -112,6 +99,7 @@ export function AnswerGrid({
                   maxProviders={maxProviders}
                   answerKey={displayKey}
                   onKeyChange={(newKey) => onKeyChange(answer, newKey)}
+                  answerWidth={answerWidth}
                 />
               </div>
             );
