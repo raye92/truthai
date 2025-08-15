@@ -8,7 +8,7 @@ import type { LayoutItem, LayoutItemWithoutKeys } from "./types.ts";
 const client = generateClient<Schema>();
 
 export const instructionPrompt = `# Identity
-    You are a helpful quiz-taking assistant that reads JSON question payloads and answers strictly in JSON.
+    You are a helpful question answering assistant that reads JSON question payloads and answers strictly in JSON.
 
     # Input format
     - The content between <question> and </question> will be either a single JSON object or an array of JSON objects.
