@@ -1,11 +1,16 @@
 import { OpenAIIcon, GeminiIcon, GoogleIcon } from "../../assets/Icons";
 import { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { MiniChat } from "../MiniChat.tsx";
 
 interface ProviderCardProps {
   providerName: string;
   index: number;
   choiceClass?: string;
   showLogoOnly?: boolean;
+  // New props to build the initial chat prompt
+  questionText?: string;
+  answerText?: string;
 }
 
 // AI Provider logos using imported icons
@@ -15,9 +20,18 @@ const ProviderLogos = {
   "Gemini Google Search": <GoogleIcon/>,
 };
 
-export function ProviderCard({ providerName, index, choiceClass, showLogoOnly: propShowLogoOnly }: ProviderCardProps) {
+// Map quiz provider labels to chat model identifiers
+const mapProviderToModel = (providerName: string): 'chatgpt' | 'gemini' | 'gemini_grounding' => {
+  if (providerName === 'GPT') return 'chatgpt';
+  if (providerName === 'Gemini Google Search') return 'gemini_grounding';
+  return 'gemini';
+};
+
+export function ProviderCard({ providerName, index, choiceClass, showLogoOnly: propShowLogoOnly, questionText, answerText }: ProviderCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [showLogoOnly, setShowLogoOnly] = useState(propShowLogoOnly || false);
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkWidth = () => {
@@ -47,28 +61,62 @@ export function ProviderCard({ providerName, index, choiceClass, showLogoOnly: p
   const logo = ProviderLogos[providerName as keyof typeof ProviderLogos];
 
   const getCardStyle = () => {
-    const baseStyle = { ...styles.quizProviderCard };
+    const baseStyle = { ...styles.quizProviderCard } as React.CSSProperties;
     if (choiceClass === 'winning') {
       return {
         ...baseStyle,
         background: '#f59e0b',
         borderColor: '#d97706',
-      };
+      } as React.CSSProperties;
     } else if (choiceClass === 'non-winning') {
       return {
         ...baseStyle,
         background: '#6b7280',
         borderColor: '#4b5563',
-      };
+      } as React.CSSProperties;
     }
     return baseStyle;
   };
 
+  const initialModel = mapProviderToModel(providerName);
+  const initialPrompt = (() => {
+    const q = (questionText || '').trim();
+    const a = (answerText || '').trim();
+    if (q && a) return `Explain, step by step, why the following answer is correct (or not) for the question.\n\nQuestion: ${q}\nAnswer: ${a}`;
+    if (q) return `Explain your answer to the question: ${q}`;
+    return 'Explain your answer in detail.';
+  })();
+
+  const handleFullScreen = () => {
+    navigate('/chat', { state: { initialModel, initialPrompt } });
+    setOpen(false);
+  };
+
   return (
-    <div ref={cardRef} style={getCardStyle()} title={`${providerName} - Vote #${index + 1}`}>
-      {logo}
-      {!showLogoOnly && <span style={styles.quizProviderName}>{providerName}</span>}
-    </div>
+    <>
+      <div
+        ref={cardRef}
+        style={{ ...getCardStyle(), cursor: 'pointer' }}
+        title={`${providerName} - Vote #${index + 1}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+      >
+        {logo}
+        {!showLogoOnly && <span style={styles.quizProviderName}>{providerName}</span>}
+      </div>
+
+      {open && (
+        <MiniChat
+          providerLabel={providerName}
+          initialModel={initialModel}
+          initialPrompt={initialPrompt}
+          onClose={() => setOpen(false)}
+          onFullScreen={handleFullScreen}
+        />
+      )}
+    </>
   );
 }
 

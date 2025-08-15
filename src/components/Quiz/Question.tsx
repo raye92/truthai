@@ -81,6 +81,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
         maxProviders={maxProviders}
         totalProviders={totalProviders}
         onKeyChange={handleKeyChange}
+        questionText={question.text} // propagate the question text
       />
     </div>
   );

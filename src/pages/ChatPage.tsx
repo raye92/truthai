@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
 import { MessageInput } from "../components/Input";
+import { useLocation } from 'react-router-dom';
 
 export function ChatPage() {
   const { messages, isLoading, sendMessage } = useChat();
@@ -10,6 +11,26 @@ export function ChatPage() {
   const [input, setInput] = useState("");
   type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
+
+  const location = useLocation();
+  const state = (location as any).state as { initialModel?: SelectedModel; initialPrompt?: string } | undefined;
+
+  // On mount, if navigated with initial state, set model and send initial prompt
+  useEffect(() => {
+    if (state?.initialModel) {
+      setSelectedModel(state.initialModel);
+    }
+    if (state?.initialPrompt) {
+      const baseModel = (state.initialModel || selectedModel).startsWith('gemini') ? 'gemini' : 'chatgpt';
+      const useGrounding = (state.initialModel || selectedModel) === 'gemini_grounding';
+      // Send asynchronously so state updates don't race
+      setTimeout(() => {
+        sendMessage(state.initialPrompt!, { model: baseModel, useGrounding: useGrounding ? true : undefined });
+      }, 0);
+    }
+    // We want to run this only once on first render for the given state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;

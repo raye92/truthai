@@ -8,6 +8,8 @@ interface AnswerGridProps {
   maxProviders: number;
   totalProviders: number;
   onKeyChange: (targetAnswer: AnswerType, newKey: string) => void;
+  // New: the question text for building the explanation prompt
+  questionText: string;
 }
 
 interface AnswerRow {
@@ -20,7 +22,8 @@ export function AnswerGrid({
   winningAnswers, 
   maxProviders, 
   totalProviders, 
-  onKeyChange 
+  onKeyChange,
+  questionText,
 }: AnswerGridProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -101,6 +104,8 @@ export function AnswerGrid({
                   answerKey={displayKey}
                   onKeyChange={(newKey) => onKeyChange(answer, newKey)}
                   answerWidth={clampedMinWidth}
+                  // Pass question text down to ProviderCard for prompt building
+                  questionText={questionText}
                 />
               </div>
             );
