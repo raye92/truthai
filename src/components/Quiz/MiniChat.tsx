@@ -65,6 +65,7 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
             title="Open in full screen"
           >
             <FullscreenIcon width={16} height={16} fill="#94a3b8" />
+            <span style={styles.ExpandLabel}>Full Screen</span>
           </button>
           <button 
             onClick={onClose}
@@ -107,7 +108,7 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
 const styles = {
   miniChatContainer: {
     position: 'absolute' as const,
-    top: '100%',
+    bottom: '0',
     left: '0',
     right: '0',
     background: '#1e293b',
@@ -157,7 +158,7 @@ const styles = {
     cursor: 'pointer',
     padding: '0.25rem',
     borderRadius: '0.25rem',
-    fontSize: '1rem',
+    fontSize: '0.75rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -166,6 +167,11 @@ const styles = {
   miniChatButtonHover: {
     background: '#475569',
     color: '#e2e8f0',
+  },
+  ExpandLabel: {
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    letterSpacing: '0.025em',
   },
   miniChatMessages: {
     flex: 1,
