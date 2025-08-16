@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
@@ -10,6 +10,36 @@ export function ChatPage() {
   const [input, setInput] = useState("");
   type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
+
+  // Handle URL parameters for mini chat navigation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const provider = urlParams.get('provider');
+    const question = urlParams.get('question');
+    const answer = urlParams.get('answer');
+
+    if (provider && question && answer) {
+      // Set the model based on provider
+      if (provider.includes('Gemini')) {
+        if (provider.includes('Google Search')) {
+          setSelectedModel('gemini_grounding');
+        } else {
+          setSelectedModel('gemini');
+        }
+      } else {
+        setSelectedModel('chatgpt');
+      }
+
+      // Auto-send the initial question if no messages exist
+      if (messages.length === 0) {
+        const initialQuestion = `Can you explain the answer "${answer}" to the question: "${question}"?`;
+        sendMessage(initialQuestion, { 
+          model: selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt', 
+          useGrounding: selectedModel === 'gemini_grounding' ? true : undefined 
+        });
+      }
+    }
+  }, [messages.length, selectedModel, sendMessage]);
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
