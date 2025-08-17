@@ -17,6 +17,7 @@ const schema = a.schema({
       lastActive: a.datetime(),
       role: a.string().required().default('USER'),
       isNewUser: a.boolean().default(true),
+
       conversations: a.hasMany('Conversation', 'userId')
     })
     .authorization((allow: any) => [
@@ -27,12 +28,10 @@ const schema = a.schema({
     id: a.id().required(),
     title: a.string().required(),
     userId: a.string().required(),
+    isArchived: a.boolean().default(false),
+
     user: a.belongsTo('UserProfile', 'userId'),
     messages: a.hasMany('Message', 'conversationId'),
-    createdAt: a.datetime().required(),
-    updatedAt: a.datetime(),
-    isArchived: a.boolean().default(false),
-    metadata: a.json()
   }).authorization(
     (allow: any) => [
       allow.ownerDefinedIn("userId"),
@@ -43,14 +42,13 @@ const schema = a.schema({
     id: a.id().required(),
     content: a.string().required(),
     conversationId: a.string().required(),
-    conversation: a.belongsTo('Conversation', 'conversationId'),
     role: a.string().required(),
-    createdAt: a.datetime().required(),
-    tokens: a.integer(),
-    metadata: a.json()
+    metadata: a.json(),
+
+    conversation: a.belongsTo('Conversation', 'conversationId'),
   }).authorization(
     (allow: any) => [
-      allow.publicApiKey(),
+      allow.ownerDefinedIn("conversation.userId"),
     ]
   ),
   
