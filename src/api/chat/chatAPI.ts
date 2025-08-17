@@ -128,4 +128,3 @@ class ChatAPI {
 }
 
 export const chatAPI = new ChatAPI();
-export default chatAPI;

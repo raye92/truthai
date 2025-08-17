@@ -76,7 +76,7 @@ export class ChatLogic {
     try {
       // Create message object
       const message: Message = {
-        messageId: this.generateMessageId(),
+        messageId: '', // Will be set by API response
         role,
         content,
         metadata: {
@@ -91,7 +91,9 @@ export class ChatLogic {
       // ==== CHECK LOGIN ====
       if (userId) {
         // API add message to DB
-        await chatAPI.addMessage(conversationId, role, content, provider, model);
+        const messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
+        // Update message with actual ID from API
+        message.messageId = messageId;
       }
 
       return message.messageId;
@@ -131,23 +133,5 @@ export class ChatLogic {
     }
   }
 
-  // Generate unique ID for messages
-  static generateMessageId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
 
-  // Format timestamp for display
-  static formatTimestamp(timestamp: Date): string {
-    return timestamp.toLocaleString();
-  }
-
-  // Validate message content
-  static validateMessage(content: string): boolean {
-    return content.trim().length > 0;
-  }
-
-  // Clear current conversation
-  static clearCurrentConversation(): void {
-    useChatStore.getState().setCurrentConversation(null);
-  }
 }
