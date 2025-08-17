@@ -50,7 +50,7 @@ export class ChatLogic {
       const response = await chatAPI.loadConversations(userId);
 
       // Convert to conversation objects with empty message arrays
-      const conversations: Conversation[] = response.conversations.map(conv => ({
+      const conversations: Conversation[] = response.conversations.map((conv: any) => ({
         conversationId: conv.id,
         title: conv.title,
         messages: []
@@ -74,9 +74,17 @@ export class ChatLogic {
     userId?: string
   ): Promise<string> {
     try {
+      let messageId = '';
+      
+      // ==== CHECK LOGIN ====
+      if (userId) {
+        // API add message to DB
+        messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
+      }
+
       // Create message object
       const message: Message = {
-        messageId: '', // Will be set by API response
+        messageId,
         role,
         content,
         metadata: {
@@ -84,19 +92,11 @@ export class ChatLogic {
           model
         }
       };
-
-      // Add to store immediately
+      
+      // Add to store
       useChatStore.getState().addMessage(conversationId, message);
 
-      // ==== CHECK LOGIN ====
-      if (userId) {
-        // API add message to DB
-        const messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
-        // Update message with actual ID from API
-        message.messageId = messageId;
-      }
-
-      return message.messageId;
+      return messageId;
     } catch (error) {
       console.error('Error adding message:', error);
       throw error;

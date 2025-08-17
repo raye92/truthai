@@ -9,7 +9,6 @@ const schema = a.schema({
   UserProfile: a
     .model({
       email: a.string().required(),
-      profileOwner: a.string().required(),
       username: a.string().required().default("User"),
       profilePicture: a.string(),
       preferences: a.json(),
@@ -21,11 +20,10 @@ const schema = a.schema({
       conversations: a.hasMany('Conversation', 'userId')
     })
     .authorization((allow: any) => [
-      allow.ownerDefinedIn("profileOwner"),
+      allow.owner(),
     ]),
   
   Conversation: a.model({
-    id: a.id().required(),
     title: a.string().required(),
     userId: a.string().required(),
     isSaved: a.boolean().default(false),
@@ -34,12 +32,11 @@ const schema = a.schema({
     messages: a.hasMany('Message', 'conversationId'),
   }).authorization(
     (allow: any) => [
-      allow.ownerDefinedIn("userId"),
+      allow.owner(),
     ]
   ),
   
   Message: a.model({
-    id: a.id().required(),
     conversationId: a.string().required(),
     role: a.string().required(),
     content: a.string().required(),
@@ -48,7 +45,7 @@ const schema = a.schema({
     conversation: a.belongsTo('Conversation', 'conversationId'),
   }).authorization(
     (allow: any) => [
-      allow.ownerDefinedIn("conversation.userId"),
+      allow.owner(),
     ]
   ),
   
@@ -91,7 +88,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'apiKey',
+    defaultAuthorizationMode: 'userPool',
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },

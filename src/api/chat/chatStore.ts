@@ -42,7 +42,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   
   addMessage: (conversationId, message) => {
     set(produce((state) => {
-      const conversation = state.conversations.find(c => c.conversationId === conversationId);
+      const conversation = state.conversations.find((c: any) => c.conversationId === conversationId);
       if (conversation) {
         conversation.messages.push(message);
       }

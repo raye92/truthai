@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 
-const client = generateClient<Schema>();
-// // Generate client with API key auth for public access
-// const client = generateClient<Schema>({
-//   authMode: 'apiKey'
-// });
+// ======== SEPARATE TWO CLIENTS IF MORE IMPORTS ========
+// const client = generateClient<Schema>();
+// Generate client with API key auth for public access
+const client = generateClient<Schema>({
+  authMode: 'apiKey'
+});
 
 export interface Message {
   role: 'user' | 'assistant';

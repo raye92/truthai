@@ -7,11 +7,13 @@ class ChatAPI {
   // Create a new conversation
   async createConversation(title: string, userId: string): Promise<string> {
     try {
-      const { data: conversation } = await client.models.Conversation.create({
-        title: [title],
-        userId: [userId],
+      console.log('Creating conversation:', title, userId);
+      const { data: conversation, errors } = await client.models.Conversation.create({
+        title: title,
+        userId: userId,
       });
       
+      console.log('Conversation created:', conversation, errors);
       if (!conversation) {
         throw new Error('Failed to create conversation');
       }
@@ -27,13 +29,13 @@ class ChatAPI {
   async addMessage(conversationId: string, role: 'user' | 'assistant', content: string, provider: string, model: string): Promise<string> {
     try {
       const { data: message } = await client.models.Message.create({
-        conversationId: [conversationId],
-        role: [role],
-        content: [content],
-        metadata: [JSON.stringify({
+        conversationId: conversationId,
+        role: role,
+        content: content,
+        metadata: JSON.stringify({
           provider,
           model
-        })]
+        })
       });
       
       if (!message) {
