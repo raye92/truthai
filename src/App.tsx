@@ -4,6 +4,7 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
 import { ChatPage } from "./pages/ChatPage";
 import { QuizPage } from "./pages/quiz";
+import DemoPage from "./pages/DemoPage";
 import { Logo, ChatIcon } from "./assets/Icons";
 import "./App.css";
 
@@ -67,6 +68,13 @@ export default function App() {
               <ChatIcon width={20} height={20} fill="currentColor" />
               Chat
             </Link>
+            <Link
+              to="/demo"
+              className={`nav-link ${location.pathname === '/demo' ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+            >
+              🧪 Demo
+            </Link>
           </nav>
         </div>
 
@@ -96,6 +104,7 @@ export default function App() {
           <Route path="/" element={<QuizPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/demo" element={<DemoPage />} />
         </Routes>
       </main>
 
