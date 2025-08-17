@@ -28,7 +28,7 @@ const schema = a.schema({
     id: a.id().required(),
     title: a.string().required(),
     userId: a.string().required(),
-    isArchived: a.boolean().default(false),
+    isSaved: a.boolean().default(false),
 
     user: a.belongsTo('UserProfile', 'userId'),
     messages: a.hasMany('Message', 'conversationId'),
@@ -40,9 +40,9 @@ const schema = a.schema({
   
   Message: a.model({
     id: a.id().required(),
-    content: a.string().required(),
     conversationId: a.string().required(),
     role: a.string().required(),
+    content: a.string().required(),
     metadata: a.json(),
 
     conversation: a.belongsTo('Conversation', 'conversationId'),
