@@ -2,136 +2,77 @@
 import { chatAPI } from './chatAPI';
 import { useChatStore } from './chatStore';
 import { Conversation, Message } from './types';
+import { getCurrentUser } from '@aws-amplify/auth';
 
 export class ChatLogic {
   // Create a new conversation with type parameter and date
-  static async createConversation(type: "Chat" | "Short-response" | "Long-form", userId?: string): Promise<string> {
-    try {
-      // ==== CHECK LOGIN ====
-      if (!userId) {
-        throw new Error('User must be logged in to create a conversation');
-      }
+  static async createConversation(type: "Chat" | "Short-response" | "Long-form"): Promise<string> {
+    // Create title with type and date
+    const today = new Date().toLocaleDateString();
+    const title = `${type} - ${today}`;
+    let conversationId = '';
 
-      // Create title with type and date
-      const today = new Date().toLocaleDateString();
-      const title = `${type} - ${today}`;
-
-      // API create conversation
-      const conversationId = await chatAPI.createConversation(title, userId);
-
-      // Create conversation object for store
-      const newConversation: Conversation = {
-        conversationId,
-        title,
-        messages: []
-      };
-
-      // Update store
-      const store = useChatStore.getState();
-      store.addConversation(newConversation);
-      store.setCurrentConversation(newConversation);
-
-      return conversationId;
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      throw error;
+    const user = await getCurrentUser();
+    if (user.userId) {
+      conversationId = await chatAPI.createConversation(title, user.userId);
     }
+
+    const newConversation: Conversation = {
+      conversationId,
+      title,
+      messages: []
+    };
+
+    useChatStore.getState().addConversations([newConversation]);
+    useChatStore.getState().setCurrentConversation(newConversation);
+
+    return conversationId;
   }
 
-  // Load conversations for a user
-  static async loadConversations(userId: string): Promise<void> {
-    try {
-      // ==== CHECK LOGIN ====
-      if (!userId) {
-        throw new Error('User must be logged in to load conversations');
-      }
+  // Load the 10 most recent conversations w/ pagination
+  static async loadConversations(): Promise<void> {
+    const user = await getCurrentUser();
+    if (!user.userId) return;
+    
+    const { conversations, nextToken: newNextToken } = await chatAPI.loadConversations(user.userId, useChatStore.getState().nextToken || undefined);
 
-      // API load conversations
-      const response = await chatAPI.loadConversations(userId);
+    const mapped: Conversation[] = conversations.map((conv: any) => ({
+      conversationId: conv.id,
+      title: conv.title,
+      messages: []
+    }));
 
-      // Convert to conversation objects with empty message arrays
-      const conversations: Conversation[] = response.conversations.map((conv: any) => ({
-        conversationId: conv.id,
-        title: conv.title,
-        messages: []
-      }));
-
-      // Update store
-      useChatStore.getState().setConversations(conversations);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-      throw error;
-    }
+    useChatStore.getState().addConversations(mapped);
+    useChatStore.getState().setnextToken(newNextToken);
   }
 
   // Add a message to conversation (both store and DB if logged in)
-  static async addMessage(
-    conversationId: string, 
-    role: 'user' | 'assistant', 
-    content: string, 
-    provider: string, 
-    model: string,
-    userId?: string
-  ): Promise<string> {
-    try {
-      let messageId = '';
-      
-      // ==== CHECK LOGIN ====
-      if (userId) {
-        // API add message to DB
-        messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
-      }
-
-      // Create message object
-      const message: Message = {
-        messageId,
-        role,
-        content,
-        metadata: {
-          provider,
-          model
-        }
-      };
-      
-      // Add to store
-      useChatStore.getState().addMessage(conversationId, message);
-
-      return messageId;
-    } catch (error) {
-      console.error('Error adding message:', error);
-      throw error;
+  static async addMessage(conversationId: string, role: 'user' | 'assistant', content: string, provider: string, model: string): Promise<string> {
+    let messageId = '';
+    
+    // ==== CHECK LOGIN ====
+    const user = await getCurrentUser();
+    if (user.userId) {
+      messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
     }
+
+    const message: Message = {
+      messageId,
+      role,
+      content,
+      metadata: {
+        provider,
+        model
+      }
+    };
+
+    useChatStore.getState().addMessage(conversationId, message);
+
+    return messageId;
   }
 
   // Load messages for current conversation from DynamoDB
   static async loadMessages(conversationId: string): Promise<void> {
-    try {
-      // API load messages
-      const response = await chatAPI.loadMessages(conversationId);
-
-      // Update current conversation's messages in store
-      const store = useChatStore.getState();
-      if (store.currentConversation?.conversationId === conversationId) {
-        // Update the current conversation's messages
-        const updatedConversation = {
-          ...store.currentConversation,
-          messages: response.messages
-        };
-        store.setCurrentConversation(updatedConversation);
-      }
-
-      // Also update the conversation in the conversations array
-      const conversations = store.conversations.map(conv => 
-        conv.conversationId === conversationId 
-          ? { ...conv, messages: response.messages }
-          : conv
-      );
-      store.setConversations(conversations);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      throw error;
-    }
+    
   }
-
-
 }

@@ -7,11 +7,12 @@ interface ChatState {
   conversations: Conversation[];
   currentConversation: Conversation | null;
   isLoading: boolean;
+  nextToken: string | null;
   
   // Actions
   setCurrentConversation: (conversation: Conversation | null) => void;
-  setConversations: (conversations: Conversation[]) => void;
-  addConversation: (conversation: Conversation) => void;
+  addConversations: (conversations: Conversation[]) => void;
+  setnextToken: (token: string | null) => void;
   addMessage: (conversationId: string, message: Message) => void;
 }
 
@@ -20,6 +21,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   currentConversation: null,
   isLoading: false,
+  nextToken: null,
   
   // Actions
   setCurrentConversation: (conversation) => {
@@ -28,15 +30,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
-  setConversations: (conversations) => {
+  addConversations: (conversations) => {
     set(produce((state) => {
-      state.conversations = conversations;
+      // Append older conversations at the end of the list
+      state.conversations.push(...conversations);
     }));
   },
-  
-  addConversation: (conversation) => {
+
+  setnextToken: (token) => {
     set(produce((state) => {
-      state.conversations.unshift(conversation);
+      state.nextToken = token;
     }));
   },
   

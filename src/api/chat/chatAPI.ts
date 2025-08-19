@@ -49,79 +49,35 @@ class ChatAPI {
     }
   }
   
-  // Load conversations (20 most recent, optionally after a specific time)
-  async loadConversations(userId: string, afterTime?: Date): Promise<any> {
+  // Load the "limit" most recent conversations w/ pagination
+  async loadConversations(userId: string, nextToken?: string): Promise<{ conversations: Array<{ id: string; title: string }>; nextToken: string | null } > {
     try {
-      let filter: any = {
-        userId: { eq: userId }
-      };
-
-      // If afterTime is provided, filter conversations created after that time
-      if (afterTime) {
-        filter.createdAt = { gt: afterTime.toISOString() };
-      }
-
-      const { data: conversations } = await client.models.Conversation.list({
-        filter,
-        limit: 20
+      const { data, nextToken: newNextToken } = await (client.models.Conversation as any).listConversationByUserIdAndUpdatedAt({
+        userId,
+        sortDirection: 'DESC',
+        limit: 10,
+        nextToken,
       });
-      
-      if (!conversations) {
-        return { conversations: [] };
-      }
 
-      // Sort by createdAt descending (most recent first)
-      const sortedConversations = conversations.sort((a: any, b: any) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      return {
-        conversations: sortedConversations.map((conv: any) => ({
-          id: conv.id,
-          title: conv.title,
-          updatedBy: conv.createdAt
-        }))
-      };
+      const conversations = (data ?? []).map((conv: any) => ({ id: conv.id, title: conv.title }));
+      return { conversations, nextToken: newNextToken ?? null };
     } catch (error) {
       console.error('Error loading conversations:', error);
       throw error;
     }
   }
   
-  // Load messages for a specific conversation (20 most recent, optionally after a specific time)
-  async loadMessages(conversationId: string, afterTime?: Date): Promise<any> {
+  // Load the "limit" most recent messages w/ pagination
+  async loadMessages(conversationId: string, nextToken?: string): Promise<any> {
     try {
-      let filter: any = {
-        conversationId: { eq: conversationId }
-      };
-
-      // If afterTime is provided, filter messages created after that time
-      if (afterTime) {
-        filter.createdAt = { gt: afterTime.toISOString() };
-      }
-
-      const { data: messages } = await client.models.Message.list({
-        filter,
-        limit: 20
+      const { data, nextToken:newnextToken } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
+        conversationId,
+        sortDirection: 'DESC',
+        limit: 2,
+        nextToken,
       });
-      
-      if (!messages) {
-        return { messages: [] };
-      }
 
-      // Sort by createdAt descending (most recent first)
-      const sortedMessages = messages.sort((a: any, b: any) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      return {
-        messages: sortedMessages.map((msg: any) => ({
-          messageId: msg.id,
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content,
-          metadata: msg.metadata as { provider: string; model: string }
-        }))
-      };
+      return { messages: data ?? [], nextToken : newnextToken ?? null };
     } catch (error) {
       console.error('Error loading messages:', error);
       throw error;

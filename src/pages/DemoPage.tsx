@@ -5,7 +5,6 @@ import { useChatStore } from '../api/chat/chatStore';
 import { Conversation, Message } from '../api/chat/types';
 
 const DemoPage: React.FC = () => {
-  const [userId, setUserId] = useState<string>('demo-user-123');
   const [messageContent, setMessageContent] = useState<string>('Hello, this is a test message!');
   const [provider, setProvider] = useState<string>('openai');
   const [model, setModel] = useState<string>('gpt-4');
@@ -14,8 +13,6 @@ const DemoPage: React.FC = () => {
     conversations, 
     currentConversation, 
     setCurrentConversation,
-    setConversations,
-    addConversation,
     addMessage
   } = useChatStore();
 
@@ -23,7 +20,7 @@ const DemoPage: React.FC = () => {
   const testCreateConversation = async (type: "Chat" | "Short-response" | "Long-form") => {
     try {
       console.log(`Creating ${type} conversation...`);
-      const conversationId = await ChatLogic.createConversation(type, userId);
+      const conversationId = await ChatLogic.createConversation(type);
       console.log(`Created conversation: ${conversationId}`);
     } catch (error) {
       console.error('Error creating conversation:', error);
@@ -33,7 +30,7 @@ const DemoPage: React.FC = () => {
   const testLoadConversations = async () => {
     try {
       console.log('Loading conversations...');
-      await ChatLogic.loadConversations(userId);
+      await ChatLogic.loadConversations();
       console.log('Conversations loaded');
     } catch (error) {
       console.error('Error loading conversations:', error);
@@ -54,7 +51,6 @@ const DemoPage: React.FC = () => {
         messageContent,
         provider,
         model,
-        userId
       );
       console.log(`Message added with ID: ${messageId}`);
       setMessageContent(''); // Clear input after sending
@@ -90,13 +86,6 @@ const DemoPage: React.FC = () => {
       {/* User ID Input */}
       <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>User ID:</label>
-        <input
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-          placeholder="Enter user ID"
-        />
       </div>
 
       {/* Test Buttons */}

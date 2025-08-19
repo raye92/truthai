@@ -27,10 +27,15 @@ const schema = a.schema({
     title: a.string().required(),
     userId: a.string().required(),
     isSaved: a.boolean().default(false),
+    updatedAt: a.datetime(),
 
     user: a.belongsTo('UserProfile', 'userId'),
     messages: a.hasMany('Message', 'conversationId'),
-  }).authorization(
+  })
+  .secondaryIndexes((index) => [
+    index("userId").sortKeys(['updatedAt'] as any),
+  ])
+  .authorization(
     (allow: any) => [
       allow.owner(),
     ]
@@ -41,9 +46,14 @@ const schema = a.schema({
     role: a.string().required(),
     content: a.string().required(),
     metadata: a.json(),
+    updatedAt: a.datetime(),
 
     conversation: a.belongsTo('Conversation', 'conversationId'),
-  }).authorization(
+  })
+  .secondaryIndexes((index) => [
+    index("conversationId").sortKeys(['updatedAt'] as any),
+  ])
+  .authorization(
     (allow: any) => [
       allow.owner(),
     ]
