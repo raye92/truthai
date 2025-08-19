@@ -33,8 +33,8 @@ export class ChatLogic {
   static async loadConversations(): Promise<void> {
     const user = await getCurrentUser();
     if (!user.userId) return;
-    
-    const { conversations, nextToken: newNextToken } = await chatAPI.loadConversations(user.userId, useChatStore.getState().nextToken || undefined);
+    console.log('Loading conversations:', useChatStore.getState().nextChatToken);
+    const { conversations, nextToken: newNextToken } = await chatAPI.loadConversations(user.userId, useChatStore.getState().nextChatToken || undefined);
 
     const mapped: Conversation[] = conversations.map((conv: any) => ({
       conversationId: conv.id,
@@ -43,7 +43,7 @@ export class ChatLogic {
     }));
 
     useChatStore.getState().addConversations(mapped);
-    useChatStore.getState().setnextToken(newNextToken);
+    useChatStore.getState().setNextChatToken(newNextToken);
   }
 
   // Add a message to conversation (both store and DB if logged in)
@@ -73,6 +73,19 @@ export class ChatLogic {
 
   // Load messages for current conversation from DynamoDB
   static async loadMessages(conversationId: string): Promise<void> {
-    
+    const user = await getCurrentUser();
+    if (!user.userId) return;
+
+    const { messages, nextToken: newNextMessageToken } = await chatAPI.loadMessages(conversationId, useChatStore.getState().nextMessageToken || undefined);
+
+    const mapped: Message[] = messages.map((msg: any) => ({
+      messageId: msg.id,
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+      metadata: JSON.parse(msg.metadata)
+    }));
+
+    useChatStore.getState().setCurrentMessages(mapped);
+    useChatStore.getState().setNextMessageToken(newNextMessageToken);
   }
 }

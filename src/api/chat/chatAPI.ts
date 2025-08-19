@@ -49,9 +49,15 @@ class ChatAPI {
     }
   }
   
-  // Load the "limit" most recent conversations w/ pagination
+  // Load the "limit" most recent conversations w/ pagination - null if no more conversations
   async loadConversations(userId: string, nextToken?: string): Promise<{ conversations: Array<{ id: string; title: string }>; nextToken: string | null } > {
     try {
+      if (!nextToken) {
+        return { conversations: [], nextToken: null };
+      }
+      else if (nextToken === "empty") {
+        nextToken = undefined;
+      }
       const { data, nextToken: newNextToken } = await (client.models.Conversation as any).listConversationByUserIdAndUpdatedAt({
         userId,
         sortDirection: 'DESC',
@@ -67,17 +73,24 @@ class ChatAPI {
     }
   }
   
-  // Load the "limit" most recent messages w/ pagination
-  async loadMessages(conversationId: string, nextToken?: string): Promise<any> {
+  // Load the "limit" most recent messages w/ pagination - null if no more messages
+  async loadMessages(conversationId: string, nextToken?: string): Promise<{ messages: Array<{ id: string; role: string; content: string; metadata: string }>; nextToken: string | null }> {
     try {
-      const { data, nextToken:newnextToken } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
+      if (!nextToken) {
+        return { messages: [], nextToken: null };
+      }
+      else if (nextToken === "empty") {
+        nextToken = undefined;
+      }
+      const { data, nextToken: newNextToken } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
         conversationId,
         sortDirection: 'DESC',
         limit: 2,
         nextToken,
       });
+      console.log('Messages loaded:', data, newNextToken);
 
-      return { messages: data ?? [], nextToken : newnextToken ?? null };
+      return { messages: data ?? [], nextToken: newNextToken ?? null };
     } catch (error) {
       console.error('Error loading messages:', error);
       throw error;

@@ -7,12 +7,15 @@ interface ChatState {
   conversations: Conversation[];
   currentConversation: Conversation | null;
   isLoading: boolean;
-  nextToken: string | null;
+  nextChatToken: string | null;
+  nextMessageToken: string | null;
   
   // Actions
   setCurrentConversation: (conversation: Conversation | null) => void;
   addConversations: (conversations: Conversation[]) => void;
-  setnextToken: (token: string | null) => void;
+  setNextChatToken: (token: string | null) => void;
+  setNextMessageToken: (token: string | null) => void;
+  setCurrentMessages: (messages: Message[]) => void;
   addMessage: (conversationId: string, message: Message) => void;
 }
 
@@ -21,7 +24,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   currentConversation: null,
   isLoading: false,
-  nextToken: null,
+  nextChatToken: "empty",
+  nextMessageToken: "empty",
   
   // Actions
   setCurrentConversation: (conversation) => {
@@ -37,9 +41,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
-  setnextToken: (token) => {
+  setNextChatToken: (token) => {
     set(produce((state) => {
-      state.nextToken = token;
+      state.nextChatToken = token;
+    }));
+  },
+
+  setNextMessageToken: (token) => {
+    set(produce((state) => {
+      state.nextMessageToken = token;
+    }));
+  },
+
+  setCurrentMessages: (messages) => {
+    set(produce((state) => {
+      if (state.currentConversation) {
+        state.currentConversation.messages.push(...messages);
+      }
     }));
   },
   
