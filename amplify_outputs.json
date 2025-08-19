@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "us-west-1_Ory10kMpK",
+    "user_pool_id": "us-west-1_MaBHaNTVm",
     "aws_region": "us-west-1",
-    "user_pool_client_id": "61eqhoc7fmcjd0u0plef0oieh1",
-    "identity_pool_id": "us-west-1:5b311749-e7bc-4c33-b79f-35888bda653b",
+    "user_pool_client_id": "25i8ka6iukjhl8i82ces4jsj68",
+    "identity_pool_id": "us-west-1:c86ff588-493a-4caf-9a47-b858e2c19eee",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -43,17 +43,17 @@
         "profile",
         "aws.cognito.signin.user.admin"
       ],
-      "domain": "db0fb19789550ee23cea.auth.us-west-1.amazoncognito.com"
+      "domain": "30fa1fd6d0b52caed9b8.auth.us-west-1.amazoncognito.com"
     },
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://uvgz32kj55cb5eg7ls4vxnoqxm.appsync-api.us-west-1.amazonaws.com/graphql",
+    "url": "https://52jwuekzzzesljrvwdcu3obm6m.appsync-api.us-west-1.amazonaws.com/graphql",
     "aws_region": "us-west-1",
-    "api_key": "da2-usmjwu7zbjekxeobfghl4ru24q",
-    "default_authorization_type": "API_KEY",
+    "api_key": "da2-hqrv3ccl4vga5i4efnz35m2yim",
+    "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
-      "AMAZON_COGNITO_USER_POOLS",
+      "API_KEY",
       "AWS_IAM"
     ],
     "model_introspection": {
@@ -71,13 +71,6 @@
             },
             "email": {
               "name": "email",
-              "isArray": false,
-              "type": "String",
-              "isRequired": true,
-              "attributes": []
-            },
-            "profileOwner": {
-              "name": "profileOwner",
               "isArray": false,
               "type": "String",
               "isRequired": true,
@@ -178,7 +171,7 @@
                 "rules": [
                   {
                     "provider": "userPools",
-                    "ownerField": "profileOwner",
+                    "ownerField": "owner",
                     "allow": "owner",
                     "identityClaim": "cognito:username",
                     "operations": [
@@ -222,6 +215,20 @@
               "isRequired": true,
               "attributes": []
             },
+            "isSaved": {
+              "name": "isSaved",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
             "user": {
               "name": "user",
               "isArray": false,
@@ -257,29 +264,9 @@
               "name": "createdAt",
               "isArray": false,
               "type": "AWSDateTime",
-              "isRequired": true,
-              "attributes": []
-            },
-            "updatedAt": {
-              "name": "updatedAt",
-              "isArray": false,
-              "type": "AWSDateTime",
               "isRequired": false,
-              "attributes": []
-            },
-            "isArchived": {
-              "name": "isArchived",
-              "isArray": false,
-              "type": "Boolean",
-              "isRequired": false,
-              "attributes": []
-            },
-            "metadata": {
-              "name": "metadata",
-              "isArray": false,
-              "type": "AWSJSON",
-              "isRequired": false,
-              "attributes": []
+              "attributes": [],
+              "isReadOnly": true
             }
           },
           "syncable": true,
@@ -292,8 +279,11 @@
             {
               "type": "key",
               "properties": {
+                "name": "conversationsByUserIdAndUpdatedAt",
+                "queryField": "listConversationByUserIdAndUpdatedAt",
                 "fields": [
-                  "id"
+                  "userId",
+                  "updatedAt"
                 ]
               }
             },
@@ -303,7 +293,7 @@
                 "rules": [
                   {
                     "provider": "userPools",
-                    "ownerField": "userId",
+                    "ownerField": "owner",
                     "allow": "owner",
                     "identityClaim": "cognito:username",
                     "operations": [
@@ -333,6 +323,20 @@
               "isRequired": true,
               "attributes": []
             },
+            "conversationId": {
+              "name": "conversationId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "role": {
+              "name": "role",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
             "content": {
               "name": "content",
               "isArray": false,
@@ -340,11 +344,18 @@
               "isRequired": true,
               "attributes": []
             },
-            "conversationId": {
-              "name": "conversationId",
+            "metadata": {
+              "name": "metadata",
               "isArray": false,
-              "type": "String",
-              "isRequired": true,
+              "type": "AWSJSON",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
               "attributes": []
             },
             "conversation": {
@@ -362,36 +373,8 @@
                 ]
               }
             },
-            "role": {
-              "name": "role",
-              "isArray": false,
-              "type": "String",
-              "isRequired": true,
-              "attributes": []
-            },
             "createdAt": {
               "name": "createdAt",
-              "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": true,
-              "attributes": []
-            },
-            "tokens": {
-              "name": "tokens",
-              "isArray": false,
-              "type": "Int",
-              "isRequired": false,
-              "attributes": []
-            },
-            "metadata": {
-              "name": "metadata",
-              "isArray": false,
-              "type": "AWSJSON",
-              "isRequired": false,
-              "attributes": []
-            },
-            "updatedAt": {
-              "name": "updatedAt",
               "isArray": false,
               "type": "AWSDateTime",
               "isRequired": false,
@@ -409,8 +392,11 @@
             {
               "type": "key",
               "properties": {
+                "name": "messagesByConversationIdAndUpdatedAt",
+                "queryField": "listMessageByConversationIdAndUpdatedAt",
                 "fields": [
-                  "id"
+                  "conversationId",
+                  "updatedAt"
                 ]
               }
             },
@@ -419,8 +405,10 @@
               "properties": {
                 "rules": [
                   {
-                    "allow": "public",
-                    "provider": "apiKey",
+                    "provider": "userPools",
+                    "ownerField": "owner",
+                    "allow": "owner",
+                    "identityClaim": "cognito:username",
                     "operations": [
                       "create",
                       "update",
