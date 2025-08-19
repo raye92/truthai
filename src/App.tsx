@@ -6,6 +6,7 @@ import { ChatPage } from "./pages/ChatPage";
 import { QuizPage } from "./pages/quiz";
 import DemoPage from "./pages/DemoPage";
 import { Logo, ChatIcon } from "./assets/Icons";
+import { HistoryContainer } from "./components/HistoryContainer";
 import "./App.css";
 
 export default function App() {
@@ -77,6 +78,8 @@ export default function App() {
             </Link>
           </nav>
         </div>
+
+        <HistoryContainer />
 
         <div className="sidebar-footer">
           {isAuthenticated ? (
