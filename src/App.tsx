@@ -30,7 +30,7 @@ export default function App() {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label="Toggle sidebar"
       >
-        <Logo width={80} height={80} fill="white" />
+        <Logo width={80} height={80} fill="#e2e8f0" />
       </button>
 
       {/* Sign In Button for unauthenticated users */}

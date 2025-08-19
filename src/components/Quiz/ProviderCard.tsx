@@ -80,7 +80,7 @@ const styles = {
     borderRadius: '0.375rem',
     fontSize: '0.85rem',
     fontWeight: '600',
-    color: 'white',
+    color: '#e2e8f0',
     minWidth: '20px',
     height: '2.25rem',
     transition: 'transform 0.2s, box-shadow 0.2s',

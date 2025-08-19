@@ -65,7 +65,7 @@ const styles = {
   },
   userMessageBubble: {
     background: '#3b82f6',
-    color: 'white',
+    color: '#e2e8f0',
     borderBottomRightRadius: '0.25rem',
   },
   assistantMessageBubble: {
