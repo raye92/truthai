@@ -12,4 +12,5 @@ export interface Conversation {
   conversationId: string;
   title: string;
   messages: Message[];
+  nextMessageToken: string | null;
 }

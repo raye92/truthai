@@ -20,10 +20,11 @@ export class ChatLogic {
     const newConversation: Conversation = {
       conversationId,
       title,
-      messages: []
+      messages: [],
+      nextMessageToken: "empty"
     };
 
-    useChatStore.getState().addConversations([newConversation]);
+    useChatStore.getState().prependConversation(newConversation);
     useChatStore.getState().setCurrentConversation(newConversation);
 
     return conversationId;
@@ -33,15 +34,14 @@ export class ChatLogic {
   static async loadConversations(): Promise<void> {
     const user = await getCurrentUser();
     if (!user.userId) return;
-    console.log('Loading conversations:', useChatStore.getState().nextChatToken);
     const { conversations, nextToken: newNextToken } = await chatAPI.loadConversations(user.userId, useChatStore.getState().nextChatToken || undefined);
 
     const mapped: Conversation[] = conversations.map((conv: any) => ({
       conversationId: conv.id,
       title: conv.title,
-      messages: []
+      messages: [],
+      nextMessageToken: "empty"
     }));
-
     useChatStore.getState().addConversations(mapped);
     useChatStore.getState().setNextChatToken(newNextToken);
   }
@@ -66,7 +66,7 @@ export class ChatLogic {
       }
     };
 
-    useChatStore.getState().addMessage(conversationId, message);
+    useChatStore.getState().prependMessage(message);
 
     return messageId;
   }
@@ -75,17 +75,19 @@ export class ChatLogic {
   static async loadMessages(conversationId: string): Promise<void> {
     const user = await getCurrentUser();
     if (!user.userId) return;
-
-    const { messages, nextToken: newNextMessageToken } = await chatAPI.loadMessages(conversationId, useChatStore.getState().nextMessageToken || undefined);
-
+    const { messages, nextToken: newNextMessageToken } = await chatAPI.loadMessages(
+      conversationId, 
+      useChatStore.getState().currentConversation?.nextMessageToken || undefined
+    );
     const mapped: Message[] = messages.map((msg: any) => ({
       messageId: msg.id,
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
       metadata: JSON.parse(msg.metadata)
     }));
-
-    useChatStore.getState().setCurrentMessages(mapped);
-    useChatStore.getState().setNextMessageToken(newNextMessageToken);
+    
+    const store = useChatStore.getState();
+    store.setConversationNextMessageToken(newNextMessageToken);
+    store.addCurrentMessages(mapped);
   }
 }

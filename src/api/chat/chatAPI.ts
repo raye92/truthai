@@ -88,7 +88,6 @@ class ChatAPI {
         limit: 2,
         nextToken,
       });
-      console.log('Messages loaded:', data, newNextToken);
 
       return { messages: data ?? [], nextToken: newNextToken ?? null };
     } catch (error) {

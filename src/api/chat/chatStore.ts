@@ -8,15 +8,15 @@ interface ChatState {
   currentConversation: Conversation | null;
   isLoading: boolean;
   nextChatToken: string | null;
-  nextMessageToken: string | null;
   
   // Actions
   setCurrentConversation: (conversation: Conversation | null) => void;
   addConversations: (conversations: Conversation[]) => void;
+  prependConversation: (conversation: Conversation) => void;
   setNextChatToken: (token: string | null) => void;
-  setNextMessageToken: (token: string | null) => void;
-  setCurrentMessages: (messages: Message[]) => void;
-  addMessage: (conversationId: string, message: Message) => void;
+  addCurrentMessages: (messages: Message[]) => void;
+  prependMessage: (message: Message) => void;
+  setConversationNextMessageToken: (token: string | null) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -25,7 +25,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentConversation: null,
   isLoading: false,
   nextChatToken: "empty",
-  nextMessageToken: "empty",
   
   // Actions
   setCurrentConversation: (conversation) => {
@@ -41,36 +40,49 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
+  // Put a new conversation at the beginning of the list (most recent first)
+  prependConversation: (conversation) => {
+    set(produce((state) => {
+      state.conversations.unshift(conversation);
+    }));
+  },
+
   setNextChatToken: (token) => {
     set(produce((state) => {
       state.nextChatToken = token;
     }));
   },
 
-  setNextMessageToken: (token) => {
+  addCurrentMessages: (messages) => {
     set(produce((state) => {
-      state.nextMessageToken = token;
-    }));
-  },
-
-  setCurrentMessages: (messages) => {
-    set(produce((state) => {
-      if (state.currentConversation) {
-        state.currentConversation.messages.push(...messages);
+      const inListConv = state.conversations.find((c: any) => c.conversationId === state.currentConversation?.conversationId);
+      if (inListConv) {
+        inListConv.messages.push(...messages);
       }
+
+      state.currentConversation.messages.push(...messages); // TODO: remove this
     }));
   },
   
-  addMessage: (conversationId, message) => {
+  prependMessage: (message) => {
     set(produce((state) => {
-      const conversation = state.conversations.find((c: any) => c.conversationId === conversationId);
-      if (conversation) {
-        conversation.messages.push(message);
+      const inListConv = state.conversations.find((c: any) => c.conversationId === state.currentConversation?.conversationId);
+      if (inListConv) {
+        inListConv.messages.push(message);
       }
-      
-      if (state.currentConversation?.conversationId === conversationId) {
-        state.currentConversation.messages.push(message);
+
+      state.currentConversation.messages.unshift(message);
+    }));
+  },
+
+  // Update nextMessageToken for a specific conversation in both locations
+  setConversationNextMessageToken: (token) => {
+    set(produce((state) => {
+      const inListConv = state.conversations.find((c: any) => c.conversationId === state.currentConversation?.conversationId);
+      if (inListConv) {
+        inListConv.nextMessageToken = token;
       }
+      state.currentConversation.nextMessageToken = token;
     }));
   },
 }));

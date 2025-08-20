@@ -1,10 +1,16 @@
 import React from 'react';
 import { useChatStore } from '../api/chat/chatStore';
+import { getCurrentUser } from '@aws-amplify/auth';
 
 export const HistoryContainer: React.FC = () => {
   const conversations = useChatStore((state) => state.conversations);
   const currentConversation = useChatStore((state) => state.currentConversation);
   const setCurrentConversation = useChatStore((state) => state.setCurrentConversation);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  React.useEffect(() => {
+    getCurrentUser().then(user => setIsAuthenticated(!!user.userId));
+  }, []);
 
   return (
     <div className="history-container">
@@ -25,9 +31,15 @@ export const HistoryContainer: React.FC = () => {
           ))
         ) : (
           <div className="history-empty">
-            <p>No chat history yet</p>
-            <p> -</p>
-            <p>Unsaved chats will be deleted after 1 week</p> {/* ======== IMPLEMENT ======== */}
+            {isAuthenticated ? (
+              <>
+                <p>No chat history yet</p>
+                <p> -</p>
+                <p>Unsaved chats will be deleted after 1 week</p> {/* ======== IMPLEMENT ======== */}
+              </>
+            ) : (
+              <p>Sign in to save your history</p>
+            )}
           </div>
         )}
       </div>
