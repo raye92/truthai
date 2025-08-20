@@ -1,15 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
 import { MessageInput } from "../components/Input";
+import { useChatStore } from "../api/chat/chatStore";
+import { ChatLogic } from "../api/chat/chatLogic";
 
 export function ChatPage() {
   const { messages, isLoading, sendMessage } = useChat();
-  // Local state previously handled inside ChatInputBar
   const [input, setInput] = useState("");
   type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
+
+  const currentConversation = useChatStore((s) => s.currentConversation);
+
+  const storeMessages = currentConversation?.messages || [];
+  const viewMessages = currentConversation
+    ? storeMessages.map(m => ({ role: m.role, content: m.content, model: m.metadata?.provider === 'gemini' ? 'gemini' : 'chatgpt' }))
+    : messages;
+
+  // Minimal scroll handling
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  // Newest at bottom by reversing for render
+  const renderMessages = [...viewMessages].reverse();
+
+  // Always stick to bottom on updates
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [renderMessages.length, currentConversation?.conversationId]);
+
+  const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (!currentConversation || isFetchingMore) return;
+    const el = e.currentTarget;
+    const canScroll = el.scrollHeight > el.clientHeight + 10;
+    if (!canScroll) return;
+    if (el.scrollTop <= 10) {
+      setIsFetchingMore(true);
+      ChatLogic.loadMessages(currentConversation.conversationId)
+        .catch(console.error)
+        .finally(() => setIsFetchingMore(false));
+    }
+  };
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
@@ -20,8 +55,8 @@ export function ChatPage() {
 
   return (
     <div style={styles.chatPage}>
-      <div style={styles.messagesContainer}>
-        {messages.length === 0 && (
+      <div style={styles.messagesContainer} ref={containerRef} onScroll={handleContainerScroll}>
+        {renderMessages.length === 0 && (
           <div style={styles.emptyState}>
             <h1 style={styles.chatLogoTitle}>CurateAI</h1>
             <p style={styles.emptyStateP}>
@@ -29,7 +64,7 @@ export function ChatPage() {
             </p>
           </div>
         )}
-        {messages.map((message, idx) => (
+        {renderMessages.map((message, idx) => (
           <MessageBubble key={idx} message={message} />
         ))}
         {isLoading && (

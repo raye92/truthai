@@ -85,7 +85,7 @@ class ChatAPI {
       const { data, nextToken: newNextToken } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
         conversationId,
         sortDirection: 'DESC',
-        limit: 2,
+        limit: 10,
         nextToken,
       });
 

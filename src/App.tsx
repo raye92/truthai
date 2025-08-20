@@ -87,7 +87,7 @@ export default function App() {
           </nav>
         </div>
 
-        <HistoryContainer isAuthenticated={authStatus === "authenticated"} />
+        <HistoryContainer isAuthenticated={authStatus === "authenticated"} onSelectChat={() => setSidebarOpen(false)} />
 
         <div className="sidebar-footer">
           {authStatus === "authenticated" ? (
@@ -114,6 +114,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<QuizPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:conversationId" element={<ChatPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/demo" element={<DemoPage />} />
         </Routes>

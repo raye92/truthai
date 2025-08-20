@@ -1,13 +1,15 @@
 import React from 'react';
 import { useChatStore } from '../api/chat/chatStore';
 import { ChatLogic } from '../api/chat/chatLogic';
+import { useNavigate } from 'react-router-dom';
 
-export const HistoryContainer: React.FC<{ isAuthenticated: boolean; }> = ({ isAuthenticated }) => {
+export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat?: () => void; }> = ({ isAuthenticated, onSelectChat }) => {
   const conversations = useChatStore((state) => state.conversations);
   const currentConversation = useChatStore((state) => state.currentConversation);
   const setCurrentConversation = useChatStore((state) => state.setCurrentConversation);
   const clearConversations = useChatStore((state) => state.clearConversations);
   const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
 
   // Clear conversations when user signs out
   React.useEffect(() => {
@@ -44,7 +46,12 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; }> = ({ isAu
               className={`history-item${
                 currentConversation?.conversationId === conv.conversationId ? ' selected' : ''
               }`}
-              onClick={() => setCurrentConversation(conv)}
+              onClick={async () => {
+                setCurrentConversation(conv);
+                onSelectChat?.();
+                navigate(`/chat/${conv.conversationId}`);
+                ChatLogic.loadMessages(conv.conversationId);
+              }}
             >
               <span className="history-title">{conv.title || 'Untitled conversation'}</span>
               <span className="history-timestamp">{conv.messages.length} message{conv.messages.length === 1 ? '' : 's'}</span>
@@ -56,7 +63,7 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; }> = ({ isAu
               <>
                 <p>No chat history yet</p>
                 <p> -</p>
-                <p>Unsaved chats will be deleted after 1 week</p> {/* ======== IMPLEMENT ======== */}
+                <p>Unsaved chats will be deleted after a while</p> {/* ======== IMPLEMENT ======== */}
               </>
             ) : (
               <p>Sign in to save your history</p>
