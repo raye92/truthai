@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
@@ -7,6 +7,7 @@ import { QuizPage } from "./pages/quiz";
 import DemoPage from "./pages/DemoPage";
 import { Logo, ChatIcon } from "./assets/Icons";
 import { HistoryContainer } from "./components/HistoryContainer";
+import { ChatLogic } from "./api/chat/chatLogic";
 import "./App.css";
 
 export default function App() {
@@ -15,15 +16,22 @@ export default function App() {
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const location = useLocation();
 
+  // Load conversations when user is authenticated
+  useEffect(() => {
+    if (authStatus === "authenticated") {
+      ChatLogic.loadConversations();
+    }
+  }, [authStatus]);
+
   const handleSignOut = async () => {
     try {
+      console.log("Current authStatus before signOut:", authStatus);
       await signOut();
+      console.log("Current authStatus after signOut:", authStatus);
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
-
-  const isAuthenticated = authStatus === "authenticated";
 
   return (
     <div className="app-container">
@@ -36,7 +44,7 @@ export default function App() {
       </button>
 
       {/* Sign In Button for unauthenticated users */}
-      {!isAuthenticated && (
+      {authStatus !== "authenticated" && (
         <button
           className="sign-in-button"
           onClick={() => setSignInModalOpen(true)}
@@ -79,10 +87,10 @@ export default function App() {
           </nav>
         </div>
 
-        <HistoryContainer />
+        <HistoryContainer isAuthenticated={authStatus === "authenticated"} />
 
         <div className="sidebar-footer">
-          {isAuthenticated ? (
+          {authStatus === "authenticated" ? (
             <div className="user-info">
               <p className="welcome-text">
                 Welcome, {user?.signInDetails?.loginId || "User"}!

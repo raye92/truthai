@@ -17,6 +17,7 @@ interface ChatState {
   addCurrentMessages: (messages: Message[]) => void;
   prependMessage: (message: Message) => void;
   setConversationNextMessageToken: (token: string | null) => void;
+  clearConversations: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -83,6 +84,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
         inListConv.nextMessageToken = token;
       }
       state.currentConversation.nextMessageToken = token;
+    }));
+  },
+
+  clearConversations: () => {
+    set(produce((state) => {
+      state.conversations = [];
+      state.currentConversation = null;
+      state.nextChatToken = "empty";
     }));
   },
 }));

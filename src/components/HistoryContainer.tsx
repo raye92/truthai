@@ -1,20 +1,41 @@
 import React from 'react';
 import { useChatStore } from '../api/chat/chatStore';
-import { getCurrentUser } from '@aws-amplify/auth';
+import { ChatLogic } from '../api/chat/chatLogic';
 
-export const HistoryContainer: React.FC = () => {
+export const HistoryContainer: React.FC<{ isAuthenticated: boolean; }> = ({ isAuthenticated }) => {
   const conversations = useChatStore((state) => state.conversations);
   const currentConversation = useChatStore((state) => state.currentConversation);
   const setCurrentConversation = useChatStore((state) => state.setCurrentConversation);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const clearConversations = useChatStore((state) => state.clearConversations);
+  const [isLoading, setIsLoading] = React.useState(false);
 
+  // Clear conversations when user signs out
   React.useEffect(() => {
-    getCurrentUser().then(user => setIsAuthenticated(!!user.userId));
-  }, []);
+    if (!isAuthenticated) {
+      clearConversations();
+      setCurrentConversation(null);
+    }
+  }, [isAuthenticated, clearConversations, setCurrentConversation]);
+
+  const handleScroll = React.useCallback(async (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    
+    // Check if scrolled to bottom (with small threshold)
+    if (scrollTop + clientHeight >= scrollHeight - 10 && !isLoading) {
+      setIsLoading(true);
+      try {
+        await ChatLogic.loadConversations();
+      } catch (error) {
+        console.error('Error loading more conversations:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [isLoading]);
 
   return (
     <div className="history-container">
-      <div className="history-list">
+      <div className="history-list" onScroll={handleScroll}>
         {conversations.length > 0 ? (
           conversations.map((conv) => (
             <button
@@ -42,6 +63,13 @@ export const HistoryContainer: React.FC = () => {
             )}
           </div>
         )}
+        
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="history-loading">
+            <div className="spinner"></div>
+          </div>
+        )}
       </div>
       <style>{styles}</style>
     </div>
@@ -63,6 +91,8 @@ const styles = `
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-height: 100%;
+    overflow-y: auto;
   }
 
   .history-item {
@@ -110,5 +140,25 @@ const styles = `
     font-size: 0.875rem;
     margin: 0;
     font-style: italic;
+  }
+
+  .history-loading {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #4b5563;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 `;
