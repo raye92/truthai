@@ -29,6 +29,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   
   // Actions
   setCurrentConversation: (conversation) => {
+    const current = get().currentConversation; // Ensure we don't double set the same conv
+    if (current?.conversationId === conversation?.conversationId) return;
+    console.log('Setting current conversation:', conversation);
     set(produce((state) => {
       state.currentConversation = conversation;
     }));

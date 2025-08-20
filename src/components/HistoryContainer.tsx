@@ -48,7 +48,7 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
               }`}
               onClick={async () => {
                 setCurrentConversation(conv);
-                onSelectChat?.();
+                onSelectChat?.(); // close sidebar
                 navigate(`/chat/${conv.conversationId}`);
                 ChatLogic.loadMessages(conv.conversationId);
               }}

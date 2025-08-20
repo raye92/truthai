@@ -21,7 +21,7 @@ export class ChatLogic {
       conversationId,
       title,
       messages: [],
-      nextMessageToken: "empty"
+      nextMessageToken: null
     };
 
     useChatStore.getState().prependConversation(newConversation);
@@ -33,7 +33,7 @@ export class ChatLogic {
   // Load the 10 most recent conversations w/ pagination
   static async loadConversations(): Promise<void> {
     const user = await getCurrentUser();
-    if (!user.userId) return;
+    if (!user.userId || !useChatStore.getState().nextChatToken) return;
     const { conversations, nextToken: newNextToken } = await chatAPI.loadConversations(user.userId, useChatStore.getState().nextChatToken || undefined);
 
     const mapped: Conversation[] = conversations.map((conv: any) => ({
@@ -73,12 +73,15 @@ export class ChatLogic {
 
   // Load messages for current conversation from DynamoDB
   static async loadMessages(conversationId: string): Promise<void> {
+    const store = useChatStore.getState();
     const user = await getCurrentUser();
-    if (!user.userId) return;
+
+    if (!user.userId || !store.currentConversation?.nextMessageToken) return;
     const { messages, nextToken: newNextMessageToken } = await chatAPI.loadMessages(
       conversationId, 
-      useChatStore.getState().currentConversation?.nextMessageToken || undefined
+      store.currentConversation?.nextMessageToken || undefined
     );
+    console.log('Loaded messages:', messages);
     const mapped: Message[] = messages.map((msg: any) => ({
       messageId: msg.id,
       role: msg.role as 'user' | 'assistant',
@@ -86,7 +89,6 @@ export class ChatLogic {
       metadata: JSON.parse(msg.metadata)
     }));
     
-    const store = useChatStore.getState();
     store.setConversationNextMessageToken(newNextMessageToken);
     store.addCurrentMessages(mapped);
   }

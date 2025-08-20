@@ -8,6 +8,7 @@ import DemoPage from "./pages/DemoPage";
 import { Logo, ChatIcon } from "./assets/Icons";
 import { HistoryContainer } from "./components/HistoryContainer";
 import { ChatLogic } from "./api/chat/chatLogic";
+import { useChatStore } from "./api/chat/chatStore";
 import "./App.css";
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const location = useLocation();
+  const setCurrentConversation = useChatStore((s) => s.setCurrentConversation);
 
   // Load conversations when user is authenticated
   useEffect(() => {
@@ -71,8 +73,8 @@ export default function App() {
             </Link>
             <Link
               to="/chat"
-              className={`nav-link ${location.pathname === '/chat' ? 'active' : ''}`}
-              onClick={() => setSidebarOpen(false)}
+              className={`nav-link ${location.pathname.startsWith('/chat') ? 'active' : ''}`}
+              onClick={() => { setCurrentConversation(null); setSidebarOpen(false); }}
             >
               <ChatIcon width={20} height={20} fill="currentColor" />
               Chat
