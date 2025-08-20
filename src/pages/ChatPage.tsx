@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
@@ -12,7 +12,9 @@ export function ChatPage() {
   type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
 
-  const currentConversation = useChatStore((s) => s.currentConversation);
+  const currentConversationId = useChatStore((s) => s.currentConversationId);
+  const conversations = useChatStore((s) => s.conversations);
+  const currentConversation = useMemo(() => conversations.find(c => c.conversationId === currentConversationId) || null, [conversations, currentConversationId]);
 
   const storeMessages = currentConversation?.messages || [];
   const viewMessages = currentConversation
@@ -26,21 +28,20 @@ export function ChatPage() {
   // Newest at bottom by reversing for render
   const renderMessages = [...viewMessages].reverse();
 
-  // Always stick to bottom on updates
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [renderMessages.length, currentConversation?.conversationId]);
+  }, [renderMessages.length, currentConversationId]); //?
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!currentConversation || isFetchingMore) return;
+    if (!currentConversationId || isFetchingMore) return;
     const el = e.currentTarget;
     const canScroll = el.scrollHeight > el.clientHeight + 10;
     if (!canScroll) return;
     if (el.scrollTop <= 10) {
       setIsFetchingMore(true);
-      ChatLogic.loadMessages(currentConversation.conversationId)
+      ChatLogic.loadMessages(currentConversationId)
         .catch(console.error)
         .finally(() => setIsFetchingMore(false));
     }

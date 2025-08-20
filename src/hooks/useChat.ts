@@ -27,11 +27,11 @@ export function useChat() {
     if (!content.trim()) return '';
 
     // Ensure a conversation exists; create on new chat
-    let convId = useChatStore.getState().currentConversation?.conversationId;
+    let convId = useChatStore.getState().currentConversationId || undefined;
     if (!convId) {
       convId = await ChatLogic.createConversation('Chat');
     }
-    await ChatLogic.addMessage(convId, 'user', content, options.model, options.model);
+    await ChatLogic.addMessage(convId as string, 'user', content, options.model, options.model);
     
     setIsLoading(true);
     try {
@@ -40,11 +40,11 @@ export function useChat() {
         : await client.queries.promptGpt({ prompt: content });
 
       const assistantText = result.errors?.length ? `Error: ${result.errors[0].message}` : (result.data ?? '');
-      await ChatLogic.addMessage(convId, 'assistant', assistantText, options.model, options.model);
+      await ChatLogic.addMessage(convId as string, 'assistant', assistantText, options.model, options.model);
       return assistantText;
     } catch (err: any) {
       const errText = err?.message ? `Error: ${err.message}` : 'Error fetching response.';
-      await ChatLogic.addMessage(convId, 'assistant', errText, options.model, options.model);
+      await ChatLogic.addMessage(convId as string, 'assistant', errText, options.model, options.model);
       return '';
     } finally {
       setIsLoading(false);

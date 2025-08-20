@@ -16,7 +16,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const location = useLocation();
-  const setCurrentConversation = useChatStore((s) => s.setCurrentConversation);
+  const setCurrentConversationId = useChatStore((s) => s.setCurrentConversationId);
 
   // Load conversations when user is authenticated
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function App() {
             <Link
               to="/chat"
               className={`nav-link ${location.pathname.startsWith('/chat') ? 'active' : ''}`}
-              onClick={() => { setCurrentConversation(null); setSidebarOpen(false); }}
+              onClick={() => { setCurrentConversationId(null); setSidebarOpen(false); }}
             >
               <ChatIcon width={20} height={20} fill="currentColor" />
               Chat

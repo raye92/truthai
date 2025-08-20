@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat?: () => void; }> = ({ isAuthenticated, onSelectChat }) => {
   const conversations = useChatStore((state) => state.conversations);
-  const currentConversation = useChatStore((state) => state.currentConversation);
-  const setCurrentConversation = useChatStore((state) => state.setCurrentConversation);
+  const currentConversationId = useChatStore((state) => state.currentConversationId);
+  const setCurrentConversationId = useChatStore((state) => state.setCurrentConversationId);
   const clearConversations = useChatStore((state) => state.clearConversations);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -15,9 +15,9 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
   React.useEffect(() => {
     if (!isAuthenticated) {
       clearConversations();
-      setCurrentConversation(null);
+      setCurrentConversationId(null);
     }
-  }, [isAuthenticated, clearConversations, setCurrentConversation]);
+  }, [isAuthenticated, clearConversations, setCurrentConversationId]);
 
   const handleScroll = React.useCallback(async (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -44,10 +44,10 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
               type="button"
               key={conv.conversationId}
               className={`history-item${
-                currentConversation?.conversationId === conv.conversationId ? ' selected' : ''
+                currentConversationId === conv.conversationId ? ' selected' : ''
               }`}
               onClick={async () => {
-                setCurrentConversation(conv);
+                setCurrentConversationId(conv.conversationId);
                 onSelectChat?.(); // close sidebar
                 navigate(`/chat/${conv.conversationId}`);
                 ChatLogic.loadMessages(conv.conversationId);

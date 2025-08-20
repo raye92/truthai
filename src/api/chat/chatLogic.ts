@@ -25,7 +25,7 @@ export class ChatLogic {
     };
 
     useChatStore.getState().prependConversation(newConversation);
-    useChatStore.getState().setCurrentConversation(newConversation);
+    useChatStore.getState().setCurrentConversationId(newConversation.conversationId);
 
     return conversationId;
   }
@@ -66,7 +66,7 @@ export class ChatLogic {
       }
     };
 
-    useChatStore.getState().prependMessage(message);
+    useChatStore.getState().prependMessage(conversationId, message);
 
     return messageId;
   }
@@ -76,10 +76,11 @@ export class ChatLogic {
     const store = useChatStore.getState();
     const user = await getCurrentUser();
 
-    if (!user.userId || !store.currentConversation?.nextMessageToken) return;
+    const currentConv = store.conversations.find(c => c.conversationId === conversationId);
+    if (!user.userId || !currentConv?.nextMessageToken) return;
     const { messages, nextToken: newNextMessageToken } = await chatAPI.loadMessages(
       conversationId, 
-      store.currentConversation?.nextMessageToken || undefined
+      currentConv.nextMessageToken || undefined
     );
     console.log('Loaded messages:', messages);
     const mapped: Message[] = messages.map((msg: any) => ({
@@ -89,7 +90,7 @@ export class ChatLogic {
       metadata: JSON.parse(msg.metadata)
     }));
     
-    store.setConversationNextMessageToken(newNextMessageToken);
-    store.addCurrentMessages(mapped);
+    store.setConversationNextMessageToken(conversationId, newNextMessageToken);
+    store.addMessages(conversationId, mapped);
   }
 }
