@@ -36,11 +36,12 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
   }, [isLoading]);
 
   const handleSave = async (conversationId: string) => {
-    // ======== IMPLEMENT SAVE ========
+    ChatLogic.saveConversation(conversationId);
   };
 
   const handleDelete = async (conversationId: string) => {
-    // ======== IMPLEMENT DELETE ========
+    console.log('Deleting conversation:', conversationId);
+    ChatLogic.deleteConversation(conversationId);
   };
 
   return (

@@ -1,5 +1,6 @@
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
+import type { Message as ChatMessage } from './types';
 
 const client = generateClient<Schema>();
 
@@ -96,24 +97,18 @@ class ChatAPI {
     }
   }
 
-  // Create conversation (if needed) and persist a list of messages
+  // Create conversation in backendand save messages
   async saveConversation(
     title: string,
     userId: string,
     messages: Array<{ role: 'user' | 'assistant'; content: string; metadata: { provider: string; model: string } }>,
-    existingConversationId?: string,
   ): Promise<string> {
     try {
-      let conversationId = existingConversationId || '';
+      const conversationId = await this.createConversation(title, userId);
 
-      // If there isn't already a server-side conversation, create one
-      if (!conversationId) {
-        // ======== CHECK LOGIC ======== if conversations are already created on first use, this may be redundant
-        conversationId = await this.createConversation(title, userId);
-      }
-
-      // Persist all messages
-      for (const msg of messages) {
+      // Save all messages (copy before reversing to avoid mutating Zustand arrays)
+      const messagesToSave = [...messages].reverse();
+      for (const msg of messagesToSave) {
         await this.addMessage(conversationId, msg.role, msg.content, msg.metadata.provider, msg.metadata.model);
       }
 
@@ -124,29 +119,19 @@ class ChatAPI {
     }
   }
 
-  // Delete all messages for a conversation (and optionally the conversation itself)
-  async deleteConversation(conversationId: string): Promise<void> {
+  // Delete provided messages (by messageId) and then delete the conversation
+  async deleteConversation(conversationId: string, messages: ChatMessage[]): Promise<void> {
     try {
-      // Page through all messages and delete them
-      let nextToken: string | undefined = undefined;
-      do {
-        const { messages, nextToken: nt } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
-          conversationId,
-          sortDirection: 'DESC',
-          limit: 50,
-          nextToken,
-        });
-        const items = messages ?? [];
-        for (const m of items) {
-          // ======== CHECK LOGIC ======== delete shape may differ; adjust to your generated API
-          await (client.models.Message as any).delete({ id: m.id });
+      // Delete each provided message by its messageId (ignore unsaved messages without an id)
+      for (const m of messages) {
+        if (m.messageId) {
+          await (client.models.Message as any).delete({ id: m.messageId });
         }
-        nextToken = nt ?? undefined;
-      } while (nextToken);
+      }
 
       // Optionally delete the conversation record itself
       // ======== CHECK LOGIC ======== uncomment if you want to remove the conversation row
-      // await (client.models.Conversation as any).delete({ id: conversationId });
+      await (client.models.Conversation as any).delete({ id: conversationId });
     } catch (error) {
       console.error('Error deleting conversation:', error);
       throw error;
