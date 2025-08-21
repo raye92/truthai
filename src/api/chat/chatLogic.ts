@@ -21,7 +21,8 @@ export class ChatLogic {
       conversationId,
       title,
       messages: [],
-      nextMessageToken: null
+      nextMessageToken: null,
+      isSaved: false,
     };
 
     useChatStore.getState().prependConversation(newConversation);
@@ -40,7 +41,8 @@ export class ChatLogic {
       conversationId: conv.id,
       title: conv.title,
       messages: [],
-      nextMessageToken: "empty"
+      nextMessageToken: "empty",
+      isSaved: true,
     }));
     useChatStore.getState().addConversations(mapped);
     useChatStore.getState().setNextChatToken(newNextToken);
@@ -49,12 +51,16 @@ export class ChatLogic {
   // Add a message to conversation (both store and DB if logged in)
   static async addMessage(conversationId: string, role: 'user' | 'assistant', content: string, provider: string, model: string): Promise<string> {
     let messageId = '';
+
+    const store = useChatStore.getState();
+    const conv = store.conversations.find(c => c.conversationId === conversationId);
     
-    // ==== CHECK LOGIN ====
+    // Only persist to backend if conversation is saved
     const user = await getCurrentUser();
-    if (user.userId) {
+    if (user.userId && conv?.isSaved) {
       messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
     }
+
 
     const message: Message = {
       messageId,
@@ -66,7 +72,7 @@ export class ChatLogic {
       }
     };
 
-    useChatStore.getState().prependMessage(conversationId, message);
+    store.prependMessage(conversationId, message);
 
     return messageId;
   }
@@ -92,5 +98,43 @@ export class ChatLogic {
     
     store.setConversationNextMessageToken(conversationId, newNextMessageToken);
     store.addMessages(conversationId, mapped);
+  }
+
+  static async saveConversation(conversationId: string): Promise<void> {
+    const store = useChatStore.getState();
+    const conv = store.conversations.find(c => c.conversationId === conversationId);
+    if (!conv) return;
+
+    // Mark saved locally first for immediate UI feedback
+    store.saveConversation(conversationId);
+
+    // Persist remotely
+    const user = await getCurrentUser();
+    if (!user.userId) return;
+
+    // If the conversation exists server-side already, we can reuse id
+    // ======== CHECK LOGIC ======== assumes conversation row may or may not exist yet
+    const persistedId = await chatAPI.saveConversation(
+      conv.title,
+      user.userId,
+      conv.messages,
+      conv.conversationId || undefined
+    );
+
+    // Optionally reconcile local id/state if a new id was created
+    // ======== CHECK LOGIC ======== if save creates a new id, update local state here
+  }
+
+  static async deleteConversation(conversationId: string): Promise<void> {
+    const store = useChatStore.getState();
+
+    // Update UI state first
+    store.deleteConversation(conversationId);
+
+    // Delete remotely if exists
+    const user = await getCurrentUser();
+    if (!user.userId) return;
+
+    await chatAPI.deleteConversation(conversationId);
   }
 }

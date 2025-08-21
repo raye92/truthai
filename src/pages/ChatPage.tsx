@@ -28,11 +28,11 @@ export function ChatPage() {
   // Newest at bottom by reversing for render
   const renderMessages = [...viewMessages].reverse();
 
-  useEffect(() => {
+  useEffect(() => { // auto scroll to bottom on new load
     const el = containerRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [renderMessages.length, currentConversationId]); //?
+  }, [renderMessages.length, currentConversationId]);
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (!currentConversationId || isFetchingMore) return;

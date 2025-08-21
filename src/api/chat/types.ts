@@ -13,4 +13,5 @@ export interface Conversation {
   title: string;
   messages: Message[];
   nextMessageToken: string | null;
+  isSaved: boolean;
 }

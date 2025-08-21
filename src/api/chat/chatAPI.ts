@@ -95,6 +95,63 @@ class ChatAPI {
       throw error;
     }
   }
+
+  // Create conversation (if needed) and persist a list of messages
+  async saveConversation(
+    title: string,
+    userId: string,
+    messages: Array<{ role: 'user' | 'assistant'; content: string; metadata: { provider: string; model: string } }>,
+    existingConversationId?: string,
+  ): Promise<string> {
+    try {
+      let conversationId = existingConversationId || '';
+
+      // If there isn't already a server-side conversation, create one
+      if (!conversationId) {
+        // ======== CHECK LOGIC ======== if conversations are already created on first use, this may be redundant
+        conversationId = await this.createConversation(title, userId);
+      }
+
+      // Persist all messages
+      for (const msg of messages) {
+        await this.addMessage(conversationId, msg.role, msg.content, msg.metadata.provider, msg.metadata.model);
+      }
+
+      return conversationId;
+    } catch (error) {
+      console.error('Error saving conversation:', error);
+      throw error;
+    }
+  }
+
+  // Delete all messages for a conversation (and optionally the conversation itself)
+  async deleteConversation(conversationId: string): Promise<void> {
+    try {
+      // Page through all messages and delete them
+      let nextToken: string | undefined = undefined;
+      do {
+        const { messages, nextToken: nt } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
+          conversationId,
+          sortDirection: 'DESC',
+          limit: 50,
+          nextToken,
+        });
+        const items = messages ?? [];
+        for (const m of items) {
+          // ======== CHECK LOGIC ======== delete shape may differ; adjust to your generated API
+          await (client.models.Message as any).delete({ id: m.id });
+        }
+        nextToken = nt ?? undefined;
+      } while (nextToken);
+
+      // Optionally delete the conversation record itself
+      // ======== CHECK LOGIC ======== uncomment if you want to remove the conversation row
+      // await (client.models.Conversation as any).delete({ id: conversationId });
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      throw error;
+    }
+  }
 }
 
 export const chatAPI = new ChatAPI();

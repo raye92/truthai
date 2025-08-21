@@ -18,6 +18,8 @@ interface ChatState {
   prependMessage: (conversationId: string, message: Message) => void;
   setConversationNextMessageToken: (conversationId: string, token: string | null) => void;
   clearConversations: () => void;
+  saveConversation: (conversationId: string) => void;
+  deleteConversation: (conversationId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -83,6 +85,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
       if (conv) {
         conv.nextMessageToken = token;
+      }
+    }));
+  },
+
+  saveConversation: (conversationId) => {
+    set(produce((state) => {
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.isSaved = true;
+      }
+    }));
+  },
+
+  deleteConversation: (conversationId) => {
+    set(produce((state) => {
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.isSaved = false;
       }
     }));
   },

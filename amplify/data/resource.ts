@@ -26,7 +26,6 @@ const schema = a.schema({
   Conversation: a.model({
     title: a.string().required(),
     userId: a.string().required(),
-    isSaved: a.boolean().default(false),
     updatedAt: a.datetime(),
 
     user: a.belongsTo('UserProfile', 'userId'),
