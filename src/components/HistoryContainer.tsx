@@ -9,6 +9,7 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
   const setCurrentConversationId = useChatStore((state) => state.setCurrentConversationId);
   const clearConversations = useChatStore((state) => state.clearConversations);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
   const navigate = useNavigate();
 
   // Clear conversations when user signs out
@@ -36,12 +37,19 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
   }, [isLoading]);
 
   const handleSave = async (conversationId: string) => {
-    ChatLogic.saveConversation(conversationId);
+    if (isSaving) return;
+    setIsSaving(true);
+    await ChatLogic.saveConversation(conversationId).finally(() => {
+      setIsSaving(false);
+    });
   };
 
   const handleDelete = async (conversationId: string) => {
-    console.log('Deleting conversation:', conversationId);
-    ChatLogic.deleteConversation(conversationId);
+    if (isSaving) return;
+    setIsSaving(true);
+    await ChatLogic.deleteConversation(conversationId).finally(() => {
+      setIsSaving(false);
+    });
   };
 
   return (
@@ -61,7 +69,6 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
                 }}
               >
                 <span className="history-title">{conv.title || 'Untitled conversation'}</span>
-                <span className="history-timestamp">{conv.messages.length} message{conv.messages.length === 1 ? '' : 's'}</span>
               </button>
               {conv.isSaved ? (
                 <button
@@ -70,11 +77,16 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
                   title="Delete this chat"
                   aria-label="Delete chat"
                   onClick={() => handleDelete(conv.conversationId)}
+                  disabled={isSaving}
                 >
-                  {/* Trash icon */}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  {isSaving ? (
+                    <div className="spinner" />
+                  ) : (
+                    // Trash icon
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
                 </button>
               ) : (
                 <button
@@ -83,11 +95,16 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
                   title="Save this chat"
                   aria-label="Save chat"
                   onClick={() => handleSave(conv.conversationId)}
+                  disabled={isSaving}
                 >
-                  {/* Bookmark icon */}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 2h12a1 1 0 0 1 1 1v18l-7-4-7 4V3a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="2" fill="none" />
-                  </svg>
+                  {isSaving ? (
+                    <div className="spinner" />
+                  ) : (
+                    // Bookmark icon
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 2h12a1 1 0 0 1 1 1v18l-7-4-7 4V3a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                  )}
                 </button>
               )}
             </div>
@@ -98,7 +115,24 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
               <>
                 <p>No chat history yet</p>
                 <p> -</p>
-                <p>Unsaved chats will be deleted after a while</p> {/* ======== IMPLEMENT ======== */}
+                <p>Save chats here to keep them!</p>
+                <p> -</p>
+                <div className="history-item-row placeholder">
+                  <div className="history-item">
+                    <span className="history-title">Save with button —&gt; </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="history-action-btn"
+                    title="Save this chat"
+                    aria-label="Save chat"
+                    disabled
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 2h12a1 1 0 0 1 1 1v18l-7-4-7 4V3a1 1 0 0 1 1-1z" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                  </button>
+                </div>
               </>
             ) : (
               <p>Sign in to save your history</p>
@@ -176,13 +210,6 @@ const styles = `
     color: #d1d5db;
     font-size: 0.875rem;
     font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-
-  .history-timestamp {
-    color: #9ca3af;
-    font-size: 0.75rem;
-    font-weight: 400;
   }
 
   .history-action-btn {
@@ -228,10 +255,10 @@ const styles = `
   }
 
   .spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #4b5563;
-    border-top: 2px solid #3b82f6;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #6b7280;
+    border-top: 2px solid #93c5fd;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto;
