@@ -1,8 +1,8 @@
 // ======== DEMO ========
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChatLogic } from '../api/chat/chatLogic';
 import { useChatStore } from '../api/chat/chatStore';
-import { Conversation, Message } from '../api/chat/types';
+import { Conversation } from '../api/chat/types';
 
 const DemoPage: React.FC = () => {
   const [messageContent, setMessageContent] = useState<string>('Hello, this is a test message!');
@@ -11,10 +11,14 @@ const DemoPage: React.FC = () => {
   
   const { 
     conversations, 
-    currentConversation, 
-    setCurrentConversation,
-    addMessage
+    currentConversationId, 
+    setCurrentConversationId,
   } = useChatStore();
+
+  const currentConversation = useMemo(
+    () => conversations.find(c => c.conversationId === currentConversationId) || null,
+    [conversations, currentConversationId]
+  );
 
   // Test functions
   const testCreateConversation = async (type: "Chat" | "Short-response" | "Long-form") => {
@@ -70,7 +74,7 @@ const DemoPage: React.FC = () => {
   };
 
   const selectConversation = (conversation: Conversation) => {
-    setCurrentConversation(conversation);
+    setCurrentConversationId(conversation.conversationId);
   };
 
   return (

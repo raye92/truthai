@@ -5,32 +5,37 @@ import { Conversation, Message } from './types';
 interface ChatState {
   // State properties
   conversations: Conversation[];
-  currentConversation: Conversation | null;
+  currentConversationId: string | null;
   isLoading: boolean;
   nextChatToken: string | null;
-  nextMessageToken: string | null;
   
   // Actions
-  setCurrentConversation: (conversation: Conversation | null) => void;
+  setCurrentConversationId: (conversationId: string | null) => void;
   addConversations: (conversations: Conversation[]) => void;
+  prependConversation: (conversation: Conversation) => void;
   setNextChatToken: (token: string | null) => void;
-  setNextMessageToken: (token: string | null) => void;
-  setCurrentMessages: (messages: Message[]) => void;
-  addMessage: (conversationId: string, message: Message) => void;
+  addMessages: (conversationId: string, messages: Message[]) => void;
+  prependMessage: (conversationId: string, message: Message) => void;
+  setConversationNextMessageToken: (conversationId: string, token: string | null) => void;
+  clearConversations: () => void;
+  saveConversation: (conversationId: string) => void;
+  deleteConversation: (conversationId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   // Initial state
   conversations: [],
-  currentConversation: null,
+  currentConversationId: null,
   isLoading: false,
   nextChatToken: "empty",
-  nextMessageToken: "empty",
   
   // Actions
-  setCurrentConversation: (conversation) => {
+  setCurrentConversationId: (conversationId) => {
+    const currentId = get().currentConversationId; // Avoid redundant updates
+    if (currentId === conversationId) return;
+    console.log('Setting current conversationId:', conversationId);
     set(produce((state) => {
-      state.currentConversation = conversation;
+      state.currentConversationId = conversationId;
     }));
   },
 
@@ -41,36 +46,72 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
+  // Put a new conversation at the beginning of the list (most recent first)
+  prependConversation: (conversation) => {
+    set(produce((state) => {
+      state.conversations.unshift(conversation);
+    }));
+  },
+
   setNextChatToken: (token) => {
     set(produce((state) => {
       state.nextChatToken = token;
     }));
   },
 
-  setNextMessageToken: (token) => {
+  // Append older, paginated messages to the end (we render reversed in UI)
+  addMessages: (conversationId, messages) => {
     set(produce((state) => {
-      state.nextMessageToken = token;
-    }));
-  },
-
-  setCurrentMessages: (messages) => {
-    set(produce((state) => {
-      if (state.currentConversation) {
-        state.currentConversation.messages.push(...messages);
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.messages.push(...messages);
       }
     }));
   },
   
-  addMessage: (conversationId, message) => {
+  // Prepend the newest message to the start
+  prependMessage: (conversationId, message) => {
     set(produce((state) => {
-      const conversation = state.conversations.find((c: any) => c.conversationId === conversationId);
-      if (conversation) {
-        conversation.messages.push(message);
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.messages.unshift(message);
       }
-      
-      if (state.currentConversation?.conversationId === conversationId) {
-        state.currentConversation.messages.push(message);
+    }));
+  },
+
+  // Update nextMessageToken for a specific conversation
+  setConversationNextMessageToken: (conversationId, token) => {
+    set(produce((state) => {
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.nextMessageToken = token;
       }
+    }));
+  },
+
+  saveConversation: (conversationId) => {
+    set(produce((state) => {
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.isSaved = true;
+      }
+    }));
+  },
+
+  deleteConversation: (conversationId) => {
+    set(produce((state) => {
+      const conv = state.conversations.find((c: Conversation) => c.conversationId === conversationId);
+      if (conv) {
+        conv.isSaved = false;
+      }
+    }));
+  },
+
+  clearConversations: () => {
+    set(produce((state) => {
+      state.conversations = [];
+      state.currentConversationId = null;
+      state.nextChatToken = "empty";
     }));
   },
 }));

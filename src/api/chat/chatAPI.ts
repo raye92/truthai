@@ -1,5 +1,6 @@
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
+import type { Message as ChatMessage } from './types';
 
 const client = generateClient<Schema>();
 
@@ -85,14 +86,54 @@ class ChatAPI {
       const { data, nextToken: newNextToken } = await (client.models.Message as any).listMessageByConversationIdAndUpdatedAt({
         conversationId,
         sortDirection: 'DESC',
-        limit: 2,
+        limit: 10,
         nextToken,
       });
-      console.log('Messages loaded:', data, newNextToken);
 
       return { messages: data ?? [], nextToken: newNextToken ?? null };
     } catch (error) {
       console.error('Error loading messages:', error);
+      throw error;
+    }
+  }
+
+  // Create conversation in backendand save messages
+  async saveConversation(
+    title: string,
+    userId: string,
+    messages: Array<{ role: 'user' | 'assistant'; content: string; metadata: { provider: string; model: string } }>,
+  ): Promise<string> {
+    try {
+      const conversationId = await this.createConversation(title, userId);
+
+      // Save all messages (copy before reversing to avoid mutating Zustand arrays)
+      const messagesToSave = [...messages].reverse();
+      for (const msg of messagesToSave) {
+        await this.addMessage(conversationId, msg.role, msg.content, msg.metadata.provider, msg.metadata.model);
+      }
+
+      return conversationId;
+    } catch (error) {
+      console.error('Error saving conversation:', error);
+      throw error;
+    }
+  }
+
+  // Delete provided messages (by messageId) and then delete the conversation
+  async deleteConversation(conversationId: string, messages: ChatMessage[]): Promise<void> {
+    try {
+      // Delete each provided message by its messageId (ignore unsaved messages without an id)
+      for (const m of messages) {
+        if (m.messageId) {
+          await (client.models.Message as any).delete({ id: m.messageId });
+        }
+      }
+
+      // Optionally delete the conversation record itself
+      // ======== CHECK LOGIC ======== uncomment if you want to remove the conversation row
+      await (client.models.Conversation as any).delete({ id: conversationId });
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
       throw error;
     }
   }
