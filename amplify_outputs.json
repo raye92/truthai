@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "us-west-1_MaBHaNTVm",
+    "user_pool_id": "us-west-1_6Mj903O3V",
     "aws_region": "us-west-1",
-    "user_pool_client_id": "25i8ka6iukjhl8i82ces4jsj68",
-    "identity_pool_id": "us-west-1:c86ff588-493a-4caf-9a47-b858e2c19eee",
+    "user_pool_client_id": "3hrdbimue7i6ojn2oi16eijudg",
+    "identity_pool_id": "us-west-1:e40c11f9-c72c-4312-86f0-f9170f41531e",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -43,14 +43,14 @@
         "profile",
         "aws.cognito.signin.user.admin"
       ],
-      "domain": "30fa1fd6d0b52caed9b8.auth.us-west-1.amazoncognito.com"
+      "domain": "db0fb19789550ee23cea.auth.us-west-1.amazoncognito.com"
     },
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://52jwuekzzzesljrvwdcu3obm6m.appsync-api.us-west-1.amazonaws.com/graphql",
+    "url": "https://inklfivyjvbqlchk34wewjuymu.appsync-api.us-west-1.amazonaws.com/graphql",
     "aws_region": "us-west-1",
-    "api_key": "da2-hqrv3ccl4vga5i4efnz35m2yim",
+    "api_key": "da2-vvwfw33korg2bph3cpxvql5tmi",
     "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
       "API_KEY",
@@ -213,13 +213,6 @@
               "isArray": false,
               "type": "String",
               "isRequired": true,
-              "attributes": []
-            },
-            "isSaved": {
-              "name": "isSaved",
-              "isArray": false,
-              "type": "Boolean",
-              "isRequired": false,
               "attributes": []
             },
             "updatedAt": {
