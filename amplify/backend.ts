@@ -13,4 +13,5 @@ defineBackend({
   testTickle,
   promptGpt,
   promptGemini,
+  promptLayout,
 });

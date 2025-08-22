@@ -41,7 +41,6 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
   );
 };
 
-// ======== STYLES ========
 const styles: Record<string, React.CSSProperties> = {
   button: {
     padding: '0 1.5rem',
