@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { MessageBubble } from "../MessageBubble";
-import { useChat } from "../../hooks/useChat";
-import { MessageInput } from "../Input";
-import { FullscreenIcon } from "../../assets/Icons";
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { MessageBubble } from '../MessageBubble';
+import { useChat } from '../../hooks/useChat';
+// Replacing heavy MessageInput with lightweight inline input to avoid loading flicker
+import { FullscreenIcon } from '../../assets/Icons';
+import { useChatStore } from '../../api/chat/chatStore';
 
 interface MiniChatProps {
   providerName: string;
@@ -13,39 +14,50 @@ interface MiniChatProps {
   onFullScreen: () => void;
 }
 
-export function MiniChat({ providerName, questionText, answerText, isOpen, onClose, onFullScreen }: MiniChatProps) {
-  const { messages, isLoading, sendMessage } = useChat();
-  const [input, setInput] = useState("");
+// Provider -> internal model mapping
+function mapProvider(provider: string): { model: 'chatgpt' | 'gemini'; grounding?: boolean } {
+  if (provider.includes('Gemini') && provider.includes('Google')) return { model: 'gemini', grounding: true };
+  if (provider.includes('Gemini')) return { model: 'gemini' };
+  return { model: 'chatgpt' };
+}
 
-  // Map provider names to model types
-  const getModelType = (provider: string) => {
-    if (provider.includes('GPT') || provider.includes('OpenAI')) return 'chatgpt';
-    if (provider.includes('Gemini')) return 'gemini';
-    if (provider.includes('Google Search')) return 'gemini_grounding';
-    return 'chatgpt';
-  };
+export function MiniChat({ providerName, answerText, isOpen, onClose, onFullScreen }: MiniChatProps) {
+  const { isLoading, sendMessage } = useChat();
+  const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const hasSentInitial = useRef(false);
 
-  const selectedModel = getModelType(providerName);
+  // Pull current conversation messages from store (like ChatPage)
+  const currentConversationId = useChatStore(s => s.currentConversationId);
+  const conversations = useChatStore(s => s.conversations);
+  const currentConversation = useMemo(() => conversations.find(c => c.conversationId === currentConversationId) || null, [conversations, currentConversationId]);
+  const storeMessages = currentConversation?.messages || [];
+  const viewMessages = storeMessages.map(m => ({ role: m.role, content: m.content, model: m.metadata?.provider === 'gemini' ? 'gemini' : 'chatgpt' }));
+  const renderMessages = [...viewMessages].reverse(); // newest bottom
 
-  // Send initial question when chat opens
+  // Auto send concise explanation once when opened
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      const initialQuestion = `Explain this answer: "${answerText}"`;
-      sendMessage(initialQuestion, { 
-        model: selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt', 
-        useGrounding: selectedModel === 'gemini_grounding' ? true : undefined 
-      });
-    }
-  }, [isOpen, messages.length, answerText, selectedModel, sendMessage]);
+    if (!isOpen || hasSentInitial.current) return;
+    const { model, grounding } = mapProvider(providerName);
+    const prompt = `Explain concisely why this answer is correct: "${answerText}"`;
+    hasSentInitial.current = true;
+    sendMessage(prompt, { model, useGrounding: grounding });
+  }, [isOpen, providerName, answerText, sendMessage]);
 
-  const handleSend = () => {
-    if (!input.trim() || isLoading) return;
-    const baseModel = selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt';
-    sendMessage(input, { 
-      model: baseModel, 
-      useGrounding: selectedModel === 'gemini_grounding' ? true : undefined 
-    });
-    setInput("");
+  // Scroll to bottom on new message
+  const msgRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = msgRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [renderMessages.length, isOpen]);
+
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
+    const { model, grounding } = mapProvider(providerName);
+    setSending(true);
+    await sendMessage(input, { model, useGrounding: grounding });
+    setInput('');
+    setSending(false);
   };
 
   if (!isOpen) return null;
@@ -59,28 +71,16 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
           <span style={styles.miniChatQuestion}>Mini Chat</span>
         </div>
         <div style={styles.miniChatActions}>
-          <button 
-            onClick={onFullScreen}
-            style={styles.miniChatButton}
-            title="Open in full screen"
-          >
+          <button onClick={onFullScreen} style={styles.miniChatButton} title="Open in full screen">
             <FullscreenIcon width={16} height={16} fill="#94a3b8" />
             <span style={styles.ExpandLabel}>Full Screen</span>
           </button>
-          <button 
-            onClick={onClose}
-            style={styles.miniChatButton}
-            title="Close mini chat"
-          >
-            ×
-          </button>
+          <button onClick={onClose} style={styles.miniChatButton} title="Close mini chat">×</button>
         </div>
       </div>
-      
-      <div style={styles.miniChatMessages}>
-        {messages.map((message, idx) => (
-          <MessageBubble key={idx} message={message} />
-        ))}
+
+      <div style={styles.miniChatMessages} ref={msgRef}>
+        {renderMessages.map((m, i) => <MessageBubble key={i} message={m} />)}
         {isLoading && (
           <div style={styles.miniChatLoading}>
             <span style={styles.miniChatLoadingText}>Thinking...</span>
@@ -89,18 +89,22 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
       </div>
 
       <div style={styles.miniChatInput}>
-        <MessageInput
-          value={input}
-          onChange={setInput}
-          placeholder={`Ask ${providerName}...`}
-          disabled={isLoading}
-          isLoading={isLoading}
-          onEnterPress={handleSend}
-          showModelSelect={false}
-          model={selectedModel}
-          onModelChange={() => {}}
-          noAutoFocus={false}
-        />
+        <div style={styles.inlineInputContainer}>
+          <textarea
+            value={input}
+            placeholder={`Ask ${providerName}...`}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            rows={1}
+            style={styles.inlineTextarea as any}
+            disabled={sending}
+          />
+          <button
+            onClick={handleSend}
+            disabled={sending || !input.trim()}
+            style={{ ...styles.inlineSendButton, ...(sending || !input.trim() ? styles.inlineSendButtonDisabled : {}) }}
+          >{sending ? 'Sending...' : 'Send'}</button>
+        </div>
       </div>
     </div>
   );
@@ -198,6 +202,44 @@ const styles = {
     background: '#334155',
     borderRadius: '0 0 0.75rem 0.75rem',
     flexShrink: 0,
+  },
+  inlineInputContainer: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: '0.5rem',
+  },
+  inlineTextarea: {
+    flex: 1,
+    background: '#1e293b',
+    border: '1px solid #475569',
+    borderRadius: '0.5rem',
+    padding: '0.6rem 0.75rem',
+    resize: 'none' as const,
+    fontSize: '0.9rem',
+    lineHeight: '1.25rem',
+    color: '#e2e8f0',
+    fontFamily: 'inherit',
+    maxHeight: '120px',
+    outline: 'none',
+  },
+  inlineSendButton: {
+    background: '#3b82f6',
+    color: '#e2e8f0',
+    border: 'none',
+    borderRadius: '0.5rem',
+    padding: '0 1rem',
+    height: '42px',
+    cursor: 'pointer',
+    fontWeight: 600,
+    fontSize: '0.9rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.2s',
+  },
+  inlineSendButtonDisabled: {
+    background: '#475569',
+    cursor: 'not-allowed',
   },
 };
 
