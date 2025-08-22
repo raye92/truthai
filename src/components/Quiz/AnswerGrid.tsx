@@ -92,7 +92,6 @@ export function AnswerGrid({
             const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
             const answerWidth = calculateAnswerWidth(answer, displayKey);
             const clampedMinWidth = Math.min(answerWidth, maxRowWidth);
-            console.log(`Answer: ${answer.answer}, Width: ${answerWidth}, Clamped Min Width: ${clampedMinWidth}`);
             return (
               <div key={answer.answer} style={{ ...styles.answerWrapper, minWidth: clampedMinWidth }}>
                 <Answer

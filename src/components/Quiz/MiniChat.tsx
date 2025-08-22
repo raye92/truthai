@@ -27,16 +27,16 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
 
   const selectedModel = getModelType(providerName);
 
-  // Auto-send initial question when chat opens
+  // Send initial question when chat opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      const initialQuestion = `Can you explain the answer "${answerText}" to the question: "${questionText}"?`;
+      const initialQuestion = `Explain this answer: "${answerText}"`;
       sendMessage(initialQuestion, { 
         model: selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt', 
         useGrounding: selectedModel === 'gemini_grounding' ? true : undefined 
       });
     }
-  }, [isOpen, messages.length, answerText, questionText, selectedModel, sendMessage]);
+  }, [isOpen, messages.length, answerText, selectedModel, sendMessage]);
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
@@ -99,6 +99,7 @@ export function MiniChat({ providerName, questionText, answerText, isOpen, onClo
           showModelSelect={false}
           model={selectedModel}
           onModelChange={() => {}}
+          noAutoFocus={false}
         />
       </div>
     </div>
@@ -116,7 +117,7 @@ const styles = {
     borderRadius: '0.75rem',
     boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
     zIndex: 1000,
-    maxHeight: '400px',
+    maxHeight: '500px',
     display: 'flex',
     flexDirection: 'column' as const,
     animation: 'slideDown 0.3s ease-out',
@@ -129,6 +130,7 @@ const styles = {
     borderBottom: '1px solid #475569',
     background: '#334155',
     borderRadius: '0.75rem 0.75rem 0 0',
+    flexShrink: 0,
   },
   miniChatTitle: {
     display: 'flex',
@@ -177,7 +179,7 @@ const styles = {
     flex: 1,
     overflowY: 'auto' as const,
     padding: '0.75rem 1rem',
-    maxHeight: '200px',
+    minHeight: '200px',
   },
   miniChatLoading: {
     display: 'flex',
@@ -195,6 +197,7 @@ const styles = {
     borderTop: '1px solid #475569',
     background: '#334155',
     borderRadius: '0 0 0.75rem 0.75rem',
+    flexShrink: 0,
   },
 };
 

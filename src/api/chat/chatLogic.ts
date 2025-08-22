@@ -62,9 +62,7 @@ export class ChatLogic {
     const conv = store.conversations.find(c => c.conversationId === conversationId);
     
     // Only persist to backend if conversation is saved
-    console.log("1");
     const user = await ChatLogic.getCurrentUserSafe();
-    console.log("2");
     if (user?.userId && conv?.isSaved) {
       messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
     }
