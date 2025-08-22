@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
 import { ChatPage } from "./pages/ChatPage";
 import { QuizPage } from "./pages/quiz";
+import DemoPage from "./pages/DemoPage";
 import { Logo, ChatIcon } from "./assets/Icons";
+import { HistoryContainer } from "./components/HistoryContainer";
+import { ChatLogic } from "./api/chat/chatLogic";
+import { useChatStore } from "./api/chat/chatStore";
 import "./App.css";
 
 export default function App() {
@@ -12,16 +16,24 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const location = useLocation();
+  const setCurrentConversationId = useChatStore((s) => s.setCurrentConversationId);
+
+  // Load conversations when user is authenticated
+  useEffect(() => {
+    if (authStatus === "authenticated") {
+      ChatLogic.loadConversations();
+    }
+  }, [authStatus]);
 
   const handleSignOut = async () => {
     try {
+      console.log("Current authStatus before signOut:", authStatus);
       await signOut();
+      console.log("Current authStatus after signOut:", authStatus);
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
-
-  const isAuthenticated = authStatus === "authenticated";
 
   return (
     <div className="app-container">
@@ -30,11 +42,11 @@ export default function App() {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label="Toggle sidebar"
       >
-        <Logo width={80} height={80} fill="white" />
+        <Logo width={80} height={80} fill="#e2e8f0" />
       </button>
 
       {/* Sign In Button for unauthenticated users */}
-      {!isAuthenticated && (
+      {authStatus !== "authenticated" && (
         <button
           className="sign-in-button"
           onClick={() => setSignInModalOpen(true)}
@@ -61,17 +73,26 @@ export default function App() {
             </Link>
             <Link
               to="/chat"
-              className={`nav-link ${location.pathname === '/chat' ? 'active' : ''}`}
-              onClick={() => setSidebarOpen(false)}
+              className={`nav-link ${location.pathname.startsWith('/chat') ? 'active' : ''}`}
+              onClick={() => { setCurrentConversationId(null); setSidebarOpen(false); }}
             >
               <ChatIcon width={20} height={20} fill="currentColor" />
               Chat
             </Link>
+            <Link
+              to="/demo"
+              className={`nav-link ${location.pathname === '/demo' ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+            >
+              🧪 Demo
+            </Link>
           </nav>
         </div>
 
+        <HistoryContainer isAuthenticated={authStatus === "authenticated"} onSelectChat={() => setSidebarOpen(false)} />
+
         <div className="sidebar-footer">
-          {isAuthenticated ? (
+          {authStatus === "authenticated" ? (
             <div className="user-info">
               <p className="welcome-text">
                 Welcome, {user?.signInDetails?.loginId || "User"}!
@@ -95,7 +116,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<QuizPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:conversationId" element={<ChatPage />} />
           <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/demo" element={<DemoPage />} />
         </Routes>
       </main>
 

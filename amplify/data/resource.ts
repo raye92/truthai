@@ -9,7 +9,6 @@ const schema = a.schema({
   UserProfile: a
     .model({
       email: a.string().required(),
-      profileOwner: a.string().required(),
       username: a.string().required().default("User"),
       profilePicture: a.string(),
       preferences: a.json(),
@@ -17,40 +16,45 @@ const schema = a.schema({
       lastActive: a.datetime(),
       role: a.string().required().default('USER'),
       isNewUser: a.boolean().default(true),
+
       conversations: a.hasMany('Conversation', 'userId')
     })
     .authorization((allow: any) => [
-      allow.ownerDefinedIn("profileOwner"),
+      allow.owner(),
     ]),
   
   Conversation: a.model({
-    id: a.id().required(),
     title: a.string().required(),
     userId: a.string().required(),
+    updatedAt: a.datetime(),
+
     user: a.belongsTo('UserProfile', 'userId'),
     messages: a.hasMany('Message', 'conversationId'),
-    createdAt: a.datetime().required(),
-    updatedAt: a.datetime(),
-    isArchived: a.boolean().default(false),
-    metadata: a.json()
-  }).authorization(
+  })
+  .secondaryIndexes((index) => [
+    index("userId").sortKeys(['updatedAt'] as any),
+  ])
+  .authorization(
     (allow: any) => [
-      allow.ownerDefinedIn("userId"),
+      allow.owner(),
     ]
   ),
   
   Message: a.model({
-    id: a.id().required(),
-    content: a.string().required(),
     conversationId: a.string().required(),
-    conversation: a.belongsTo('Conversation', 'conversationId'),
     role: a.string().required(),
-    createdAt: a.datetime().required(),
-    tokens: a.integer(),
-    metadata: a.json()
-  }).authorization(
+    content: a.string().required(),
+    metadata: a.json(),
+    updatedAt: a.datetime(),
+
+    conversation: a.belongsTo('Conversation', 'conversationId'),
+  })
+  .secondaryIndexes((index) => [
+    index("conversationId").sortKeys(['updatedAt'] as any),
+  ])
+  .authorization(
     (allow: any) => [
-      allow.publicApiKey(),
+      allow.owner(),
     ]
   ),
   
@@ -93,7 +97,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'apiKey',
+    defaultAuthorizationMode: 'userPool',
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },

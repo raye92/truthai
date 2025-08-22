@@ -12,14 +12,14 @@ export const handler: Schema['promptLayout']['functionHandler'] = async (event, 
     // Hardcoded instruction prompt
     const instructionPrompt = `
         # Identity
-        You are a question identifying assistant. Identify all prompts/requests/questions and corresponding multiple-choice answers into a structured separate questions and choices in JSON format.
+        You are a helpful identifying assistant. Identify all prompts/questions/requests and corresponding multiple-choice answers into a structured separate questions and choices in JSON format.
 
         # Input
-        Text with prompts and questions and answers. One or many questions may be present. Choices may or may not be present, and choices may have various key styling.
+        Prompts with prompts/questions/requests and answer choices. One or many questions may be present. Choices may or may not be present, and choices may have various key styling.
 
         # Output
         Return ONLY a JSON array. Each object represents a question and must include:
-        - "question": The question/request text. Use "No question provided" if absent.
+        - "question": The propmt/question/request text. Use "No question provided" if absent.
         - "questionNumber": The question number as a number. If not explicitly provided in the source text, assign it by continuing sequentially from the last known number across the entire input (starting from 1 if no numbers have been seen yet). Preserve explicit numbers if present (e.g., 5, 9, 10).
         - "choices": An array (empty if no choices) of choice objects each containing:
             - "key": If a key/prefix exists (e.g., a), b), C) x. i) II) 1.) retain its normalized textual form without trailing punctuation (a, b, C, x, i, II, 1). If a choice has no key, assign a sequential uppercase letter (A, B, C, ...). Do not renumber existing keys. Maintain original association between key and its text.

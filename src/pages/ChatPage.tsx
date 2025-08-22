@@ -1,45 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { MessageBubble } from "../components/MessageBubble";
 import { useChat } from "../hooks/useChat";
 import { Logo } from "../assets/Icons";
 import { MessageInput } from "../components/Input";
+import { useChatStore } from "../api/chat/chatStore";
+import { ChatLogic } from "../api/chat/chatLogic";
 
 export function ChatPage() {
   const { messages, isLoading, sendMessage } = useChat();
-  // Local state previously handled inside ChatInputBar
   const [input, setInput] = useState("");
   type SelectedModel = 'chatgpt' | 'gemini' | 'gemini_grounding';
   const [selectedModel, setSelectedModel] = useState<SelectedModel>('chatgpt');
 
-  // Handle URL parameters for mini chat navigation
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const provider = urlParams.get('provider');
-    const question = urlParams.get('question');
-    const answer = urlParams.get('answer');
+  const currentConversationId = useChatStore((s) => s.currentConversationId);
+  const conversations = useChatStore((s) => s.conversations);
+  const currentConversation = useMemo(() => conversations.find(c => c.conversationId === currentConversationId) || null, [conversations, currentConversationId]);
 
-    if (provider && question && answer) {
-      // Set the model based on provider
-      if (provider.includes('Gemini')) {
-        if (provider.includes('Google Search')) {
-          setSelectedModel('gemini_grounding');
-        } else {
-          setSelectedModel('gemini');
-        }
-      } else {
-        setSelectedModel('chatgpt');
-      }
+  const storeMessages = currentConversation?.messages || [];
+  const viewMessages = currentConversation
+    ? storeMessages.map(m => ({ role: m.role, content: m.content, model: m.metadata?.provider === 'gemini' ? 'gemini' : 'chatgpt' }))
+    : messages;
 
-      // Auto-send the initial question if no messages exist
-      if (messages.length === 0) {
-        const initialQuestion = `Can you explain the answer "${answer}" to the question: "${question}"?`;
-        sendMessage(initialQuestion, { 
-          model: selectedModel.startsWith('gemini') ? 'gemini' : 'chatgpt', 
-          useGrounding: selectedModel === 'gemini_grounding' ? true : undefined 
-        });
-      }
+  // Minimal scroll handling
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  // Newest at bottom by reversing for render
+  const renderMessages = [...viewMessages].reverse();
+
+  useEffect(() => { // auto scroll to bottom on new load
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [renderMessages.length, currentConversationId]);
+
+  const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (!currentConversationId || isFetchingMore) return;
+    const el = e.currentTarget;
+    const canScroll = el.scrollHeight > el.clientHeight + 10;
+    if (!canScroll) return;
+    if (el.scrollTop <= 10) {
+      setIsFetchingMore(true);
+      ChatLogic.loadMessages(currentConversationId)
+        .catch(console.error)
+        .finally(() => setIsFetchingMore(false));
     }
-  }, [messages.length, selectedModel, sendMessage]);
+  };
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
@@ -50,8 +56,8 @@ export function ChatPage() {
 
   return (
     <div style={styles.chatPage}>
-      <div style={styles.messagesContainer}>
-        {messages.length === 0 && (
+      <div style={styles.messagesContainer} ref={containerRef} onScroll={handleContainerScroll}>
+        {renderMessages.length === 0 && (
           <div style={styles.emptyState}>
             <h1 style={styles.chatLogoTitle}>CurateAI</h1>
             <p style={styles.emptyStateP}>
@@ -59,7 +65,7 @@ export function ChatPage() {
             </p>
           </div>
         )}
-        {messages.map((message, idx) => (
+        {renderMessages.map((message, idx) => (
           <MessageBubble key={idx} message={message} />
         ))}
         {isLoading && (

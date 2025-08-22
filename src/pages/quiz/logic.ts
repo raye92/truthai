@@ -5,7 +5,7 @@ import type { Quiz as QuizType } from "../../components/Quiz/types";
 import { stripCodeFences } from "../../utils/stringUtils";
 import type { LayoutItem, LayoutItemWithoutKeys } from "./types.ts";
 
-const client = generateClient<Schema>();
+const client = generateClient<Schema>({ authMode: 'apiKey' });
 
 export const instructionPrompt = `# Identity
     You are a helpful question answering assistant that reads JSON question payloads and answers strictly in JSON.

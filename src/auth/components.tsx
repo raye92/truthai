@@ -260,7 +260,7 @@ export interface LogoHeaderProps {
 export function LogoHeader({ title = "CurateAI" }: LogoHeaderProps) {
   return (
     <div className="auth-logo-header">
-      <Logo width={40} height={40} fill="white" />
+      <Logo width={40} height={40} fill="#e2e8f0" />
       <h2 className="auth-logo-title">{title}</h2>
     </div>
   );
