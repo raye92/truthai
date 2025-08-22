@@ -43,7 +43,11 @@ const styles = {
   messageBubble: {
     maxWidth: '70%',
     padding: '0.75rem 1rem',
-    borderRadius: '1rem',
+    // Replace shorthand borderRadius with explicit corners
+    borderTopLeftRadius: '1rem',
+    borderTopRightRadius: '1rem',
+    borderBottomLeftRadius: '1rem',
+    borderBottomRightRadius: '1rem',
     lineHeight: 1.5,
     wordBreak: 'break-word' as const,
     position: 'relative' as const,
@@ -65,7 +69,7 @@ const styles = {
   },
   userMessageBubble: {
     background: '#3b82f6',
-    color: 'white',
+    color: '#e2e8f0',
     borderBottomRightRadius: '0.25rem',
   },
   assistantMessageBubble: {

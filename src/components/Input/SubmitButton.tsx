@@ -41,12 +41,11 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
   );
 };
 
-// ======== STYLES ========
 const styles: Record<string, React.CSSProperties> = {
   button: {
     padding: '0 1.5rem',
     background: '#3b82f6',
-    color: '#ffffff',
+    color: '#e2e8f0',
     border: 'none',
     borderRadius: '0.375rem',
     fontWeight: 500,

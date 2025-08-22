@@ -51,7 +51,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'background 0.15s, border-color 0.15s'
   },
   ext: { background: '#334155', color: '#93c5fd', fontSize: '0.55rem', padding: '0.2rem 0.35rem', borderRadius: '0.375rem', fontWeight: 600, letterSpacing: '0.5px' },
-  name: { fontWeight: 500, whiteSpace: 'nowrap', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', color: '#ffffff' },
+  name: { fontWeight: 500, whiteSpace: 'nowrap', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', color: '#e2e8f0' },
   status: { fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.25rem' },
   dot: { width: 6, height: 6, borderRadius: '50%', display: 'inline-block' },
   removeBtn: { background: 'transparent', color: '#94a3b8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', padding: '0 0.25rem', alignSelf: 'flex-start' }

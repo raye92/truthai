@@ -5,11 +5,8 @@ import { ConfirmEmailPage } from './ConfirmEmailPage';
 import { ForgotPasswordPage } from './ForgotPasswordPage';
 import { ConfirmResetPasswordPage } from './ConfirmResetPasswordPage';
 
-type AuthPage = 'signIn' | 'signUp' | 'confirmEmail' | 'forgotPassword' | 'confirmResetPassword';
-
 interface AuthRouterState {
-  currentPage: AuthPage;
-  data?: any;
+  currentPage: string;
 }
 
 export function CustomAuthenticator() {
@@ -17,8 +14,8 @@ export function CustomAuthenticator() {
     currentPage: 'signIn'
   });
 
-  const handleNavigate = (page: AuthPage, data?: any) => {
-    setAuthState({ currentPage: page, data });
+  const handleNavigate = (page: string) => {
+    setAuthState({ currentPage: page });
   };
 
   const renderCurrentPage = () => {
@@ -30,8 +27,7 @@ export function CustomAuthenticator() {
       case 'confirmEmail':
         return (
           <ConfirmEmailPage 
-            onNavigate={handleNavigate} 
-            email={authState.data?.email}
+            onNavigate={handleNavigate}
           />
         );
       case 'forgotPassword':
@@ -40,7 +36,6 @@ export function CustomAuthenticator() {
         return (
           <ConfirmResetPasswordPage 
             onNavigate={handleNavigate}
-            email={authState.data?.email}
           />
         );
       default:

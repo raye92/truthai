@@ -10,7 +10,7 @@ interface IconProps {
 export const Logo: React.FC<IconProps> = ({
   width = 80,
   height = 80,
-  fill = 'white',
+  fill = '#e2e8f0',
   className = '',
 }) => {
   return (

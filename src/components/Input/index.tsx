@@ -55,8 +55,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     setTimeout(() => { clearingRef.current = false; }, 0);
   };
 
-  // Ensure clicks inside container focus textarea (unless clicking remove buttons etc.)
-  const focusTextarea = useCallback(() => {
+  // Ensure clicks inside container focus textarea (unless clicking on ModelSelect dropdown)
+  const focusTextarea = useCallback((e: React.MouseEvent) => {
+    // Don't focus textarea if clicking on ModelSelect dropdown
+    const target = e.target as HTMLElement;
+    if (target.closest('select')) {
+      return;
+    }
+    
     if (ref.current && !disabled) {
       ref.current.focus();
     }
@@ -109,7 +115,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         ...(isLoading ? { opacity: 0.9 } : {}),
         cursor: disabled ? 'not-allowed' : 'text'
       }}
-      onClick={focusTextarea}
+      onClick={(e) => focusTextarea(e)}
     >
       <textarea
         ref={ref}
@@ -125,7 +131,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         style={{ ...styles.textArea, color: isLoading ? '#64748b' : '#e2e8f0', maxHeight }}
       />
       {/* Make footer elements also focus textarea when clicked */}
-      <div style={styles.innerFooter} onClick={focusTextarea}>
+      <div style={styles.innerFooter}>
         <div style={styles.uploadContainer}>
           <label style={styles.uploadBtn}>
             <input
@@ -149,16 +155,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <div style={{ flex: 1 }} />
         )}
         <div style={styles.rightGroup}>
-          <div onClick={focusTextarea}>
-            <ModelSelect
-              value={model}
-              disabled={disabled}
-              isLoading={isLoading}
-              show={showModelSelect}
-              onChange={onModelChange}
-            />
-          </div>
-          <div onClick={focusTextarea}>
+          <ModelSelect
+            value={model}
+            disabled={disabled}
+            isLoading={isLoading}
+            show={showModelSelect}
+            onChange={onModelChange}
+          />
+          <div>
             <SubmitButton
               label={submitLabel}
               disabled={disabled || isLoading || !fullCombined.trim()}
