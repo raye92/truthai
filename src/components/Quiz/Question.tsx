@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
 import { AnswerGrid } from "./AnswerGrid";
+import { MiniChat } from "./MiniChat";
 
 interface QuestionProps {
   question: QuestionType;
@@ -11,6 +12,11 @@ interface QuestionProps {
 export function Question({ question, questionNumber }: QuestionProps) {
   // Local copy of answers so we can mutate keys for testing without affecting parent
   const [answers, setAnswers] = useState<AnswerType[]>(() => [...question.answers]);
+  
+  // Mini chat state
+  const [miniChatOpen, setMiniChatOpen] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<string>('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
 
   // Keep local answers in sync if parent changes
   useEffect(() => {
@@ -67,6 +73,24 @@ export function Question({ question, questionNumber }: QuestionProps) {
     });
   };
 
+  const handleProviderClick = (providerName: string, answerText: string) => {
+    setSelectedProvider(providerName);
+    setSelectedAnswer(answerText);
+    setMiniChatOpen(true);
+  };
+
+  const handleMiniChatClose = () => {
+    setMiniChatOpen(false);
+    setSelectedProvider('');
+    setSelectedAnswer('');
+  };
+
+  const handleMiniChatFullScreen = () => {
+    // Navigate to full chat page with the selected provider and question context
+    const chatUrl = `/chat?provider=${encodeURIComponent(selectedProvider)}&question=${encodeURIComponent(question.text)}&answer=${encodeURIComponent(selectedAnswer)}`;
+    window.open(chatUrl, '_blank');
+  };
+
   return (
     <div style={styles.quizQuestion}>
       <div style={styles.quizQuestionHeader}>
@@ -81,7 +105,19 @@ export function Question({ question, questionNumber }: QuestionProps) {
         maxProviders={maxProviders}
         totalProviders={totalProviders}
         onKeyChange={handleKeyChange}
+  onProviderClick={handleProviderClick}
       />
+      
+      {miniChatOpen && (
+        <MiniChat
+          providerName={selectedProvider}
+          questionText={question.text}
+          answerText={selectedAnswer}
+          isOpen={miniChatOpen}
+          onClose={handleMiniChatClose}
+          onFullScreen={handleMiniChatFullScreen}
+        />
+      )}
     </div>
   );
 }
@@ -94,6 +130,7 @@ const styles = {
     paddingTop: '1rem',
     border: '1px solid #475569',
     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+    position: 'relative' as const,
   },
   quizQuestionHeader: {
     display: 'flex',

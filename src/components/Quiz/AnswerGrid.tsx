@@ -8,6 +8,7 @@ interface AnswerGridProps {
   maxProviders: number;
   totalProviders: number;
   onKeyChange: (targetAnswer: AnswerType, newKey: string) => void;
+  onProviderClick?: (providerName: string, answerText: string) => void;
 }
 
 interface AnswerRow {
@@ -20,7 +21,8 @@ export function AnswerGrid({
   winningAnswers, 
   maxProviders, 
   totalProviders, 
-  onKeyChange 
+  onKeyChange,
+  onProviderClick
 }: AnswerGridProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -90,7 +92,6 @@ export function AnswerGrid({
             const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
             const answerWidth = calculateAnswerWidth(answer, displayKey);
             const clampedMinWidth = Math.min(answerWidth, maxRowWidth);
-            console.log(`Answer: ${answer.answer}, Width: ${answerWidth}, Clamped Min Width: ${clampedMinWidth}`);
             return (
               <div key={answer.answer} style={{ ...styles.answerWrapper, minWidth: clampedMinWidth }}>
                 <Answer
@@ -101,6 +102,7 @@ export function AnswerGrid({
                   answerKey={displayKey}
                   onKeyChange={(newKey) => onKeyChange(answer, newKey)}
                   answerWidth={clampedMinWidth}
+                  onProviderClick={onProviderClick}
                 />
               </div>
             );

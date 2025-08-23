@@ -17,7 +17,7 @@ export class ChatLogic {
     }
   }
   // Create a new conversation with type parameter and date
-  static async createConversation(type: "Chat" | "Short-response" | "Long-form"): Promise<string> {
+  static async createConversation(type: "Chat" | "Short-response" | "Long-form" | "Explain"): Promise<string> {
     // Create title with type and date
     const today = new Date().toLocaleDateString();
     const title = `${type} - ${today}`;
@@ -62,9 +62,7 @@ export class ChatLogic {
     const conv = store.conversations.find(c => c.conversationId === conversationId);
     
     // Only persist to backend if conversation is saved
-    console.log("1");
     const user = await ChatLogic.getCurrentUserSafe();
-    console.log("2");
     if (user?.userId && conv?.isSaved) {
       messageId = await chatAPI.addMessage(conversationId, role, content, provider, model);
     }
