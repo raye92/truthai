@@ -79,14 +79,6 @@ export function Question({ question, questionNumber }: QuestionProps) {
     setMiniChatOpen(true);
   };
 
-  const handleProviderClickWrapper = (providerName: string) => {
-    // Find the answer that contains this provider
-    const answer = answers.find(ans => ans.providers.includes(providerName));
-    if (answer) {
-      handleProviderClick(providerName, answer.answer);
-    }
-  };
-
   const handleMiniChatClose = () => {
     setMiniChatOpen(false);
     setSelectedProvider('');
@@ -113,7 +105,7 @@ export function Question({ question, questionNumber }: QuestionProps) {
         maxProviders={maxProviders}
         totalProviders={totalProviders}
         onKeyChange={handleKeyChange}
-        onProviderClick={handleProviderClickWrapper}
+  onProviderClick={handleProviderClick}
       />
       
       {miniChatOpen && (

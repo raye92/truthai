@@ -17,7 +17,7 @@ export class ChatLogic {
     }
   }
   // Create a new conversation with type parameter and date
-  static async createConversation(type: "Chat" | "Short-response" | "Long-form"): Promise<string> {
+  static async createConversation(type: "Chat" | "Short-response" | "Long-form" | "Explain"): Promise<string> {
     // Create title with type and date
     const today = new Date().toLocaleDateString();
     const title = `${type} - ${today}`;

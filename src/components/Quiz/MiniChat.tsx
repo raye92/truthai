@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageBubble } from '../MessageBubble';
-import { useChat } from '../../hooks/useChat';
+import { useMaskedChat } from '../../hooks/useMaskedChat';
 // Replacing heavy MessageInput with lightweight inline input to avoid loading flicker
 import { FullscreenIcon } from '../../assets/Icons';
 import { useChatStore } from '../../api/chat/chatStore';
@@ -21,8 +21,8 @@ function mapProvider(provider: string): { model: 'chatgpt' | 'gemini'; grounding
   return { model: 'chatgpt' };
 }
 
-export function MiniChat({ providerName, answerText, isOpen, onClose, onFullScreen }: MiniChatProps) {
-  const { isLoading, sendMessage } = useChat();
+export function MiniChat({ providerName, answerText, questionText, isOpen, onClose, onFullScreen }: MiniChatProps) {
+  const { isLoading, sendMessage, sendMasked } = useMaskedChat();
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const hasSentInitial = useRef(false);
@@ -30,19 +30,20 @@ export function MiniChat({ providerName, answerText, isOpen, onClose, onFullScre
   // Pull current conversation messages from store (like ChatPage)
   const currentConversationId = useChatStore(s => s.currentConversationId);
   const conversations = useChatStore(s => s.conversations);
-  const currentConversation = useMemo(() => conversations.find(c => c.conversationId === currentConversationId) || null, [conversations, currentConversationId]);
-  const storeMessages = currentConversation?.messages || [];
-  const viewMessages = storeMessages.map(m => ({ role: m.role, content: m.content, model: m.metadata?.provider === 'gemini' ? 'gemini' : 'chatgpt' }));
-  const renderMessages = [...viewMessages].reverse(); // newest bottom
+  const currentConversation = conversations.find(c => c.conversationId === currentConversationId) || null;
+  const renderMessages = [...(currentConversation?.messages || [])]
+    .map(m => ({ role: m.role, content: m.content, model: m.metadata?.provider === 'gemini' ? 'gemini' : 'chatgpt' }))
+    .reverse();
 
   // Auto send concise explanation once when opened
   useEffect(() => {
     if (!isOpen || hasSentInitial.current) return;
     const { model, grounding } = mapProvider(providerName);
-    const prompt = `Explain concisely why this answer is correct: "${answerText}"`;
+    const display = 'Explain this answer';
+    const backend = `Provide a concise explanation for the question and answer pair. If it's wrong, admit it and provide the correct answer.\n\nQuestion: ${questionText}\nAnswer: ${answerText}\nExplanation:`;
     hasSentInitial.current = true;
-    sendMessage(prompt, { model, useGrounding: grounding });
-  }, [isOpen, providerName, answerText, sendMessage]);
+    sendMasked(display, backend, { model, useGrounding: grounding });
+  }, [isOpen, providerName, answerText, questionText, sendMasked]);
 
   // Scroll to bottom on new message
   const msgRef = useRef<HTMLDivElement | null>(null);
@@ -55,7 +56,7 @@ export function MiniChat({ providerName, answerText, isOpen, onClose, onFullScre
     if (!input.trim() || sending) return;
     const { model, grounding } = mapProvider(providerName);
     setSending(true);
-    await sendMessage(input, { model, useGrounding: grounding });
+  await sendMessage(input, { model, useGrounding: grounding });
     setInput('');
     setSending(false);
   };

@@ -8,7 +8,7 @@ interface AnswerGridProps {
   maxProviders: number;
   totalProviders: number;
   onKeyChange: (targetAnswer: AnswerType, newKey: string) => void;
-  onProviderClick?: (providerName: string) => void;
+  onProviderClick?: (providerName: string, answerText: string) => void;
 }
 
 interface AnswerRow {

@@ -11,7 +11,7 @@ interface AnswerProps {
   onKeyChange: (newKey: string) => void;
   forceFullRow?: boolean;
   answerWidth?: number;
-  onProviderClick?: (providerName: string) => void;
+  onProviderClick?: (providerName: string, answerText: string) => void;
 }
 
 export function Answer({ answer, isWinning, percentage, maxProviders, answerKey, onKeyChange, forceFullRow = false, answerWidth, onProviderClick }: AnswerProps) {
@@ -78,12 +78,12 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
           <div style={styles.quizAnswerBarBg} ref={barRef}>
             <div style={getBarStyle()}>
               {answer.providers.map((provider, index) => (
-                <ProviderCard 
-                  key={`${provider}-${index}`} 
-                  providerName={provider} 
-                  index={index} 
+                <ProviderCard
+                  key={`${provider}-${index}`}
+                  providerName={provider}
+                  index={index}
                   choiceClass={getChoiceClass()}
-                  onClick={onProviderClick ? () => onProviderClick(provider) : undefined}
+                  onClick={onProviderClick ? () => onProviderClick(provider, answer.answer) : undefined}
                 />
               ))}
             </div>
