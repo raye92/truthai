@@ -121,7 +121,7 @@ const styles = {
     border: '1px solid #475569',
     borderRadius: '0.75rem',
     boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-    zIndex: 1000,
+    zIndex: 800,
     maxHeight: '500px',
     display: 'flex',
     flexDirection: 'column' as const,
