@@ -1,20 +1,23 @@
-## AWS Amplify React+Vite Starter Template
+## CurateAI – LLM Aggregator
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+A starter template for building applications that seamlessly integrate multiple large language models (LLMs) with minimal setup.
 
 ## Overview
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+CurateAI provides a foundation for aggregating and orchestrating responses from various LLM providers. Designed for scalability and flexibility, it enables developers to experiment with different models and optimize outputs.
 
 ## Features
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
+Multi-Model Integration: Connect to multiple LLM APIs (e.g., OpenAI, Anthropic, etc.).
 
-## Deploying to AWS
+Aggregation Logic: Combine and rank outputs for improved results.
 
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
+Extensible: Easily add new models or custom workflows.
+
+## Deployment
+
+Refer to the deployment guide
+ for steps to host and scale your aggregator.
 
 ## Security
 
