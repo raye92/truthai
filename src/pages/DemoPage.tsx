@@ -1,363 +1,228 @@
 // ======== DEMO ========
-import React, { useMemo, useState } from 'react';
-import { ChatLogic } from '../api/chat/chatLogic';
-import { useChatStore } from '../api/chat/chatStore';
-import { Conversation } from '../api/chat/types';
+import { useEffect, useState } from 'react';
+import { Quiz } from '../components/Quiz/Quiz';
+import type { Quiz as QuizType, Question as QuestionType, Answer as AnswerType } from '../components/Quiz/types';
+import { MessageInput } from '../components/Input';
 
-const DemoPage: React.FC = () => {
-  const [messageContent, setMessageContent] = useState<string>('Hello, this is a test message!');
-  const [provider, setProvider] = useState<string>('openai');
-  const [model, setModel] = useState<string>('gpt-4');
-  
-  const { 
-    conversations, 
-    currentConversationId, 
-    setCurrentConversationId,
-  } = useChatStore();
+function buildDemoQuiz(): QuizType {
+  const q1Answers: AnswerType[] = [
+    {
+      answer: 'A Large Language Model (an AI that understands and generates text)',
+      providers: ['GPT', 'Gemini', 'Gemini Google Search'],
+    },
+    { answer: 'A kind of database', providers: [] },
+    { answer: 'A video game console', providers: [] },
+  ];
 
-  const currentConversation = useMemo(
-    () => conversations.find(c => c.conversationId === currentConversationId) || null,
-    [conversations, currentConversationId]
-  );
+  const q2Answers: AnswerType[] = [
+    { answer: 'GPT', providers: ['GPT'] },
+    { answer: 'Gemini', providers: ['Gemini'] },
+    { answer: 'Gemini - backed by Google Search', providers: ['Gemini Google Search'] },
+  ];
 
-  // Test functions
-  const testCreateConversation = async (type: "Chat" | "Short-response" | "Long-form") => {
-    try {
-      console.log(`Creating ${type} conversation...`);
-      const conversationId = await ChatLogic.createConversation(type);
-      console.log(`Created conversation: ${conversationId}`);
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-    }
+  const q1: QuestionType = {
+    text: 'What is an LLM?',
+    answers: q1Answers,
+    totalProviders: q1Answers.reduce((sum, a) => sum + a.providers.length, 0),
+    questionNumber: 1,
   };
 
-  const testLoadConversations = async () => {
-    try {
-      console.log('Loading conversations...');
-      await ChatLogic.loadConversations();
-      console.log('Conversations loaded');
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-    }
+  const q2: QuestionType = {
+    text: 'What models are supported by CurateAI?',
+    answers: q2Answers,
+    totalProviders: q2Answers.reduce((sum, a) => sum + a.providers.length, 0),
+    questionNumber: 2,
   };
 
-  const testAddMessage = async () => {
-    if (!currentConversation) {
-      alert('Please select a conversation first');
-      return;
-    }
-    
-    try {
-      console.log('Adding message...');
-      const messageId = await ChatLogic.addMessage(
-        currentConversation.conversationId,
-        'user',
-        messageContent,
-        provider,
-        model,
-      );
-      console.log(`Message added with ID: ${messageId}`);
-      setMessageContent(''); // Clear input after sending
-    } catch (error) {
-      console.error('Error adding message:', error);
-    }
+  return { questions: [q1, q2] };
+}
+
+function DemoPage() {
+  const [quiz] = useState<QuizType>(() => buildDemoQuiz());
+  const [showHint, setShowHint] = useState(true);
+  const [stage, setStage] = useState<'input' | 'quiz'>('input');
+  const [showFinal, setShowFinal] = useState(false);
+  const hardcodedPrompt = quiz.questions
+    .map(q => `Q${q.questionNumber}: ${q.text}`)
+    .join('\n\n');
+
+  const handleAnyClick = () => {
+    if (showHint) setShowHint(false);
+    setShowFinal(true);
   };
 
-  const testLoadMessages = async (conversationId: string) => {
-    try {
-      console.log('Loading messages...');
-      await ChatLogic.loadMessages(conversationId);
-      console.log('Messages loaded');
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    }
+  const handleFakeSubmit = () => {
+    // Transition to quiz stage on submit
+    setStage('quiz');
+    setShowHint(true);
   };
 
-  const selectConversation = (conversation: Conversation) => {
-    setCurrentConversationId(conversation.conversationId);
-  };
+  // Block typing while still allowing the built-in submit button
+  useEffect(() => {
+    if (stage !== 'input') return;
+    const blockTyping = (e: KeyboardEvent) => {
+      // Prevent MessageInput's global typing capture
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    window.addEventListener('keydown', blockTyping, true);
+    return () => window.removeEventListener('keydown', blockTyping, true);
+  }, [stage]);
+
+  // Hide the final confirmation on any click
+  useEffect(() => {
+    if (!showFinal) return;
+    let mounted = true;
+    const attach = () => {
+      if (!mounted) return;
+      const onAnyClick = () => setShowFinal(false);
+      window.addEventListener('click', onAnyClick, { capture: true, once: true });
+    };
+    // Defer to avoid catching the same click that showed the banner
+    const id = setTimeout(attach, 0);
+    return () => { mounted = false; clearTimeout(id); };
+  }, [showFinal]);
 
   return (
-    <div className="demo-page" style={{ 
-      padding: '24px', 
-      maxWidth: '1200px', 
-      margin: '0 auto',
-      overflowY: 'auto',
-      height: '100vh'
-    }}>
-      <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '24px' }}>Chat Logic Demo Page</h1>
-      
-      {/* User ID Input */}
-      <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>User ID:</label>
+    <div style={styles.quizPage}>
+      <div style={styles.quizPageHeader}>
+        <h1 style={styles.quizPageHeaderH1}>Tutorial</h1>
+        <p style={styles.quizPageHeaderP}>Step by step guide to using Curate AI</p>
       </div>
 
-      {/* Test Buttons */}
-      <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#eff6ff', borderRadius: '8px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Test Chat Logic Functions</h2>
-        
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '16px', 
-          marginBottom: '16px' 
-        }}>
-          <div>
-            <h3 style={{ fontWeight: '500', marginBottom: '8px' }}>Create Conversations:</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
-                onClick={() => testCreateConversation("Chat")}
-                style={{ width: '100%', backgroundColor: '#3b82f6', color: 'white', padding: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
-              >
-                Create Chat Conversation
-              </button>
-              <button
-                onClick={() => testCreateConversation("Short-response")}
-                style={{ width: '100%', backgroundColor: '#10b981', color: 'white', padding: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-              >
-                Create Short-response Conversation
-              </button>
-              <button
-                onClick={() => testCreateConversation("Long-form")}
-                style={{ width: '100%', backgroundColor: '#8b5cf6', color: 'white', padding: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
-              >
-                Create Long-form Conversation
-              </button>
+      <div style={styles.quizPageContent}>
+        <div style={styles.inputDisplaySection}>
+          {stage === 'input' && (
+            <div style={styles.hintOverlayInput}>
+              <span style={styles.hintText}>Step 1: Submit a screenshot or ask a question to begin.</span>
             </div>
-          </div>
-          
-          <div>
-            <h3 style={{ fontWeight: '500', marginBottom: '8px' }}>Other Functions:</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button
-                onClick={testLoadConversations}
-                style={{ width: '100%', backgroundColor: '#f97316', color: 'white', padding: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f97316'}
-              >
-                Load Conversations
-              </button>
-              <button
-                onClick={() => testLoadMessages(currentConversation?.conversationId || '')}
-                disabled={!currentConversation}
-                style={{ 
-                  width: '100%', 
-                  backgroundColor: currentConversation ? '#14b8a6' : '#9ca3af', 
-                  color: 'white', 
-                  padding: '8px', 
-                  borderRadius: '4px', 
-                  border: 'none', 
-                  cursor: currentConversation ? 'pointer' : 'not-allowed' 
-                }}
-                onMouseOver={(e) => {
-                  if (currentConversation) e.currentTarget.style.backgroundColor = '#0d9488';
-                }}
-                onMouseOut={(e) => {
-                  if (currentConversation) e.currentTarget.style.backgroundColor = '#14b8a6';
-                }}
-              >
-                Load Messages
-              </button>
-            </div>
-          </div>
+          )}
+          <MessageInput
+            value={hardcodedPrompt}
+            onChange={() => {}}
+            placeholder="Paste a screenshot or ask a question..."
+            disabled={stage === 'quiz'}
+            isLoading={false}
+            onEnterPress={stage === 'input' ? handleFakeSubmit : undefined}
+            submitLabel="Submit"
+            showModelSelect={false}
+          />
         </div>
-      </div>
 
-      {/* Add Message Section */}
-      <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f0fdf4', borderRadius: '8px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Add Message</h2>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '16px', 
-          marginBottom: '16px' 
-        }}>
-          <input
-            type="text"
-            value={messageContent}
-            onChange={(e) => setMessageContent(e.target.value)}
-            placeholder="Message content"
-            style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-          />
-          <input
-            type="text"
-            value={provider}
-            onChange={(e) => setProvider(e.target.value)}
-            placeholder="Provider"
-            style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-          />
-          <input
-            type="text"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder="Model"
-            style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-          />
-          <button
-            onClick={testAddMessage}
-            disabled={!currentConversation}
-            style={{ 
-              backgroundColor: currentConversation ? '#10b981' : '#9ca3af', 
-              color: 'white', 
-              padding: '8px', 
-              borderRadius: '4px', 
-              border: 'none', 
-              cursor: currentConversation ? 'pointer' : 'not-allowed' 
-            }}
-            onMouseOver={(e) => {
-              if (currentConversation) e.currentTarget.style.backgroundColor = '#059669';
-            }}
-            onMouseOut={(e) => {
-              if (currentConversation) e.currentTarget.style.backgroundColor = '#10b981';
-            }}
-          >
-            Add Message
-          </button>
-        </div>
-      </div>
-
-      {/* Conversations Display */}
-      <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Conversations ({conversations.length})</h2>
-        {conversations.length === 0 ? (
-          <p style={{ color: '#6b7280' }}>No conversations yet. Create one using the buttons above.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {conversations.map((conversation) => (
-              <div
-                key={conversation.conversationId}
-                onClick={() => selectConversation(conversation)}
-                style={{
-                  padding: '12px',
-                  border: currentConversation?.conversationId === conversation.conversationId 
-                    ? '2px solid #3b82f6' 
-                    : '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  backgroundColor: currentConversation?.conversationId === conversation.conversationId 
-                    ? '#eff6ff' 
-                    : 'white'
-                }}
-                onMouseOver={(e) => {
-                  if (currentConversation?.conversationId !== conversation.conversationId) {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (currentConversation?.conversationId !== conversation.conversationId) {
-                    e.currentTarget.style.backgroundColor = 'white';
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: '500' }}>{conversation.title}</span>
-                  <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                    {conversation.messages.length} messages
-                  </span>
-                </div>
-                <div style={{ fontSize: '14px', color: '#4b5563', marginTop: '4px' }}>
-                  ID: {conversation.conversationId}
-                </div>
+        {stage === 'quiz' && (
+          <div style={styles.quizDisplaySection} onClick={handleAnyClick}>
+            {showHint && (
+              <div style={styles.hintOverlay}>
+                <span style={styles.hintText}>Step 2: Click here to explore explanations for any answer.</span>
               </div>
-            ))}
+            )}
+            {showFinal && !showHint && (
+              <div style={styles.finalOverlay}>
+                <span style={styles.finalText}>Great! You're ready to start curating answers.</span>
+              </div>
+            )}
+            <Quiz quiz={quiz} />
           </div>
         )}
       </div>
-
-      {/* Current Conversation Messages */}
-      {currentConversation && (
-        <div style={{ padding: '16px', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>
-            Current Conversation: {currentConversation.title}
-          </h2>
-          
-          {currentConversation.messages.length === 0 ? (
-            <p style={{ color: '#6b7280' }}>No messages in this conversation yet.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {currentConversation.messages.map((message, index) => (
-                <div
-                  key={message.messageId || index}
-                  style={{
-                    padding: '12px',
-                    borderRadius: '8px',
-                    backgroundColor: message.role === 'user' ? '#dbeafe' : '#f3f4f6',
-                    marginLeft: message.role === 'user' ? '32px' : '0',
-                    marginRight: message.role === 'assistant' ? '32px' : '0'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <span style={{ 
-                      fontWeight: '500', 
-                      fontSize: '14px',
-                      color: message.role === 'user' ? '#1d4ed8' : '#374151'
-                    }}>
-                      {message.role === 'user' ? 'User' : 'Assistant'}
-                    </span>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                      <div>{message.metadata.provider}</div>
-                      <div>{message.metadata.model}</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '14px' }}>{message.content}</div>
-                  {message.messageId && (
-                    <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
-                      ID: {message.messageId}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Store State Debug */}
-      <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#fefce8', borderRadius: '8px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>Store State Debug</h2>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '16px' 
-        }}>
-          <div>
-            <h3 style={{ fontWeight: '500', marginBottom: '8px' }}>Current Conversation:</h3>
-            <pre style={{ 
-              fontSize: '12px', 
-              backgroundColor: 'white', 
-              padding: '8px', 
-              borderRadius: '4px', 
-              border: '1px solid #d1d5db', 
-              overflow: 'auto',
-              maxHeight: '200px'
-            }}>
-              {currentConversation ? JSON.stringify(currentConversation, null, 2) : 'null'}
-            </pre>
-          </div>
-          <div>
-            <h3 style={{ fontWeight: '500', marginBottom: '8px' }}>All Conversations:</h3>
-            <pre style={{ 
-              fontSize: '12px', 
-              backgroundColor: 'white', 
-              padding: '8px', 
-              borderRadius: '4px', 
-              border: '1px solid #d1d5db', 
-              overflow: 'auto',
-              maxHeight: '200px'
-            }}>
-              {JSON.stringify(conversations, null, 2)}
-            </pre>
-          </div>
-        </div>
-      </div>
     </div>
   );
-};
+}
 
 export default DemoPage;
+
+const styles = {
+  quizPage: {
+    height: '100vh',
+    overflowY: 'auto' as const,
+    padding: '2rem',
+    background: '#0f172a',
+  },
+  quizPageHeader: {
+    textAlign: 'center' as const,
+    marginBottom: '2rem',
+  },
+  quizPageHeaderH1: {
+    fontSize: '2.5rem',
+    fontWeight: 700,
+    color: '#e2e8f0',
+    margin: '0 0',
+  },
+  quizPageHeaderP: {
+    color: '#94a3b8',
+    fontSize: '1.125rem',
+    margin: 0,
+  },
+  quizPageContent: {
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '1rem',
+  },
+  quizDisplaySection: {
+    background: '#1e293b',
+    borderRadius: '1rem',
+    padding: '1.5rem',
+    border: '1px solid #475569',
+    minHeight: '400px',
+    position: 'relative' as const,
+  },
+  inputDisplaySection: {
+    background: '#1e293b',
+    borderRadius: '1rem',
+    padding: '1.5rem',
+    border: '1px solid #475569',
+    position: 'relative' as const,
+  },
+  hintOverlay: {
+    position: 'absolute' as const,
+    left: '-40rem',
+    right: 0,
+    top: '15rem',
+    display: 'flex',
+    justifyContent: 'center',
+    pointerEvents: 'none' as const,
+    zIndex: 5,
+    padding: '0 1rem',
+  },
+  hintOverlayInput: {
+    position: 'absolute' as const,
+    left: '70rem',
+    right: '1rem',
+    top: '1.75rem',
+    display: 'flex',
+    justifyContent: 'center',
+    pointerEvents: 'none' as const,
+    zIndex: 5,
+    padding: '0 1rem',
+  },
+  hintText: {
+    fontWeight: 600,
+    background: '#22c55e',
+    color: '#0b1b2a',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #16a34a',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+  },
+  finalOverlay: {
+    position: 'absolute' as const,
+    left: 0,
+    right: 0,
+    top: '0.75rem',
+    display: 'flex',
+    justifyContent: 'center',
+    pointerEvents: 'none' as const,
+    zIndex: 1000,
+    padding: '0 1rem',
+  },
+  finalText: {
+    fontWeight: 600,
+    background: '#38bdf8',
+    color: '#082f49',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #0891b2',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+  },
+};
