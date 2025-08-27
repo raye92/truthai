@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Question as QuestionType, Answer as AnswerType } from "./types";
 import { changeAnswerKey } from "./utils";
 import { AnswerGrid } from "./AnswerGrid";
@@ -91,9 +91,26 @@ export function Question({ question, questionNumber }: QuestionProps) {
     window.open(chatUrl, '_blank');
   };
 
+  // Measure the header width to set the grid max row width
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerWidth, setHeaderWidth] = useState<number>(0);
+  useEffect(() => {
+    const updateWidth = () => {
+      if (headerRef.current) setHeaderWidth(headerRef.current.clientWidth);
+    };
+    updateWidth();
+    const ro = new ResizeObserver(updateWidth);
+    if (headerRef.current) ro.observe(headerRef.current);
+    window.addEventListener('resize', updateWidth);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, []);
+
   return (
     <div style={styles.quizQuestion}>
-      <div style={styles.quizQuestionHeader}>
+      <div style={styles.quizQuestionHeader} ref={headerRef}>
         <div style={styles.quizQuestionNumber}>{question.questionNumber ?? questionNumber}</div>
         <h3 style={styles.quizQuestionTitle}>{question.text}</h3>
         <p style={styles.quizQuestionTotal}>Current Answers: <span style={styles.quizQuestionTotalNumber}>{totalProviders}</span></p>
@@ -105,7 +122,8 @@ export function Question({ question, questionNumber }: QuestionProps) {
         maxProviders={maxProviders}
         totalProviders={totalProviders}
         onKeyChange={handleKeyChange}
-  onProviderClick={handleProviderClick}
+        onProviderClick={handleProviderClick}
+        maxRowWidth={headerWidth}
       />
       
       {miniChatOpen && (

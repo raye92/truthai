@@ -9,6 +9,7 @@ interface AnswerGridProps {
   totalProviders: number;
   onKeyChange: (targetAnswer: AnswerType, newKey: string) => void;
   onProviderClick?: (providerName: string, answerText: string) => void;
+  maxRowWidth: number;
 }
 
 interface AnswerRow {
@@ -22,7 +23,8 @@ export function AnswerGrid({
   maxProviders, 
   totalProviders, 
   onKeyChange,
-  onProviderClick
+  onProviderClick,
+  maxRowWidth
 }: AnswerGridProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -42,7 +44,7 @@ export function AnswerGrid({
   // Calculate minimum width for each answer
   const calculateAnswerWidth = (answer: AnswerType, displayKey: string) => {
     const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
-    const baseWidth = 170; // 110 + 20 header margins + 24 answer padding + 16 gap
+    const baseWidth = 160; // 110 + 20 header margins + 24 answer padding + 16 gap
     const keyWidth = 40; // Width for the key
     const winningBonus = isWinning ? 140 : 0; // Bonus width if winning
     const textWidth = Math.ceil(
@@ -54,7 +56,10 @@ export function AnswerGrid({
     return baseWidth + keyWidth + winningBonus + textWidth;
   };
 
-  const maxRowWidth = windowWidth - 165; // Maximum width for a row (window width - 165px)
+  const computedMaxRowWidth = typeof maxRowWidth === 'number' && maxRowWidth > 0
+    ? maxRowWidth
+    : Math.max(0, windowWidth - 165);
+  console.log(computedMaxRowWidth)
   // Group answers into rows based on available width
   const answerRows = useMemo(() => {
     const rows: AnswerRow[] = [];
@@ -65,7 +70,7 @@ export function AnswerGrid({
       const answerWidth = calculateAnswerWidth(answer, displayKey);
 
       // If adding this answer would overflow, commit current row and start fresh
-      if (currentRow.answers.length > 0 && currentRow.totalWidth + answerWidth > maxRowWidth) {
+      if (currentRow.answers.length > 0 && currentRow.totalWidth + answerWidth > computedMaxRowWidth) {
         rows.push(currentRow);
         currentRow = { answers: [], totalWidth: 0 };
       }
@@ -80,7 +85,7 @@ export function AnswerGrid({
     }
     
     return rows;
-  }, [displayAnswers, winningAnswers, windowWidth, maxRowWidth]);
+  }, [displayAnswers, winningAnswers, windowWidth, computedMaxRowWidth]);
 
   return (
     <div style={styles.container}>
@@ -91,7 +96,7 @@ export function AnswerGrid({
             const percentage = getPercentage(providerCount);
             const isWinning = winningAnswers.some(winner => winner.answer === answer.answer);
             const answerWidth = calculateAnswerWidth(answer, displayKey);
-            const clampedMinWidth = Math.min(answerWidth, maxRowWidth);
+            const clampedMinWidth = Math.min(answerWidth, computedMaxRowWidth);
             return (
               <div key={answer.answer} style={{ ...styles.answerWrapper, minWidth: clampedMinWidth }}>
                 <Answer
