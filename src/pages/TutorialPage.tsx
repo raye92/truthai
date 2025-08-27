@@ -46,11 +46,6 @@ function TutorialPage() {
     .map(q => `Q${q.questionNumber}: ${q.text}`)
     .join('\n\n');
 
-  const handleAnyClick = () => {
-    if (showHint) setShowHint(false);
-    setShowFinal(true);
-  };
-
   const handleFakeSubmit = () => {
     // Transition to quiz stage on submit
     setStage('quiz');
@@ -110,10 +105,17 @@ function TutorialPage() {
         </div>
 
         {stage === 'quiz' && (
-          <div style={styles.quizDisplaySection} onClick={handleAnyClick}>
+          <div style={styles.quizDisplaySection} onClick={(e) => {
+            // Check if the clicked element is a provider card by looking for title with "Vote"
+            const target = e.target as HTMLElement;
+            if (target.title && target.title.includes('Vote')) {
+              if (showHint) setShowHint(false);
+              setShowFinal(true);
+            }
+          }}>
             {showHint && (
               <div style={styles.hintOverlay}>
-                <span style={styles.hintText}>Step 2: Click here to explore explanations for any answer.</span>
+                <span style={styles.hintText}>Step 2: Click ↑↑↑ to explore explanations for any answer.</span>
               </div>
             )}
             {showFinal && !showHint && (
