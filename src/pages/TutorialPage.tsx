@@ -4,7 +4,7 @@ import { Quiz } from '../components/Quiz/Quiz';
 import type { Quiz as QuizType, Question as QuestionType, Answer as AnswerType } from '../components/Quiz/types';
 import { MessageInput } from '../components/Input';
 
-function buildDemoQuiz(): QuizType {
+function buildTutorialQuiz(): QuizType {
   const q1Answers: AnswerType[] = [
     {
       answer: 'A Large Language Model (an AI that understands and generates text)',
@@ -37,8 +37,8 @@ function buildDemoQuiz(): QuizType {
   return { questions: [q1, q2] };
 }
 
-function DemoPage() {
-  const [quiz] = useState<QuizType>(() => buildDemoQuiz());
+function TutorialPage() {
+  const [quiz] = useState<QuizType>(() => buildTutorialQuiz());
   const [showHint, setShowHint] = useState(true);
   const [stage, setStage] = useState<'input' | 'quiz'>('input');
   const [showFinal, setShowFinal] = useState(false);
@@ -129,7 +129,7 @@ function DemoPage() {
   );
 }
 
-export default DemoPage;
+export default TutorialPage;
 
 const styles = {
   quizPage: {

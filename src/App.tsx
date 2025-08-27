@@ -4,8 +4,8 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { SignInModal } from "./components/SignInModal";
 import { ChatPage } from "./pages/ChatPage";
 import { QuizPage } from "./pages/quiz";
-import DemoPage from "./pages/DemoPage";
-import { Logo, ChatIcon } from "./assets/Icons";
+import TutorialPage from "./pages/TutorialPage";
+import { Logo, ChatIcon, QuestionMarkIcon } from "./assets/Icons";
 import { HistoryContainer } from "./components/HistoryContainer";
 import { ChatLogic } from "./api/chat/chatLogic";
 import { useChatStore } from "./api/chat/chatStore";
@@ -65,7 +65,7 @@ export default function App() {
           <nav className="sidebar-nav">
             <Link
               to="/"
-              className={`nav-link ${location.pathname === '/' || location.pathname === '/quiz' ? 'active' : ''}`}
+              className={`nav-link`}
               onClick={() => setSidebarOpen(false)}
             >
               <Logo width={20} height={20} fill="currentColor" />
@@ -73,18 +73,19 @@ export default function App() {
             </Link>
             <Link
               to="/chat"
-              className={`nav-link ${location.pathname.startsWith('/chat') ? 'active' : ''}`}
+              className={`nav-link`}
               onClick={() => { setCurrentConversationId(null); setSidebarOpen(false); }}
             >
               <ChatIcon width={20} height={20} fill="currentColor" />
               Chat
             </Link>
             <Link
-              to="/demo"
-              className={`nav-link ${location.pathname === '/demo' ? 'active' : ''}`}
+              to="/tutorial"
+              className={`nav-link`}
               onClick={() => setSidebarOpen(false)}
             >
-              🧪 Demo
+              <QuestionMarkIcon width={16} height={16} fill="currentColor" />
+              How To
             </Link>
           </nav>
         </div>
@@ -118,7 +119,7 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:conversationId" element={<ChatPage />} />
           <Route path="/quiz" element={<QuizPage />} />
-          <Route path="/demo" element={<DemoPage />} />
+          <Route path="/tutorial" element={<TutorialPage />} />
         </Routes>
       </main>
 
