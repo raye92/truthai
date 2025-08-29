@@ -18,7 +18,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onEnterPress,
   submitLabel = 'Send',
   maxHeight = 240,
-  initialHeight = 48,
+  initialHeight = 104,
   initialWidth = '100%',
   showModelSelect = false,
   model = 'chatgpt',
@@ -36,7 +36,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   // Auto-resize textarea & focus handling
   useEffect(() => { if (disabled && ref.current) ref.current.blur(); }, [disabled]);
   useEffect(() => {
-    if (ref.current && hasEnterBeenPressed) {
+    if (ref.current) {
       const el = ref.current;
       el.style.height = 'auto';
       const newHeight = Math.min(el.scrollHeight, maxHeight);
@@ -122,7 +122,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         ...(isLoading ? { opacity: 0.5, backgroundColor: '#3D4B5E' } : {}),
         cursor: disabled ? 'not-allowed' : 'text',
         width: hasEnterBeenPressed ? '100%' : initialWidth,
-        height: hasEnterBeenPressed ? 'auto' : `${initialHeight}px`,
         transition: 'height 0.3s ease, width 0.3s ease'
       }}
       onClick={(e) => focusTextarea(e)}
@@ -138,7 +137,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         onPaste={handlePaste}
         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
         rows={1}
-        style={{ ...styles.textArea}}
+        style={{ 
+          ...styles.textArea, 
+          maxHeight: maxHeight,
+          minHeight: hasEnterBeenPressed ? '48px' : `${initialHeight - 64}px`,
+          height: hasEnterBeenPressed ? 'auto' : `${initialHeight}px`
+        }}
       />
       {/* Make footer elements also focus textarea when clicked */}
       <div style={styles.innerFooter}>
@@ -190,7 +194,7 @@ const styles: Record<string, React.CSSProperties> = {
   baseContainer: { display: 'flex', flexDirection: 'column', border: '2px solid #475569', borderRadius: '0.75rem', padding: '0.5rem 0.75rem 0.5rem', transition: 'border-color 0.2s, box-shadow 0.2s' },
   focus: { borderColor: '#3b82f6', boxShadow: '0 0 0 3px rgba(59,130,246,0.1)' },
   blur: { borderColor: '#475569', boxShadow: 'none' },
-  textArea: { padding: 0, margin: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '1rem', lineHeight: '1.25rem', resize: 'none', overflowY: 'hidden', minHeight: '48px', fontFamily: 'inherit', color: '#e2e8f0', width: '100%', height: '100%'},
+  textArea: { padding: 0, margin: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '1rem', lineHeight: '1.25rem', resize: 'none', overflowY: 'hidden', fontFamily: 'inherit', color: '#e2e8f0'},
   innerFooter: { display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' },
   rightGroup: { display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto' },
   uploadContainer: { display: 'flex', flexDirection: 'column' },
