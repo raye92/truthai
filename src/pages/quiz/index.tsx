@@ -4,7 +4,6 @@ import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
 import { MessageInput } from '../../components/Input';
-import { useThrottledScroll } from '../../hooks/useThrottledScroll';
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
@@ -17,32 +16,20 @@ export function QuizPage() {
 
   const hasQuestions = quiz.questions.length > 0;
 
-  const handleMainPageScroll = useThrottledScroll((e: React.UIEvent<HTMLDivElement>) => {
-    // Throttled scroll handling for the main page section
-    // This will prevent the glitchy scroll behavior you were experiencing
-    console.log('Main page scroll position:', e.currentTarget.scrollTop);
-  }, 4); // 16ms = 60fps for smooth scrolling
-
   return (
     <div style={styles.quizPage}>
-      {/* Main Page Section */}
-      <div 
-        style={{ ...styles.mainPage, flex: hasQuestions ? 1 : 'none' }}
-        onScroll={handleMainPageScroll}
-      >
+      <div style={styles.contentContainer}>
         <div style={styles.quizPageTitle}>
           <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
           <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
         </div>
-
-        {hasQuestions && <Quiz quiz={quiz}/>}
+        {hasQuestions && <Quiz quiz={quiz}/>} 
       </div>
 
-      {/* Footer Section */}
-      <div style={{ 
-        ...styles.footer, 
-        height: hasQuestions ? 'auto' : '60vh',
-        borderTop: hasQuestions ? '1px solid #334155' : 'none'
+      <div style={{
+        ...styles.inputBarWrapper,
+        padding: `16px 16px ${hasQuestions ? '16px' : '369px'} 16px`,
+        transition: 'padding 0.3s ease-in-out'
       }}>
         <MessageInput
           value={newQuestion}
@@ -63,25 +50,22 @@ export function QuizPage() {
 
 const styles = {
   quizPage: {
-    height: '100vh',
-    minHeight: 0,
-    background: '#0f172a',
     display: 'flex',
     flexDirection: 'column' as const,
-    overflow: 'hidden' as const,
+    height: '100vh',
+    overflow: 'hidden',
   },
-  mainPage: {
-    padding: '2rem',
-    minHeight: 0,
+  contentContainer: {
+    flex: 1,
     overflowY: 'auto' as const,
+    padding: '2rem',
+    background: '#0f172a',
   },
-  footer: {
-    padding: '1rem 2rem',
+  inputBarWrapper: {
+    padding: '16px',
+    background: '#0f172a',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderTop: '1px solid #334155',
-    flexShrink: 0,
   },
   quizPageTitle: {
     textAlign: 'center' as const,
