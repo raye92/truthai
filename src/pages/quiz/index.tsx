@@ -31,6 +31,8 @@ export function QuizPage() {
           onEnterPress={handleAddQuestion}
           showModelSelect={false}
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
+          initialHeight={150}
+          initialWidth="60%"
         />
 
         <div style={styles.quizDisplaySection}>
