@@ -18,11 +18,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onEnterPress,
   submitLabel = 'Send',
   maxHeight = 240,
+  initialHeight = 104,
+  initialWidth = '100%',
   showModelSelect = false,
   model = 'chatgpt',
   onModelChange,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [hasEnterBeenPressed, setHasEnterBeenPressed] = useState(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
   // ========  FILE UPLOAD STATE ========
@@ -40,12 +43,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       el.style.height = `${newHeight}px`;
       el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
-  }, [userText, maxHeight]);
+  }, [userText, maxHeight, hasEnterBeenPressed]);
 
   const handleSubmit = () => {
     console.log('Submitting:', fullCombined);
     if (disabled || isLoading) return;
     if (!fullCombined.trim()) return;
+    
+    // Mark that Enter has been pressed
+    setHasEnterBeenPressed(true);
+    
     if (onEnterPress) onEnterPress();
     clearingRef.current = true;
     setUploads([]);
@@ -112,8 +119,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       style={{
         ...styles.baseContainer,
         ...(isFocused ? styles.focus : styles.blur),
-        ...(isLoading ? { opacity: 0.9 } : {}),
-        cursor: disabled ? 'not-allowed' : 'text'
+        ...(isLoading ? { opacity: 0.5, backgroundColor: '#3D4B5E' } : {}),
+        cursor: disabled ? 'not-allowed' : 'text',
+        width: hasEnterBeenPressed ? '100%' : initialWidth,
+        transition: 'height 0.3s ease, width 0.3s ease'
       }}
       onClick={(e) => focusTextarea(e)}
     >
@@ -128,7 +137,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         onPaste={handlePaste}
         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
         rows={1}
-        style={{ ...styles.textArea, color: isLoading ? '#64748b' : '#e2e8f0', maxHeight }}
+        style={{ 
+          ...styles.textArea, 
+          maxHeight: maxHeight,
+          minHeight: hasEnterBeenPressed ? '48px' : `${initialHeight - 64}px`,
+          height: hasEnterBeenPressed ? 'auto' : `${initialHeight}px`
+        }}
       />
       {/* Make footer elements also focus textarea when clicked */}
       <div style={styles.innerFooter}>
@@ -177,10 +191,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 };
 
 const styles: Record<string, React.CSSProperties> = {
-  baseContainer: { display: 'flex', flexDirection: 'column', flex: 1, border: '2px solid #475569', borderRadius: '0.75rem', padding: '0.5rem 0.75rem 0.5rem', transition: 'border-color 0.2s, box-shadow 0.2s' },
+  baseContainer: { display: 'flex', flexDirection: 'column', border: '2px solid #475569', borderRadius: '0.75rem', padding: '0.5rem 0.75rem 0.5rem', transition: 'border-color 0.2s, box-shadow 0.2s' },
   focus: { borderColor: '#3b82f6', boxShadow: '0 0 0 3px rgba(59,130,246,0.1)' },
   blur: { borderColor: '#475569', boxShadow: 'none' },
-  textArea: { padding: 0, margin: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '1rem', lineHeight: '1.25rem', resize: 'none', overflowY: 'hidden', minHeight: '48px', fontFamily: 'inherit' },
+  textArea: { padding: 0, margin: 0, border: 'none', outline: 'none', background: 'transparent', fontSize: '1rem', lineHeight: '1.25rem', resize: 'none', overflowY: 'hidden', fontFamily: 'inherit', color: '#e2e8f0'},
   innerFooter: { display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' },
   rightGroup: { display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto' },
   uploadContainer: { display: 'flex', flexDirection: 'column' },

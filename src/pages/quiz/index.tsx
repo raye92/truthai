@@ -14,14 +14,23 @@ export function QuizPage() {
     await handleAddQuestionLogic(newQuestion, quiz, setQuiz, setNewQuestion, setIsGeneratingAnswers);
   };
 
+  const hasQuestions = quiz.questions.length > 0;
+
   return (
     <div style={styles.quizPage}>
-      <div style={styles.quizPageHeader}>
-        <h1 style={styles.quizPageHeaderH1}>Curate Mode</h1>
-        <p style={styles.quizPageHeaderP}>Add questions to Curate AI answers</p>
+      <div style={styles.contentContainer}>
+        <div style={styles.quizPageTitle}>
+          <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
+          <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
+        </div>
+        {hasQuestions && <Quiz quiz={quiz}/>} 
       </div>
 
-      <div style={styles.quizPageContent}>
+      <div style={{
+        ...styles.inputBarWrapper,
+        padding: `16px 16px ${hasQuestions ? '16px' : '369px'} 16px`,
+        transition: 'padding 0.3s ease-in-out'
+      }}>
         <MessageInput
           value={newQuestion}
           onChange={setNewQuestion}
@@ -31,17 +40,9 @@ export function QuizPage() {
           onEnterPress={handleAddQuestion}
           showModelSelect={false}
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
+          initialHeight={150}
+          initialWidth="60%"
         />
-
-        <div style={styles.quizDisplaySection}>
-          {quiz.questions.length > 0 ? (
-            <Quiz quiz={quiz} />
-          ) : (
-            <div style={styles.emptyQuizState}>
-              <p style={styles.emptyQuizStateP}>No questions added yet. Add your first question above!</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -49,51 +50,37 @@ export function QuizPage() {
 
 const styles = {
   quizPage: {
+    display: 'flex',
+    flexDirection: 'column' as const,
     height: '100vh',
+    overflow: 'hidden',
+  },
+  contentContainer: {
+    flex: 1,
     overflowY: 'auto' as const,
     padding: '2rem',
     background: '#0f172a',
   },
-  quizPageHeader: {
+  inputBarWrapper: {
+    padding: '16px',
+    background: '#0f172a',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  quizPageTitle: {
     textAlign: 'center' as const,
     marginBottom: '2rem',
   },
-  quizPageHeaderH1: {
+  quizPageTitleH1: {
     fontSize: '2.5rem',
     fontWeight: 700,
     color: '#e2e8f0',
     margin: '0 0',
   },
-  quizPageHeaderP: {
+  quizPageTitleP: {
     color: '#94a3b8',
     fontSize: '1.125rem',
     margin: 0,
-  },
-  quizPageContent: {
-    margin: '0 auto',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '1rem',
-  },
-  quizDisplaySection: {
-    background: '#1e293b',
-    borderRadius: '1rem',
-    padding: '1.5rem',
-    border: '1px solid #475569',
-    minHeight: '400px',
-  },
-  emptyQuizState: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '200px',
-    color: '#94a3b8',
-    fontStyle: 'italic',
-    textAlign: 'center' as const,
-  },
-  emptyQuizStateP: {
-    margin: 0,
-    fontSize: '1.125rem',
   },
 };
 
