@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { Answer as AnswerType } from "./types";
 import { ProviderCard } from "./ProviderCard";
+import MarkdownRenderer from '../../components/MarkdownRenderer';
 
 interface AnswerProps {
   answer: AnswerType;
@@ -66,7 +67,9 @@ export function Answer({ answer, isWinning, percentage, maxProviders, answerKey,
         <div style={styles.quizAnswerKey}>
           {answerKey}
         </div>
-        <div style={styles.quizAnswerText} ref={textRef}>{answer.answer}</div>
+        <div style={styles.quizAnswerText} ref={textRef}>
+          <MarkdownRenderer content={answer.answer} />
+        </div>
         {isWinning && <div style={styles.quizAnswerCrown}>👑 BEST ANSWER</div>}
         <div style={styles.quizAnswerConfidence}>
           <span style={styles.quizAnswerSubtext}>Confidence score:</span>
