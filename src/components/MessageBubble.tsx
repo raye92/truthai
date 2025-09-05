@@ -1,4 +1,5 @@
 import { Message } from "../hooks/useChat";
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface MessageBubbleProps {
   message: Message;
@@ -23,7 +24,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             {message.model === 'gemini' ? 'Gemini' : 'ChatGPT'}
           </div>
         )}
-        <div style={styles.messageContent}>{message.content}</div>
+        <div style={styles.messageContent}>
+          <MarkdownRenderer content={message.content} />
+        </div>
       </div>
     </div>
   );
