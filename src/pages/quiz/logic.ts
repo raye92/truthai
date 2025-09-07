@@ -165,6 +165,8 @@ export const queryAIProviders = async (
 
       if (result && !result.errors && result.data && result.data.trim()) {
         const response = result.data.trim();
+        console.log(`[AI][${provider}] raw response:`, result.data);
+        
         const cleanedResponse = stripCodeFences(response);
 
         let answersByQuestion: Record<string, unknown> = {};
@@ -240,7 +242,7 @@ export const handleAddQuestion = async (
 
   const rawLayout = await runLayoutPrompt(input);
   let layoutItems = parseLayoutPrompt(rawLayout);
-  console.log('Raw items:', rawLayout, layoutItems);
+  console.log('Input:', rawLayout, layoutItems);
   if (layoutItems.length === 0) { // If no layout items, create a single question w/ original input
     layoutItems = [
         { question: input, questionNumber: 1, choices: [] }

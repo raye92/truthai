@@ -59,7 +59,6 @@ export function AnswerGrid({
   const computedMaxRowWidth = typeof maxRowWidth === 'number' && maxRowWidth > 0
     ? maxRowWidth
     : Math.max(0, windowWidth - 165);
-  console.log(computedMaxRowWidth)
   // Group answers into rows based on available width
   const answerRows = useMemo(() => {
     const rows: AnswerRow[] = [];

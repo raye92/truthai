@@ -8,7 +8,7 @@ const client = generateClient<Schema>({ authMode: 'apiKey' });
 export type ModelType = 'chatgpt' | 'gemini';
 interface ChatOptions { model: ModelType; useGrounding?: boolean; }
 
-// Provides ability to send a masked user message (display) with richer backend prompt
+// Provides ability to send hardcoded instructions with user message 
 export function useMaskedChat() {
   const [isLoading, setIsLoading] = useState(false);
   const conversationIdRef = useRef<string | null>(null);
