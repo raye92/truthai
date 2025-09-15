@@ -9,8 +9,8 @@ export interface MessageInputProps {
   onEnterPress?: () => void;
   submitLabel?: string;
   maxHeight?: number;
-  initialHeight?: number;
-  initialWidth?: string;
+  height?: number;
+  width?: string;
   showModelSelect?: boolean;
   model?: 'chatgpt' | 'gemini' | 'gemini_grounding';
   onModelChange?: (model: 'chatgpt' | 'gemini' | 'gemini_grounding') => void;

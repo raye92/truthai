@@ -18,19 +18,21 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onEnterPress,
   submitLabel = 'Send',
   maxHeight = 240,
-  initialHeight = 104,
-  initialWidth = '100%',
+  height = 40,
+  width = '100%',
   showModelSelect = false,
   model = 'chatgpt',
   onModelChange,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [hasEnterBeenPressed, setHasEnterBeenPressed] = useState(false);
+  // Track that a submission happened to gate clearing when load finishes
+  const hasPendingClearRef = useRef(false);
+  const [hasEverSubmitted, setHasEverSubmitted] = useState(false);
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
   // ========  FILE UPLOAD STATE ========
   const { uploads, parsedTexts, handleFiles, removeUpload, setParsedTexts, setUploads } = useFileExtraction();
-  const { userText, setUserText, fullCombined, clearAll, clearingRef } = useHiddenParsedText(value, onChange, parsedTexts);
+  const { userText, setUserText, fullCombined, clearAll, clearedRef } = useHiddenParsedText(value, onChange, parsedTexts);
   const handlePaste = usePasteImageHandler(disabled, isLoading, handleFiles);
 
   // Auto-resize textarea & focus handling
@@ -43,24 +45,34 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       el.style.height = `${newHeight}px`;
       el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
-  }, [userText, maxHeight, hasEnterBeenPressed]);
+  }, [userText, maxHeight]);
 
   const handleSubmit = () => {
     console.log('Submitting:', fullCombined);
     if (disabled || isLoading) return;
     if (!fullCombined.trim()) return;
     
-    // Mark that Enter has been pressed
-    setHasEnterBeenPressed(true);
+    // Mark that a submission is pending a clear
+    hasPendingClearRef.current = true;
+    setHasEverSubmitted(true);
     
     if (onEnterPress) onEnterPress();
-    clearingRef.current = true;
+  };
+
+  // Clear only after loading completes ======== CLEARING LOGIC AI SLOP ========
+  useEffect(() => {
+    if (clearedRef.current) return;
+    if (!hasPendingClearRef.current) return;
+    if (isLoading) return;
+
+    clearedRef.current = true;
     setUploads([]);
     setParsedTexts([]);
     clearAll();
     onChange('');
-    setTimeout(() => { clearingRef.current = false; }, 0);
-  };
+    hasPendingClearRef.current = false;
+    setTimeout(() => { clearedRef.current = false; }, 0);
+  }, [isLoading, setUploads, setParsedTexts, clearAll, onChange, clearedRef]);
 
   // Ensure clicks inside container focus textarea (unless clicking on ModelSelect dropdown)
   const focusTextarea = useCallback((e: React.MouseEvent) => {
@@ -119,13 +131,22 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       style={{
         ...styles.baseContainer,
         ...(isFocused ? styles.focus : styles.blur),
-        ...(isLoading ? { opacity: 0.5, backgroundColor: '#3D4B5E' } : {}),
+        ...(isLoading ? { opacity: 0.9, backgroundColor: '#3D4B5E', animation: 'messageinput-pulse 1.4s ease-in-out infinite' } : {}),
         cursor: disabled ? 'not-allowed' : 'text',
-        width: initialWidth,
+        width: width,
         transition: 'height 0.3s ease, width 0.3s ease'
       }}
       onClick={(e) => focusTextarea(e)}
     >
+      <style>
+        {`
+          @keyframes messageinput-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.25); opacity: 1; }
+            50% { box-shadow: 0 0 0 6px rgba(59,130,246,0.10); opacity: 0.4; }
+            100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.25); opacity: 1; }
+          }
+        `}
+      </style>
       <textarea
         ref={ref}
         value={userText}
@@ -140,8 +161,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         style={{ 
           ...styles.textArea, 
           maxHeight: maxHeight,
-          minHeight: hasEnterBeenPressed ? '48px' : `${initialHeight - 64}px`,
-          height: hasEnterBeenPressed ? 'auto' : `${initialHeight}px`
+          minHeight: height,
         }}
       />
       {/* Make footer elements also focus textarea when clicked */}

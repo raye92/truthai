@@ -92,14 +92,14 @@ export const useFileExtraction = () => {
 // Hook for syncing combined value while hiding parsed texts from UI
 export const useHiddenParsedText = (value: string, onChange: (v: string) => void, parsedTexts: { id: string; text: string }[]) => {
   const [userText, setUserText] = useState('');
-  const clearingRef = useRef(false);
+  const clearedRef = useRef(false);
   const combinedParsed = parsedTexts.map(p => p.text).join('\n\n');
   const fullCombined = combinedParsed && userText ? `${combinedParsed}\n\n${userText}` : combinedParsed || userText;
   const externalPrevRef = useRef<string | null>(null);
 
   // Push local changes upward (only when our computed string changes)
   useEffect(() => {
-    if (clearingRef.current) return; // skip while clearing
+    if (clearedRef.current) return; // skip while clearing
     if (value !== fullCombined) {
       onChange(fullCombined);
     }
@@ -108,7 +108,7 @@ export const useHiddenParsedText = (value: string, onChange: (v: string) => void
 
   // Handle external value changes (e.g., parent resets). Only run when parent value actually differs from what we last derived.
   useEffect(() => {
-    if (clearingRef.current) return;
+    if (clearedRef.current) return;
     if (externalPrevRef.current === value) return; // no real external change
     externalPrevRef.current = value;
 
@@ -128,13 +128,13 @@ export const useHiddenParsedText = (value: string, onChange: (v: string) => void
   }, [value, combinedParsed]);
 
   const clearAll = () => {
-    clearingRef.current = true;
+    clearedRef.current = true;
     setUserText('');
     externalPrevRef.current = '';
-    setTimeout(() => { clearingRef.current = false; }, 0);
+    setTimeout(() => { clearedRef.current = false; }, 0);
   };
 
-  return { userText, setUserText, fullCombined, combinedParsed, clearAll, clearingRef };
+  return { userText, setUserText, fullCombined, combinedParsed, clearAll, clearedRef };
 };
 
 // Handle paste of images (returns a callback to attach to textarea onPaste)
