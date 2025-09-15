@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Quiz } from '../../components/Quiz/Quiz';
 import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
@@ -9,16 +9,24 @@ export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
   const [newQuestion, setNewQuestion] = useState('');
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const handleAddQuestion = async () => {
     await handleAddQuestionLogic(newQuestion, quiz, setQuiz, setNewQuestion, setIsGeneratingAnswers);
+    if (contentRef.current) {
+      const el = contentRef.current;
+      // Scroll after DOM updates
+      setTimeout(() => {
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      }, 0);
+    }
   };
 
   const hasQuestions = quiz.questions.length > 0;
 
   return (
     <div style={styles.quizPage}>
-      <div style={styles.contentContainer}>
+      <div style={styles.contentContainer} ref={contentRef}>
         <div style={styles.quizPageTitle}>
           <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
           <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
@@ -28,7 +36,7 @@ export function QuizPage() {
 
       <div style={{
         ...styles.inputBarWrapper,
-        padding: `16px 16px ${hasQuestions ? '16px' : '369px'} 16px`,
+        padding: `16px 16px ${hasQuestions ? '16px' : '300px'} 16px`,
         transition: 'padding 0.3s ease-in-out'
       }}>
         <MessageInput
@@ -40,8 +48,8 @@ export function QuizPage() {
           onEnterPress={handleAddQuestion}
           showModelSelect={false}
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
-          initialHeight={150}
-          initialWidth={hasQuestions ? '100%' : '60%'}
+          height={hasQuestions ? 40 : 104}
+          width={hasQuestions ? '100%' : '60%'}
         />
       </div>
     </div>
