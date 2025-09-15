@@ -15,10 +15,9 @@ export function QuizPage() {
     await handleAddQuestionLogic(newQuestion, quiz, setQuiz, setNewQuestion, setIsGeneratingAnswers);
     if (contentRef.current) {
       const el = contentRef.current;
-      // Scroll after DOM updates
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-      }, 0);
+      });
     }
   };
 
