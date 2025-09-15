@@ -5,7 +5,6 @@ CurateAI provides a foundation for aggregating and orchestrating responses from 
 ## Features
 
 Multi-Model Integration: Connect to multiple LLM APIs (e.g., OpenAI, Anthropic, etc.).
-
 Aggregation Logic: Combine and rank outputs for improved results.
 
 ## License
