@@ -41,7 +41,7 @@ export function QuizPage() {
           showModelSelect={false}
           submitLabel={isGeneratingAnswers ? 'Generating...' : 'Add Question'}
           initialHeight={150}
-          initialWidth="60%"
+          initialWidth={hasQuestions ? '100%' : '60%'}
         />
       </div>
     </div>

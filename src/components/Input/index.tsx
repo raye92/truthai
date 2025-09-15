@@ -121,7 +121,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         ...(isFocused ? styles.focus : styles.blur),
         ...(isLoading ? { opacity: 0.5, backgroundColor: '#3D4B5E' } : {}),
         cursor: disabled ? 'not-allowed' : 'text',
-        width: hasEnterBeenPressed ? '100%' : initialWidth,
+        width: initialWidth,
         transition: 'height 0.3s ease, width 0.3s ease'
       }}
       onClick={(e) => focusTextarea(e)}
