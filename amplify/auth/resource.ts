@@ -43,13 +43,13 @@ export const auth = defineAuth({
         'http://localhost:5173/',
         'https://main.d3dzs5ykzgbon2.amplifyapp.com/',
         'https://www.curateai.app/',
-        'ur-mom.dev/'
+        'https://ur-mom.dev/'
       ],
       logoutUrls: [
         'http://localhost:5173/',
         'https://main.d3dzs5ykzgbon2.amplifyapp.com/',
         'https://www.curateai.app/',
-        'ur-mom.dev/'
+        'https://ur-mom.dev/'
       ]
     }
   },
