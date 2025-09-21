@@ -29,7 +29,7 @@ export const HistoryContainer: React.FC<{ isAuthenticated: boolean; onSelectChat
       try {
         await ChatLogic.loadConversations();
       } catch (error) {
-        console.error('Error loading more conversations:', error);
+        console.error('Error loading more conversations', error);
       } finally {
         setIsLoading(false);
       }
