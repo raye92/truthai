@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Quiz } from '../../components/Quiz/Quiz';
 import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
@@ -22,6 +22,25 @@ export function QuizPage() {
   };
 
   const hasQuestions = quiz.questions.length > 0;
+
+  // Log quiz object and contents whenever quiz changes
+  useEffect(() => {
+    console.log('=== QUIZ OBJECT ===');
+    console.log('Quiz:', quiz);
+    console.log('Quiz Questions Count:', quiz.questions.length);
+    console.log('Quiz Contents:');
+    quiz.questions.forEach((question, index) => {
+      console.log(`Question ${index + 1}:`, question.text);
+      console.log(`  Total Providers: ${question.totalProviders}`);
+      console.log(`  Answers (${question.answers.length}):`);
+      question.answers.forEach((answer, answerIndex) => {
+        console.log(`    ${String.fromCharCode(65 + answerIndex)}. ${answer.answer}`);
+        console.log(`       Providers: [${answer.providers.join(', ')}]`);
+      });
+      console.log('---');
+    });
+    console.log('==================');
+  }, [quiz]);
 
   return (
     <div style={styles.quizPage}>
