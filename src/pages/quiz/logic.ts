@@ -183,13 +183,27 @@ export const queryAIProviders = async (
         for (const [questionNumberKeyRaw, value] of Object.entries(answersByQuestion)) {
           const questionNumberKey = String(questionNumberKeyRaw);
           const questionText = questionTextMap[questionNumberKey] || '';
-          if (!questionText) continue;
+
+          const findQuestion = (quizState: QuizType): number => {
+            // 1) Prefer matches by exact text
+            const textMatches = quizState.questions
+              .map((q, idx) => ({ q, idx }))
+              .filter(({ q }) => q.text === questionText);
+
+            if (textMatches.length === 1) return textMatches[0].idx;
+
+            // 2) For duplicate question texts: match questionNumber
+            const numMatches = textMatches.filter(({ q }) => String(q.questionNumber ?? '') === questionNumberKey);
+            if (numMatches.length >= 1) return numMatches[0].idx;
+            // 3) Fallback to first of the text matches
+            return textMatches[0].idx;
+          };
 
           const addAnswerTextToQuestion = (answerText: string) => {
             const trimmed = String(answerText).trim();
             if (!trimmed) return;
             setQuiz(prevQuiz => {
-              const questionIndex = prevQuiz.questions.findIndex(q => q.text === questionText);
+              const questionIndex = findQuestion(prevQuiz);
               if (questionIndex < 0) return prevQuiz;
               const questionToUpdate = prevQuiz.questions[questionIndex];
               const answerToAdd = createAnswer(trimmed, provider);
