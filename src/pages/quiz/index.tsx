@@ -9,8 +9,6 @@ export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
   const [newQuestion, setNewQuestion] = useState('');
   const [isGeneratingAnswers, setIsGeneratingAnswers] = useState(false);
-  // ======== MOBILE DETECTION ========
-  const [isMobile, setIsMobile] = useState(false); 
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   const handleAddQuestion = async () => {
@@ -24,18 +22,6 @@ export function QuizPage() {
   };
 
   const hasQuestions = quiz.questions.length > 0;
-
-  // ======== MOBILE DETECTION ========
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Log quiz object and contents whenever quiz changes
   useEffect(() => {
@@ -63,17 +49,6 @@ export function QuizPage() {
           <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
           <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
         </div>
-        {/* ======== MOBILE DETECTION ======== */}
-        {isMobile && (
-          <div style={styles.mobileOverlay} onClick={() => setIsMobile(false)}>
-            <div style={styles.mobileAlertBox} onClick={(e) => e.stopPropagation()}>
-              <div style={styles.mobileAlertText}>
-                CurateAI is best on the web - Phone support coming soon!
-              </div>
-            </div>
-          </div>
-        )}
-        
         {hasQuestions && <Quiz quiz={quiz}/>} 
       </div>
 
@@ -132,40 +107,6 @@ const styles = {
     color: '#94a3b8',
     fontSize: '1.125rem',
     margin: 0,
-  },
-  // ======== MOBILE DETECTION ========
-  mobileOverlay: {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    display: 'flex' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    zIndex: 1000,
-    padding: '20px',
-  },
-  mobileAlertBox: {
-    display: 'flex' as const,
-    alignItems: 'center' as const,
-    gap: '16px',
-    padding: '24px',
-    maxWidth: '400px',
-    width: '100%',
-    background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-    border: '1px solid #475569',
-    borderRadius: '16px',
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
-    cursor: 'pointer',
-  },
-  mobileAlertText: {
-    color: '#f1f5f9',
-    fontSize: '1.1rem',
-    fontWeight: 500,
-    textAlign: 'center' as const,
-    lineHeight: 1.4,
   },
 };
 
