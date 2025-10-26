@@ -79,7 +79,7 @@ export function QuizPage() {
 
       <div style={{
         ...styles.inputBarWrapper,
-        padding: `16px 16px ${hasQuestions ? '16px' : '300px'} 16px`,
+        padding: `16px 16px ${hasQuestions ? '16px' : '50vh'} 16px`,
         transition: 'padding 0.3s ease-in-out'
       }}>
         <MessageInput
