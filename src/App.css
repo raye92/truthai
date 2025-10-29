@@ -198,7 +198,8 @@
 .main-content {
   flex: 1;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-left: 0;
   transition: margin-left 0.3s ease-in-out;
 }

@@ -85,7 +85,7 @@ export default function App() {
               onClick={() => setSidebarOpen(false)}
             >
               <QuestionMarkIcon width={16} height={16} fill="currentColor" />
-              How To
+              Home
             </Link>
           </nav>
         </div>
