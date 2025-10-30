@@ -4,6 +4,7 @@ import type { Quiz as QuizType } from '../../components/Quiz/types';
 import { createQuiz } from '../../components/Quiz/utils';
 import { handleAddQuestion as handleAddQuestionLogic } from './logic';
 import { MessageInput } from '../../components/Input';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 export function QuizPage() {
   const [quiz, setQuiz] = useState<QuizType>(createQuiz());
@@ -24,6 +25,26 @@ export function QuizPage() {
   };
 
   const hasQuestions = quiz.questions.length > 0;
+
+  const onCheckoutClick = async () => {
+    try {
+      const session = await fetchAuthSession();
+      const token = session.tokens?.idToken?.toString();
+      if (!token) throw new Error('Missing ID token');
+      const baseUrl = 'https://m65abf97cg.execute-api.us-west-1.amazonaws.com/dev';
+      const res = await fetch(baseUrl + '/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ quantity: 1 })
+      });
+      if (!res.ok) throw new Error('Failed to create checkout session');
+      const { url } = await res.json();
+      if (url) window.location.assign(url);
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Unable to start checkout. Please try again.');
+    }
+  };
 
   // ======== MOBILE DETECTION ========
   useEffect(() => {
@@ -62,6 +83,9 @@ export function QuizPage() {
         <div style={styles.quizPageTitle}>
           <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
           <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
+          <div style={{ marginTop: '1rem' }}>
+            <button onClick={onCheckoutClick} style={styles.checkoutButton}>Checkout</button>
+          </div>
         </div>
         {/* ======== MOBILE DETECTION ======== */}
         {isMobile && (
@@ -132,6 +156,15 @@ const styles = {
     color: '#94a3b8',
     fontSize: '1.125rem',
     margin: 0,
+  },
+  checkoutButton: {
+    backgroundColor: '#22c55e',
+    color: '#0f172a',
+    border: 'none',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    fontWeight: 600,
+    cursor: 'pointer',
   },
   // ======== MOBILE DETECTION ========
   mobileOverlay: {
