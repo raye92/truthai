@@ -12,7 +12,7 @@ export const handler: Schema['promptGemini']['functionHandler'] = async (event, 
     // Configure generation settings based on whether grounding is requested
     let config: any = {
         thinkingConfig: {
-            thinkingBudget: 0 // Disables thinking
+            thinkingBudget: -1 // Disables thinking
         }
     };
     if (useGrounding) {
