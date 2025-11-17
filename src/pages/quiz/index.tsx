@@ -83,9 +83,9 @@ export function QuizPage() {
         <div style={styles.quizPageTitle}>
           <h1 style={styles.quizPageTitleH1}>Curate Mode</h1>
           <p style={styles.quizPageTitleP}>Add questions to Curate AI answers</p>
-          <div style={{ marginTop: '1rem' }}>
+          {/* <div style={{ marginTop: '1rem' }}>
             <button onClick={onCheckoutClick} style={styles.checkoutButton}>Checkout</button>
-          </div>
+          </div> */}
         </div>
         {/* ======== MOBILE DETECTION ======== */}
         {isMobile && (
