@@ -12,7 +12,7 @@ export const handler: Schema['promptGpt']['functionHandler'] = async (event, con
     });
 
     const response = await openai.responses.create({
-        model: "gpt-4.1-mini",
+        model: "gpt-5.1",
         input: prompt
     });
 
